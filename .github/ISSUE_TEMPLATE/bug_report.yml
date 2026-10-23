@@ -1,0 +1,63 @@
+name: Bug report
+description: Something does not work as documented.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting. Please do not report security vulnerabilities here; see SECURITY.md.
+        Remove API keys, emails and your project data before pasting logs.
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Canvas and nodes
+        - Screens and the screen editor
+        - Tables and data
+        - Flows and triggers
+        - Integrations
+        - AI builder (Claude Code or API key)
+        - Publishing on this computer
+        - Running on your own server
+        - Import and export (.tproject)
+        - Account and sign-in
+        - Install and startup
+        - Documentation
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What did you do, what did you expect, and what happened instead?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Open a project ...
+        2. Click ...
+        3. See ...
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version or commit
+      placeholder: v0.1.0 or a commit SHA
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Operating system, Node.js version, Claude Code version (`claude --version`), installed app or running from source.
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: The terminal output of `npm run desktop`, or `%APPDATA%\Tent NoCode\logs\boot.log`.
+      render: text
