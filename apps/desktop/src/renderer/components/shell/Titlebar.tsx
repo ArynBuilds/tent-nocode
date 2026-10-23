@@ -1,7 +1,25 @@
-import { ArrowLeft, Minus, Moon, PanelBottom, PanelLeft, PanelRight, Square, Sun, X } from 'lucide-react';
+import { ArrowLeft, ChevronRight, Minus, Moon, PanelBottom, PanelLeft, PanelRight, Send, Square, Sun, X } from 'lucide-react';
+import { useQuery } from '../../lib/data/useQuery.js';
 import { desk } from '../../lib/desk.js';
+import { useOrg } from '../../lib/OrgContext.js';
 import { toggleTheme, useTheme } from '../../lib/theme.js';
+import { Logo } from '../brand/Logo.js';
 import styles from './shell.module.css';
+
+/** Where you are in the editor: Projects, then this project's name; Projects goes back. */
+function Crumb({ projectId, onBack }: { projectId: string; onBack: () => void }) {
+  const { orgId } = useOrg();
+  const projects = useQuery(`titlebar:projects:${orgId}`, () => desk.listProjects(orgId), [orgId]);
+  const name = projects.data?.find((p) => p.id === projectId)?.name ?? '';
+  return (
+    <div className={styles.crumb}>
+      <Logo size={16} className={styles.crumbMark} />
+      <button type="button" className={styles.crumbLink} onClick={onBack}>Projects</button>
+      <ChevronRight size={13} className={styles.crumbSep} />
+      <span className={styles.crumbName} title={name}>{name}</span>
+    </div>
+  );
+}
 
 /**
  * The 35px title bar (user-directed 2026-07-20, the Cursor reference): a drag
@@ -14,9 +32,11 @@ import styles from './shell.module.css';
  * row). The dashboard passes none of the panel toggles; the editor takeover
  * passes onBack — the ruled top-left way back to the dashboard.
  */
-export function Titlebar({ onBack, onPublish, toggleLabel, onToggleSide, bottomVisible = false, onToggleBottom, panelOpen = false, onTogglePanel }: {
+export function Titlebar({ onBack, projectId, onPublish, toggleLabel, onToggleSide, bottomVisible = false, onToggleBottom, panelOpen = false, onTogglePanel }: {
   /** D5: the editor takeover's top-left Back — absent on the dashboard. */
   onBack?: () => void;
+  /** The project open in the editor - the bar names it beside Back. */
+  projectId?: string;
   /** D12 (verbatim: "on top left there will be button called publish/export"):
    * the editor's door to the one project screen — absent on the dashboard. */
   onPublish?: () => void;
@@ -41,6 +61,14 @@ export function Titlebar({ onBack, onPublish, toggleLabel, onToggleSide, bottomV
           <ArrowLeft size={16} />
         </button>
       ) : null}
+      {projectId !== undefined && onBack !== undefined ? <Crumb projectId={projectId} onBack={onBack} /> : null}
+      {onPublish !== undefined ? (
+        <button type="button" className={styles.publishBtn} onClick={onPublish}>
+          <Send size={13} />
+          <span>Publish / Export</span>
+        </button>
+      ) : null}
+      <div className={styles.titlebarSpacer} />
       {onToggleSide !== undefined ? (
         <button
           type="button"
@@ -52,27 +80,6 @@ export function Titlebar({ onBack, onPublish, toggleLabel, onToggleSide, bottomV
           <PanelLeft size={16} />
         </button>
       ) : null}
-      {onPublish !== undefined ? (
-        <button
-          type="button"
-          className={`${styles.titlebarBtn} ${styles.titlebarTextBtn}`}
-          onClick={onPublish}
-        >
-          Publish/Export
-        </button>
-      ) : null}
-      <div className={styles.titlebarSpacer} />
-      {/* LIGHT MODE toggle (user-ruled 2026-07-28): per-device view-state, titlebar-owned
-          like the panel toggles. */}
-      <button
-        type="button"
-        className={styles.titlebarBtn}
-        aria-label={theme === 'dark' ? 'Light mode' : 'Dark mode'}
-        title={theme === 'dark' ? 'Light mode' : 'Dark mode'}
-        onClick={toggleTheme}
-      >
-        {theme === 'dark' ? <Sun size={15} /> : <Moon size={15} />}
-      </button>
       {onToggleBottom !== undefined ? (
         <button
           type="button"
@@ -95,6 +102,17 @@ export function Titlebar({ onBack, onPublish, toggleLabel, onToggleSide, bottomV
           <PanelRight size={16} />
         </button>
       ) : null}
+      {/* LIGHT MODE toggle (user-ruled 2026-07-28): per-device view-state, titlebar-owned
+          like the panel toggles. */}
+      <button
+        type="button"
+        className={styles.titlebarBtn}
+        aria-label={theme === 'dark' ? 'Light mode' : 'Dark mode'}
+        title={theme === 'dark' ? 'Light mode' : 'Dark mode'}
+        onClick={toggleTheme}
+      >
+        {theme === 'dark' ? <Sun size={15} /> : <Moon size={15} />}
+      </button>
       <div className={styles.winControls}>
         <button type="button" className={styles.winBtn} aria-label="Minimize" onClick={() => void desk.windowControl('minimize')}>
           <Minus size={14} />

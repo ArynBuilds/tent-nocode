@@ -1,11 +1,12 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { ArrowUp, CodeXml, Crosshair, LoaderCircle, Sparkles, X } from 'lucide-react';
 import type { OrgRole, ThreadMode } from '@tent-nocode/core';
 import type { MessageRow, WorkRunView } from '../../../shared/ipc.js';
 import { can } from '../../../shared/roles.js';
 import { useLive } from '../../lib/data/useLive.js';
 import { useQuery } from '../../lib/data/useQuery.js';
 import { desk } from '../../lib/desk.js';
-import { store } from '../../lib/canvas/store.js';
+import { store, useValue } from '../../lib/canvas/store.js';
 import type { CodeSelection } from '../../lib/canvas/store.js';
 import { ambientScreen, ambientSelection } from '../../lib/ambientSelection.js';
 import { getTheme } from '../../lib/theme.js';
@@ -74,7 +75,7 @@ export function ConversationView({ threadId, jobParam, hotkeys = true, showHeade
   useLive(['runs', 'events'], () => detailsQuery.refetch());
 
   // Esc interrupts this thread's execution, never answers a consent question; focus lands in the composer.
-  const composerInputRef = useRef<HTMLInputElement | null>(null);
+  const composerInputRef = useRef<HTMLTextAreaElement | null>(null);
   const escState = useRef({ data: convQuery.data, role, intent: intentQuery.data?.intent ?? null });
   escState.current = { data: convQuery.data, role, intent: intentQuery.data?.intent ?? null };
   useEffect(() => {
@@ -131,10 +132,10 @@ export function ConversationView({ threadId, jobParam, hotkeys = true, showHeade
   }, [convQuery.data, activityQuery.data, detailsQuery.data, intentQuery.data, deltas]);
 
   if (convQuery.error) {
-    return <div className={styles.placeholder}>failed to load conversation: {convQuery.error}</div>;
+    return <div className={styles.placeholder}>This chat could not load: {convQuery.error}</div>;
   }
   if (!convQuery.data) {
-    return <div className={styles.placeholder}>loading conversation…</div>;
+    return <div className={styles.placeholder} aria-busy="true"><span className={styles.loadingDots} /></div>;
   }
 
   const view = convQuery.data;
@@ -162,7 +163,7 @@ export function ConversationView({ threadId, jobParam, hotkeys = true, showHeade
       {/* Header keeps the title only; other chrome lives in the composer meta row. */}
       {showHeader ? (
         <div className={styles.head}>
-          <h2>{thread.title.trim() || 'untitled thread'}</h2>
+          <h2>{thread.title.trim() || 'New chat'}</h2>
         </div>
       ) : null}
       <div className={showComposer ? styles.scroll : `${styles.scroll} ${styles.scrollNoComposer}`}>
@@ -176,6 +177,12 @@ export function ConversationView({ threadId, jobParam, hotkeys = true, showHeade
           statusWord={deriveStatus(feedItems, activeRunIds.length)}
         />
       </div>
+      {/* Without a composer here, the plan still shows, docked under the feed. */}
+      {!showComposer ? (
+        <div className={styles.planDock}>
+          <IntentChecklist intent={intentQuery.data?.intent ?? null} />
+        </div>
+      ) : null}
       {/* The float wrapper lets the feed scroll beneath the capsule; the scroll pads its bottom. */}
       {showComposer ? (
       <div className={styles.composerFloat}>
@@ -219,10 +226,12 @@ interface ChatComposerProps {
   role: OrgRole;
   /** Seeds the input's initial text; read only on first render, never auto-sends. */
   initialText?: string;
+  /** A suggestion picked elsewhere: each new n replaces the text and focuses the box, never sends. */
+  seed?: { text: string; n: number } | null;
   /** Lets the thread's Esc handler land focus here after an interrupt. */
-  inputRef?: React.RefObject<HTMLInputElement | null>;
+  inputRef?: React.RefObject<HTMLTextAreaElement | null>;
   placeholder?: string;
-  /** Composer-owned chrome rendered inside the pill's right edge. */
+  /** Composer-owned chrome rendered inside the capsule's right edge. */
   trailing?: React.ReactNode;
   /** When a threadless composer creates its thread, call this instead of navigating. */
   onCreated?: (threadId: string) => void;
@@ -232,33 +241,55 @@ interface ChatComposerProps {
   disabled?: boolean;
 }
 
-/** Pinned composer: sends into the open thread, or creates one on the fly when threadId is null. */
-export function ChatComposer({ orgId, threadId, role, initialText, inputRef, placeholder, trailing, onCreated, onSent, disabled = false }: ChatComposerProps) {
+// The box grows with its text up to this height, then scrolls.
+const COMPOSER_MAX_PX = 168;
+
+/** The composer capsule: sends into the open thread, or creates one when threadId is null. Enter sends, Shift+Enter breaks the line. */
+export function ChatComposer({ orgId, threadId, role, initialText, seed, inputRef, placeholder, trailing, onCreated, onSent, disabled = false }: ChatComposerProps) {
   const [text, setText] = useState(initialText ?? '');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | undefined>(undefined);
+  const ownRef = useRef<HTMLTextAreaElement | null>(null);
+  const boxRef = inputRef ?? ownRef;
   // A threadless send births its thread in the focused project.
   const { focusedProjectId } = useFocusedProject();
+  // What rides the next message: a picked screen part and selected code lines.
+  const armed = useValue('composer.armed', () => store.panel.armed, []);
+  const armedCode = useValue('composer.armedCode', () => store.panel.armedCode, []);
+
+  useLayoutEffect(() => {
+    const el = boxRef.current;
+    if (el === null) return;
+    el.style.height = '0px';
+    el.style.height = `${Math.min(el.scrollHeight, COMPOSER_MAX_PX)}px`;
+  }, [text, boxRef]);
+
+  useEffect(() => {
+    if (seed === undefined || seed === null) return;
+    setText(seed.text);
+    const el = boxRef.current;
+    if (el !== null) { el.focus(); el.setSelectionRange(seed.text.length, seed.text.length); }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [seed?.n]);
 
   if (!can(role, 'submit')) {
-    return <div className={styles.composerNote}>you have read-only access to this thread</div>;
+    return <div className={styles.composerNote}>You can read this chat but not write in it.</div>;
   }
 
   async function send(): Promise<void> {
     const value = text.trim();
-    if (!value) return;
+    if (!value || submitting || disabled) return;
     setSubmitting(true);
     setError(undefined);
     // An armed inspector selection rides this ask; consumed only when a real desk turn took it.
-    const armed = store.panel.armed;
-    // An armed code selection rides the ask as text appended to the message.
-    const armedCode = store.panel.armedCode;
-    const outgoing = armedCode !== null ? value + codeSelectionBlock(armedCode) : value;
+    const armedNow = store.panel.armed;
+    const armedCodeNow = store.panel.armedCode;
+    const outgoing = armedCodeNow !== null ? value + codeSelectionBlock(armedCodeNow) : value;
     // The ambient envelope rides every ask: theme, open screen, and current selection.
     const screen = ambientScreen();
     const result = await desk.sendChat(
       orgId, threadId, outgoing,
-      armed ? { sceneSlug: armed.sceneSlug, nodeId: armed.nodeId } : undefined,
+      armedNow ? { sceneSlug: armedNow.sceneSlug, nodeId: armedNow.nodeId } : undefined,
       threadId === null ? focusedProjectId ?? undefined : undefined,
       { theme: getTheme(), ...(screen !== null ? { screen } : {}), selection: ambientSelection() },
     );
@@ -267,13 +298,14 @@ export function ChatComposer({ orgId, threadId, role, initialText, inputRef, pla
       setError(result.error);
       return;
     }
-    if (armed && result.data?.runId !== null) store.armSelection(null);
-    if (armedCode !== null && result.data?.runId !== null) store.armCodeSelection(null);
+    if (armedNow && result.data?.runId !== null) store.armSelection(null);
+    if (armedCodeNow !== null && result.data?.runId !== null) store.armCodeSelection(null);
     if (threadId === null) {
       if (!result.data) {
-        setError('thread created but no thread id was returned');
+        setError('The chat was created but did not answer with its id. Try again.');
         return;
       }
+      setText('');
       if (onCreated) onCreated(result.data.threadId);
       else navigate(`/thread/${result.data.threadId}`);
       onSent?.();
@@ -283,30 +315,62 @@ export function ChatComposer({ orgId, threadId, role, initialText, inputRef, pla
     onSent?.();
   }
 
+  const ready = text.trim() !== '' && !submitting && !disabled;
   return (
     <div className={styles.composerDock}>
-      <div className={styles.composer}>
-        <input
-          ref={inputRef}
-          className={styles.cbox}
-          placeholder={placeholder ?? 'Ask anything…'}
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          disabled={submitting || disabled}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') void send();
-          }}
-        />
-        {trailing}
-        <button
-          type="button"
-          className={styles.send}
-          aria-label="Send"
-          disabled={submitting || disabled || text.trim() === ''}
-          onClick={() => void send()}
-        >
-          ↑
-        </button>
+      <div className={disabled ? `${styles.composer} ${styles.composerOff}` : styles.composer} onClick={() => boxRef.current?.focus()}>
+        {armed !== null || armedCode !== null ? (
+          <div className={styles.attachRow}>
+            {armed !== null ? (
+              <span className={styles.attach} title={`This part of ${armed.sceneTitle} goes with your next message`}>
+                <Crosshair size={12} />
+                <span className={styles.attachText}>{armed.sceneTitle}</span>
+                <button type="button" className={styles.attachDrop} aria-label="Remove" onClick={(e) => { e.stopPropagation(); store.armSelection(null); }}>
+                  <X size={11} />
+                </button>
+              </span>
+            ) : null}
+            {armedCode !== null ? (
+              <span className={styles.attach} title={`Lines ${armedCode.fromLine} to ${armedCode.toLine} go with your next message`}>
+                <CodeXml size={12} />
+                <span className={styles.attachText}>{armedCode.subject}, lines {armedCode.fromLine}-{armedCode.toLine}</span>
+                <button type="button" className={styles.attachDrop} aria-label="Remove" onClick={(e) => { e.stopPropagation(); store.armCodeSelection(null); }}>
+                  <X size={11} />
+                </button>
+              </span>
+            ) : null}
+          </div>
+        ) : null}
+        <div className={styles.composerRow}>
+          <Sparkles size={16} className={styles.composerMark} aria-hidden="true" />
+          <textarea
+            ref={boxRef}
+            rows={1}
+            className={styles.cbox}
+            placeholder={placeholder ?? 'Ask anything…'}
+            value={text}
+            spellCheck
+            onChange={(e) => { setText(e.target.value); if (error !== undefined) setError(undefined); }}
+            disabled={disabled}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) {
+                e.preventDefault();
+                void send();
+              }
+            }}
+          />
+          {trailing}
+          <button
+            type="button"
+            className={styles.send}
+            aria-label="Send"
+            title="Send (Enter)"
+            disabled={!ready}
+            onClick={(e) => { e.stopPropagation(); void send(); }}
+          >
+            {submitting ? <LoaderCircle size={17} className={styles.spin} /> : <ArrowUp size={17} strokeWidth={2.2} />}
+          </button>
+        </div>
       </div>
       {error ? <div className={styles.errorText}>{error}</div> : null}
     </div>

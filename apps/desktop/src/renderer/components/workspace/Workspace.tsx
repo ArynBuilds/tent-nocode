@@ -21,6 +21,7 @@ import { channelDrop } from '../../lib/page-edit/channelLanes.js';
 import { CanvasEngine, activeEditor } from '../canvas/CanvasEngine.js';
 import type { EngineDecor } from '../canvas/CanvasEngine.js';
 import { CornerLegend } from '../canvas/CornerLegend.js';
+import { EmptyCanvas } from '../canvas/EmptyCanvas.js';
 import type { CanvasNode } from '../canvas/NodeCard.js';
 import { DropRefusal } from '../canvas/WireLayer.js';
 import { DropTarget } from '../canvas/DropTarget.js';
@@ -97,6 +98,7 @@ export function Workspace({ cluster }: { cluster: { title: string } }) {
   const elementSel = useValue('ws.elementSel', () => store.selectedElement(), []);
   const mode = useValue('ws.mode', () => store.mode, []);
   const descend = useValue('ws.descend', () => store.panel.descend, []);
+  const nodePropsAsk = useValue('ws.nodeProps', () => store.panel.nodeProps, []);
   const catalogAdd = useValue('ws.catalogAdd', () => store.panel.catalogAdd, []);
   const byId = new Map(nodes.map((n) => [n.id, n]));
   const project = projects.find((p) => p.id === projectId) ?? null;
@@ -116,7 +118,12 @@ export function Workspace({ cluster }: { cluster: { title: string } }) {
   const [confirmDelete, setConfirmDelete] = useState<DeleteConfirm | null>(null);
   const [ask, setAsk] = useState<{ rect: { x: number; y: number; w: number; h: number }; client: Placed; frame: { screenId: string; scene: string; rel: { x: number; y: number; w: number; h: number } } | null } | null>(null);
   const placeAt = useRef<Placed | null>(null);
-  const cardOn = (nodeId: string): void => { const n = byId.get(nodeId); setConfigCard({ mode: 'node', client: null, sel: n !== undefined ? citizenSel(n) : { citizen: true, kind: 'step', nodeId, label: nodeId, projectId } }); };
+  const cardOn = (nodeId: string): void => { const n = byId.get(nodeId); setConfigCard({ mode: 'node', client: null, sel: n !== undefined ? citizenSel(n) : { citizen: true, kind: 'step', nodeId, label: '', projectId } }); };
+  // A node's properties: a Table opens straight to its rows, every other node opens its card.
+  const openNodeProps = (n: NodeRecord): void => {
+    if (n.kind === 'dataset') void openVerbDoor({ orgId, say: quiet }, citizenSel(n), 'open-rows');
+    else cardOn(n.id);
+  };
   const newTrigger = (prefill?: { dataset?: string; operation?: string }): void => setConfigCard({ mode: 'trigger-new', ...(prefill !== undefined ? { prefill } : {}), client: null });
 
   const integrationRows = usePlaceableIntegrations(orgId, { projectKind: project?.kind ?? null });
@@ -138,7 +145,7 @@ export function Workspace({ cluster }: { cluster: { title: string } }) {
   // ---- the add lane: births through the kernel's doors; the born card lands at the remembered spot ----
   function placeBorn(nodeId: string | null): void {
     if (nodeId === null || placeAt.current === null) return;
-    store.placeNodes({ [nodeId]: placeAt.current }, 'user');
+    store.placeNodes({ [nodeId]: store.freeSpotNear(nodeId, placeAt.current) }, 'user');
     placeAt.current = null;
   }
   async function connectionFor(service: string): Promise<{ id: string; label: string; projectId: string | null; insideTables: Record<string, string> } | null> {
@@ -286,6 +293,7 @@ export function Workspace({ cluster }: { cluster: { title: string } }) {
   const addRef = useRef(handleCatalogAdd); addRef.current = handleCatalogAdd;
   useEffect(() => { if (catalogAdd !== null) addRef.current(catalogAdd.add); }, [catalogAdd]);
   useEffect(() => { if (descend !== null) setEntered(descend.target); }, [descend]);
+  useEffect(() => { const n = nodePropsAsk !== null ? byId.get(nodePropsAsk.nodeId) : undefined; if (n !== undefined) openNodeProps(n); }, [nodePropsAsk]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // The create pick: Screen + the five placeable primitives - a bare instance reads "New instance" until its component is picked in properties.
   const armOf = (name: PrimitiveName): CreateArm => ({ kind: 'primitive', label: PRIMITIVES[name].title, name, prefill: {} });
@@ -301,7 +309,7 @@ export function Workspace({ cluster }: { cluster: { title: string } }) {
     if (choice.pick === 'node') {
       const target = byId.get(choice.id);
       if (source !== undefined && target !== undefined) void wireDrop(lane, source, target, { x: 120, y: 120 });
-      else if (target !== undefined) store.openInspector(citizenSel(target));
+      else if (target !== undefined) openNodeProps(target);
     } else if (choice.pick === 'insert') {
       if (choice.name !== undefined) void insertNamed(choice.kind, choice.name, choice.typed, source);
       else if (choice.kind === 'tool' && source === undefined) navigate(projectId !== null ? `/code/${projectId}?draft=1` : '/code?draft=1');
@@ -355,7 +363,7 @@ export function Workspace({ cluster }: { cluster: { title: string } }) {
     decorate: (n) => { const badge = badges.get(n.id); const d: CanvasNode = badge !== undefined ? { ...n, badge } : { ...n }; return n.id.startsWith('fstep:') && badge !== undefined ? { ...d, growExtra: store.lastRunWordFor(n.id) ?? null, onBadge: () => store.startReplay(n.id) } : d; },
     nodeFold: (n) => foldDoorFor(n.id, selected),
     nodeExtras: (n) => { const slug = store.sceneSlugOf(n.id); return slug === null ? [] : [{ key: 'play', icon: Play, label: 'Play - open the app full screen', onAct: () => { if (!store.openFocusedScene(slug)) quiet('the app surface is not ready'); } }]; },
-    nodeProps: (n) => { const full = byId.get(n.id); return full === undefined ? undefined : () => store.openInspector(citizenSel(full)); },
+    nodeProps: (n) => { const full = byId.get(n.id); return full === undefined ? undefined : () => openNodeProps(full); },
     outPortsFor: (id) => store.outPortsFor(id),
     onNodeVerb: (n, door) => { const full = byId.get(n.id); if (full !== undefined) void openVerbDoor({ orgId, say: quiet }, citizenSel(full), door); },
     onPortPlus: (n) => browse({ headline: 'What happens next?', source: { id: n.id, kind: n.kind, label: n.label } }),
@@ -366,13 +374,12 @@ export function Workspace({ cluster }: { cluster: { title: string } }) {
   };
   // A selected wire opens its sentence in the inspector; a single card re-aims an open contract form.
   useEffect(() => { if (wireSel !== null) { const e = edges.find((x) => x.from === wireSel.from && x.to === wireSel.to && x.action === wireSel.action && x.rule === wireSel.rule && x.param === wireSel.param && x.port === wireSel.port && x.slot === wireSel.slot); const subject = e !== undefined ? wireSubject(e, byId, projectId) : null; if (subject !== null) store.openInspector(subject); } }, [wireSel]); // eslint-disable-line react-hooks/exhaustive-deps
-  useEffect(() => { if (selected.size === 1) { const n = byId.get([...selected][0]!); if (n !== undefined) store.retargetInspector(citizenSel(n)); } }, [selected]); // eslint-disable-line react-hooks/exhaustive-deps
   // A selected element re-aims the open inspector at its properties (selection opens properties).
   useEffect(() => { if (elementSel !== null && elementSel.elementId !== 'root') { const s = store.screenOf(elementSel.screenId); if (s !== undefined) store.retargetInspector({ sceneId: s.sceneId, sceneSlug: elementSel.scene, sceneTitle: s.title, nodeId: elementSel.elementId, extraIds: [...elementSel.extras] }); } }, [elementSel]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (entered !== null) {
     const onRowEdit: ComponentProps<typeof WorkspaceEntered>['onRowEdit'] = () => undefined;
-    return <WorkspaceEntered title={cluster.title} entered={entered} quietLine={quietLine} onExit={() => setEntered(null)} onRowEdit={onRowEdit} />;
+    return <WorkspaceEntered title={cluster.title} entered={entered} quietLine={quietLine} orgId={orgId} projectId={projectId} say={quiet} onExit={() => setEntered(null)} onRowEdit={onRowEdit} />;
   }
   const menuNode = (n: { id: string }): NodeRecord | undefined => byId.get(n.id);
   return (
@@ -389,8 +396,14 @@ export function Workspace({ cluster }: { cluster: { title: string } }) {
         ask={ask} onAskPick={(arm) => { const g = ask; setAsk(null); const editor = activeEditor.get(); if (g !== null && editor !== null) void landCreate(editor, createDeps, arm, g); }} onAskClose={() => setAsk(null)}
       />
       {quietLine !== null ? <div className={styles.benchQuietFloat}>{quietLine}</div> : null}
-      {projectId !== null && nodes.length === 0 ? <div className={canvasStyles.emptyTeach}>right-click to create - drag from a port to connect</div> : null}
-      <CornerLegend storageKey={`obs-legend:${orgId}`} lines={['V - C - H: select - create - hand', 'right-click: create', 'drag from a port: connect', 'double-click: open', 'Shift+1/2/0: fit - selection - 100%']} />
+      {projectId !== null && nodes.length === 0 ? <EmptyCanvas website={project?.kind === 'website'} onAdd={(kind) => addCitizen(kind)} onNamed={(kind, name, typed) => void insertNamed(kind, name, typed)} /> : null}
+      <CornerLegend storageKey={`obs-legend:${orgId}`} items={[
+        { does: 'Select · Create · Hand', keys: 'V · C · H' },
+        { does: 'Create menu', keys: 'Right-click' },
+        { does: 'Connect', keys: 'Drag a port' },
+        { does: 'Open', keys: 'Double-click' },
+        { does: 'Fit all · Selection · 100%', keys: 'Shift 1 · 2 · 0' },
+      ]} />
       <WorkspaceOverlays
         confirmDelete={confirmDelete}
         onConfirmDelete={(name) => { setConfirmDelete(null); store.markGone([`ds:${name}`]); void desk.humanDeleteDataset(orgId, name, projectId ?? undefined); }}
@@ -404,7 +417,7 @@ export function Workspace({ cluster }: { cluster: { title: string } }) {
           doors: doorRows, placeDoor: (service, endpoint, at) => void placeDoorStep(service, endpoint, at),
           triggers: triggerRows, placeTrigger: (service, trigger, at) => void placeTriggerRow(service, trigger, at),
           openVerb: (n, door) => { const full = menuNode(n); if (full !== undefined) void openVerbDoor({ orgId, say: quiet }, citizenSel(full), door); },
-          openProps: (n) => { const full = menuNode(n); if (full !== undefined) store.openInspector(citizenSel(full)); },
+          openProps: (n) => { const full = menuNode(n); if (full !== undefined) openNodeProps(full); },
           connect: (n) => browse({ headline: 'What happens next?', source: { id: n.id, kind: n.kind, label: n.label } }),
           deleteIds,
         }}

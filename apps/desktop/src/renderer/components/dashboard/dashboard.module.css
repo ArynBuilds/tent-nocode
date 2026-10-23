@@ -1,210 +1,346 @@
 /*
- * The dashboard's projects surface: full-bleed card grid on the bare ground,
- * one surface frame on hover, raised pill verbs. Every color is a token.
+ * The apps page: a greeting, one main verb, and the projects as soft cards on the ground.
+ * Cards rise in once, lift on hover, and open on click. Every color is a token.
  */
-
-/* The dashboard reads one type step bigger; the editor keeps the app ladder. */
-.scaleUp {
-  --fs-caption: 12px;
-  --fs-small: 13px;
-  --fs-body: 15px;
-  --fs-title: 17px;
-  --fs-heading: 20px;
-}
 
 .home {
   flex: 1;
   min-height: 0;
   overflow: auto;
   background: var(--ground);
-  padding: var(--s5) var(--s6);
+  padding: var(--s6) clamp(24px, 4vw, 56px) 64px;
+  scrollbar-gutter: stable;
 }
 
+/* ---- the head: greeting left, find + new right ---- */
+
 .pageHead {
+  max-width: 1320px;
+  margin: 0 auto 28px;
   display: flex;
-  align-items: baseline;
-  gap: var(--s3);
-  margin: 0 0 var(--s5);
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--s4);
+  animation: rise 520ms var(--ease-out) both;
+}
+
+.hello {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
 }
 
 .pageTitle {
-  font: 600 var(--fs-heading) var(--sans);
-  color: var(--t1);
   margin: 0;
+  font: 600 28px / 1.15 var(--sans);
+  letter-spacing: -0.02em;
+  color: var(--t1);
 }
 
 .pageMeta {
+  margin: 0;
   font: 400 var(--fs-body) var(--sans);
   color: var(--t3);
 }
 
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(390px, 1fr));
-  gap: var(--s4);
-}
-
-/* At rest the card is a naked tile; hover raises one surface frame around it. */
-.card {
+.headTools {
   display: flex;
-  flex-direction: column;
-  background: transparent;
-  border-radius: var(--r2);
-  cursor: pointer;
-  text-align: left;
-  border: 0;
-  padding: var(--s2);
-  font-family: var(--sans);
-  transition: background 120ms ease-out;
+  align-items: center;
+  gap: var(--s2);
 }
 
-.card:hover {
-  background: var(--surface);
+.search {
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+  width: 240px;
+  height: 40px;
+  padding: 0 var(--s3);
+  background: var(--well);
+  border-radius: 999px;
+  color: var(--t3);
+  transition: width 260ms var(--ease-out);
 }
 
-.card:focus-visible {
-  outline: 2px solid var(--live);
+.search:focus-within {
+  width: 300px;
+  outline: 1.5px solid var(--focus);
   outline-offset: -2px;
 }
 
-.previewEmpty {
-  aspect-ratio: 16 / 9;
-  width: 100%;
-  background: var(--well);
-  border-radius: var(--r2);
+.searchInput {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  background: transparent;
+  border: 0;
+  outline: none;
+  color: var(--t1);
+  font: 400 var(--fs-body) var(--sans);
 }
 
-/* A project with no screens: the logo as a quiet placeholder, never a brand stamp. */
-.previewMark {
+.searchInput::placeholder {
+  color: var(--t3);
+}
+
+.newBtn {
+  height: 40px;
+  padding: 0 var(--s4) 0 var(--s3);
+  font-size: var(--fs-body);
+}
+
+.problem {
+  max-width: 1320px;
+  margin: 0 auto var(--s4);
+  font: 400 var(--fs-small) var(--sans);
+  color: var(--red);
+}
+
+.noMatch {
+  max-width: 1320px;
+  margin: var(--s5) auto;
+  font: 400 var(--fs-body) var(--sans);
+  color: var(--t3);
+}
+
+/* ---- the cards ---- */
+
+.grid {
+  max-width: 1320px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 8px;
+  background: var(--surface);
+  border-radius: var(--r3);
+  box-shadow: var(--lift);
+  animation: rise 560ms var(--ease-out) backwards;
+  animation-delay: calc(80ms + min(var(--i, 0), 12) * 45ms);
+  transition: transform 260ms var(--ease-out), box-shadow 260ms var(--ease-out), background 160ms ease-out;
+}
+
+.card:hover {
+  transform: translateY(-3px);
+  background: color-mix(in srgb, var(--surface) 70%, var(--raised));
+  box-shadow: 0 18px 40px -18px rgba(0, 0, 0, 0.55), var(--lift);
+}
+
+/* The whole card opens the project; its tools sit above this layer. */
+.cardOpen {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border: 0;
+  border-radius: inherit;
+  background: transparent;
+  cursor: pointer;
+}
+
+.cardOpen:focus-visible {
+  outline: 1.5px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.preview {
+  position: relative;
   display: grid;
   place-items: center;
+  aspect-ratio: 16 / 10;
+  background: var(--well);
+  border-radius: var(--r2);
+  overflow: hidden;
 }
 
-.previewMark img {
-  filter: grayscale(1);
-  opacity: 0.14;
-  transition: opacity 120ms ease-out;
+/* A soft light that follows nothing: one quiet radial step so the well reads as depth. */
+.preview::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(120% 90% at 50% 0%, rgba(255, 255, 255, 0.035), transparent 60%);
+  pointer-events: none;
 }
 
-.card:hover .previewMark img {
-  opacity: 0.22;
+.previewMark {
+  color: var(--mark-quiet);
+  transition: transform 420ms var(--ease-out), color 260ms ease-out;
 }
 
-.markOnLight {
-  display: none;
+.card:hover .previewMark {
+  color: var(--mark);
+  transform: scale(1.06) rotate(-2deg);
 }
 
-:global([data-theme='light']) .markOnDark {
-  display: none;
+.previewCount {
+  position: absolute;
+  left: 10px;
+  bottom: 10px;
+  padding: 3px 9px;
+  background: color-mix(in srgb, var(--ground) 70%, transparent);
+  border-radius: 999px;
+  font: 500 var(--fs-caption) var(--sans);
+  color: var(--t2);
 }
 
-:global([data-theme='light']) .markOnLight {
-  display: block;
+.cardTools {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 2;
+  display: flex;
+  gap: 4px;
+  opacity: 0;
+  transform: translateY(-4px);
+  transition: opacity 180ms ease-out, transform 260ms var(--ease-out);
+}
+
+.card:hover .cardTools,
+.card:focus-within .cardTools {
+  opacity: 1;
+  transform: none;
+}
+
+.cardTool {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--float);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  color: var(--t2);
+  cursor: pointer;
+  transition: color 120ms ease-out, background 120ms ease-out;
+}
+
+.cardTool:hover {
+  color: var(--t0);
+}
+
+.cardTool:focus-visible {
+  outline: 1.5px solid var(--focus);
+  outline-offset: 2px;
 }
 
 .cardBody {
-  padding: var(--s2) 0 0;
   display: flex;
   flex-direction: column;
-  gap: var(--s1);
-  width: 100%;
+  gap: 4px;
+  padding: 12px 8px 6px;
+  min-width: 0;
 }
 
 .cardName {
-  font: 500 var(--fs-body) var(--sans);
+  margin: 0;
+  font: 500 var(--fs-title) var(--sans);
+  letter-spacing: -0.01em;
   color: var(--t1);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
+.cardRename {
+  position: relative;
+  z-index: 2;
+  height: 32px;
+  margin: -4px 0 -2px;
+  font-size: var(--fs-title);
+}
+
 .cardMeta {
   display: flex;
   align-items: center;
   gap: var(--s2);
+  min-width: 0;
   font: 400 var(--fs-small) var(--sans);
-  color: var(--t2);
-  white-space: nowrap;
-  overflow: hidden;
-}
-
-.cardVerbs {
-  display: flex;
-  gap: var(--s2);
-  padding: var(--s2) 0 0;
-}
-
-.verb {
-  height: 36px;
-  padding: 0 var(--s4);
-  border: 0;
-  border-radius: 999px;
-  background: var(--raised);
-  color: var(--t1);
-  font: 500 var(--fs-small) var(--sans);
-  cursor: pointer;
-  transition: background 120ms ease-out;
-}
-
-.verb:hover {
-  background: var(--float);
-}
-
-.verb:focus-visible {
-  outline: 2px solid var(--live);
-  outline-offset: -2px;
-}
-
-.verbPrimary {
-  background: var(--live);
-  color: var(--ground);
-}
-
-.verbPrimary:hover {
-  background: var(--live);
-  filter: brightness(1.08);
-}
-
-/* The plus card: the birth door. */
-.plusCard {
-  cursor: pointer;
-}
-
-.plusFrame {
-  display: grid;
-  place-items: center;
   color: var(--t3);
+  white-space: nowrap;
 }
 
-.plusCard:hover .plusFrame {
-  color: var(--t1);
+.kindTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--t2);
 }
 
-/* The birth screen: name + the kind cards, centered. */
-.birthWrap {
-  flex: 1;
+.dot {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--t3);
+}
+
+/* ---- nothing yet ---- */
+
+.empty {
+  max-width: 460px;
+  margin: 10vh auto 0;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: var(--s4);
-  padding: var(--s5);
-}
-
-.birthName {
-  width: min(360px, 100%);
-  height: 36px;
-  padding: 0 var(--s3);
-  background: var(--well);
-  border: 0;
-  border-radius: var(--r1);
-  color: var(--t1);
-  font: 400 var(--fs-body) var(--sans);
-  outline: none;
   text-align: center;
+  gap: var(--s3);
+  animation: rise 640ms var(--ease-out) 120ms both;
 }
 
-.birthName:focus {
-  outline: 2px solid var(--live);
-  outline-offset: -2px;
+.emptyMark {
+  display: grid;
+  place-items: center;
+  width: 128px;
+  height: 128px;
+  margin-bottom: var(--s3);
+  border-radius: 36px;
+  background: var(--surface);
+  color: var(--mark);
+  box-shadow: var(--lift);
+  animation: breathe 5.5s ease-in-out infinite;
+}
+
+.emptyTitle {
+  margin: 0;
+  font: 600 22px var(--sans);
+  letter-spacing: -0.015em;
+  color: var(--t1);
+}
+
+.emptyLine {
+  margin: 0 0 var(--s3);
+  font: 400 var(--fs-body) / 1.55 var(--sans);
+  color: var(--t2);
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes breathe {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pageHead,
+  .card,
+  .empty,
+  .emptyMark {
+    animation: none;
+  }
 }

@@ -26,13 +26,29 @@
   /* THE CURSOR NEVER LIES (user amendment 2026-07-31): the DEFAULT ARROW at rest —
      a hand would promise left-drag panning that doesn't exist (pan is middle-drag). */
   cursor: default;
-  /* THE WORLD-LOCKED GRID (user-ruled 2026-08-18 on the reference screenshots):
-     CLEARLY VISIBLE dots that ride the camera — the engine sets the phase
-     (background-position = the camera offset), the adaptive spacing, and the
-     dot radius (--dotr) per zoom. The color derives from --t3 so BOTH themes
-     carry it (the token flips in lockstep — never a hardcoded gray again). */
-  background-image: radial-gradient(circle, color-mix(in srgb, var(--t3) 42%, transparent) var(--dotr, 1.3px), transparent var(--dotr, 1.3px));
+}
+
+/* The world-locked grid: dots that ride the camera. The engine paints its phase, spacing and dot radius
+   straight onto this layer, which has no children, so a pan restyles nothing else. */
+.grid,
+.light {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
   background-size: 18px 18px;
+}
+
+.grid {
+  background-image: radial-gradient(circle, color-mix(in srgb, var(--t3) 42%, transparent) var(--dotr, 1.3px), transparent var(--dotr, 1.3px));
+}
+
+/* The cursor's light: the same dots a little brighter in a soft circle around the pointer. */
+.light {
+  background-image: radial-gradient(circle, color-mix(in srgb, var(--t1) 55%, transparent) var(--dotr, 1.3px), transparent var(--dotr, 1.3px));
+  -webkit-mask-image: radial-gradient(180px circle at var(--mx, -999px) var(--my, -999px), #000 0%, transparent 100%);
+  mask-image: radial-gradient(180px circle at var(--mx, -999px) var(--my, -999px), #000 0%, transparent 100%);
+  opacity: var(--spot, 0);
+  transition: opacity 300ms ease-out;
 }
 
 /* `grabbing` while a gesture runs = chrome.module.css .scrollGrabbing (one concern,
@@ -70,9 +86,7 @@
   color: var(--t1);
 }
 
-/* THE RE-HOUSING R0: the code-only anatomy drawer DIED — code opens the Code tab (one
-   home); properties open the Inspector (R2, where the anatomy CANVAS died too — the
-   ContractForm's body absorbed the read; .lineMono left with it). */
+/* Code opens the Code tab; a node's details live in its card. */
 
 .canvas {
   position: relative;
@@ -81,6 +95,8 @@
 .edges {
   position: absolute;
   inset: 0;
+  /* Wires ride above screens (big frames would hide them) and below the node tiles. */
+  z-index: 1;
   pointer-events: none;
   /* THE FREE CANVAS (2026-08-18): wires reach into negative space — the svg
      viewport never clips a path whose ends live left/above the origin. */
@@ -89,18 +105,42 @@
 
 .edge {
   fill: none;
-  stroke-width: 1.4;
-  opacity: 0.38;
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  opacity: 0.62;
   pointer-events: stroke;
   transition: opacity 150ms ease-out;
 }
 
-.edge:hover { opacity: 0.85; }
+.edge:hover { opacity: 1; }
+
+/* Where a wire plugs in: a small dot in the wire's own tone, ringed with the ground so it reads on any card. */
+.wireCap {
+  r: calc(3.5px / var(--cz, 1));
+  stroke: var(--ground);
+  stroke-width: calc(2px / var(--cz, 1));
+  opacity: 0.9;
+}
+
+/* The direction light: a soft spark travelling from the source to the target. */
+.wireSpark {
+  r: calc(2.6px / var(--cz, 1));
+  fill: var(--t0);
+  opacity: 0.8;
+  filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.55));
+  pointer-events: none;
+}
+
+:global([data-theme='light']) .wireSpark {
+  fill: var(--t1);
+  filter: none;
+}
 
 .edgeLive {
   fill: none;
-  stroke-width: 1.8;
-  opacity: 0.85;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  opacity: 0.95;
   pointer-events: stroke;
   stroke-dasharray: 6 5;
   animation: canvasFlow 0.9s linear infinite;
@@ -116,6 +156,7 @@
    --raised on the ground, NO border; hover = one surface step (--float). */
 .node {
   position: absolute;
+  z-index: 2;
   display: flex;
   flex-direction: column;
   padding: 10px 12px;
@@ -449,9 +490,9 @@
 /* UNIVERSAL HOVER (Figma idiom, user-ruled 2026-08-19): the bare --live
    outline, constant screen px. Screens light from their NAME alone - the body
    belongs to the elements inside. */
-.node:not(.nodeNatural):hover { outline: calc(2px / var(--cz, 1)) solid var(--live); }
-.nodeNatural:has([data-frame-name]:hover) { outline: calc(2px / var(--cz, 1)) solid var(--live); }
-.looseHit:hover { outline: calc(2px / var(--cz, 1)) solid var(--live); }
+.node:not(.nodeNatural):hover { outline: calc(1.5px / var(--cz, 1)) solid var(--select); }
+.nodeNatural:has([data-frame-name]:hover) { outline: calc(1.5px / var(--cz, 1)) solid var(--select); }
+.looseHit:hover { outline: calc(1.5px / var(--cz, 1)) solid var(--select); }
 
 /* P2 THE CREATE MODE: the drawn thing's coming box (dashed, quiet). */
 .createGhost {
@@ -510,9 +551,11 @@
 /* Phase C (FR-e7): the in-flight wire + the quiet drop refusal. */
 .wireDrag {
   fill: none;
-  stroke: var(--live);
+  stroke: var(--select);
   stroke-width: 1.8;
-  stroke-dasharray: 5 4;
+  stroke-linecap: round;
+  stroke-dasharray: 6 5;
+  animation: canvasFlow 0.9s linear infinite;
   opacity: 0.9;
   /* constant screen-px at any zoom - the aim line must always be visible */
   vector-effect: non-scaling-stroke;
@@ -543,7 +586,27 @@
    permission · arrowed solid = flow. The word is the signal on hover; style is texture. */
 .edgeWatch { stroke-dasharray: 6 5; }
 .edgePermission { stroke-dasharray: 1.5 4; stroke-linecap: round; }
-.edgeFlow { stroke-width: 1.7; opacity: 0.6; marker-end: url(#wireArrow); }
+.edgeFlow { opacity: 0.75; marker-end: url(#wireArrow); }
+
+/* The picked wire: brighter, thicker, with a soft halo underneath. */
+.edgeSelected { opacity: 1; stroke-width: 2.4; }
+.edgeHalo {
+  fill: none;
+  stroke: var(--select);
+  stroke-width: 9;
+  stroke-linecap: round;
+  opacity: 0.14;
+  pointer-events: none;
+}
+
+/* The wire in flight: dashed, marching toward the cursor, with a ring where it will land. */
+.wireDragEnd {
+  r: calc(6px / var(--cz, 1));
+  fill: none;
+  stroke: var(--select);
+  stroke-width: calc(1.5px / var(--cz, 1));
+  opacity: 0.8;
+}
 
 /* Hit ≫ visual: the wide invisible hit lane — a wire is touchable, never a pixel hunt.
    Click = SELECT (the Inspector speaks the sentence); the toolbar carries +/×. */
@@ -553,9 +616,6 @@
   stroke-width: 24;
   pointer-events: stroke;
 }
-
-/* SELECT-TO-FOCUS (the Unreal trick): outside the neighborhood dims, never hides. */
-.nodeDim { opacity: 0.32; }
 
 /* A wire in flight lights its LEGAL landing spots (contract-read). N1: the tile is
    borderless — the light is an outline (the fold card and the natural frame ride
@@ -606,6 +666,7 @@
    chrome overlay, SQUARE (the frame's own rendered radius IS 0). overflow visible so
    the label above and the edge ports live; the CONTENT clips inside .frameBody. */
 .nodeNatural {
+  z-index: 0;
   display: block;
   padding: 0;
   background: var(--bg);
@@ -635,7 +696,7 @@
 /* The keyboard-reclaim target (fix 2026-08-07 ported): a surface, never a control. */
 .frameNatural:focus { outline: none; }
 
-.frameNameLive { color: var(--live); }
+.frameNameLive { color: var(--select); }
 
 
 /* The Figma frame-name idiom: small, quiet, above the frame - THE SCREEN'S OWN
@@ -659,7 +720,7 @@
 
 /* Unfocused element hit spans - hover lights the element (constant px). */
 .elHit { position: absolute; pointer-events: auto; background: transparent; }
-.elHit:hover { outline: calc(2px / var(--cz, 1) / var(--fs, 1)) solid var(--live); }
+.elHit:hover { outline: calc(1.5px / var(--cz, 1) / var(--fs, 1)) solid var(--select); }
 
 /* The page itself — a live mount. THE FRESH FRAME (P1): the frame body is
    ANCHORED, not stretched (position from the card's top-left, sized by the
@@ -669,7 +730,8 @@
 /* The miniature (user-ruled 2026-08-19): the card box holds a frame-unit inner
    scaled by --fs; chrome inside counter-divides to stay constant-px. */
 /* The inline scale(k) rides this span - origin 0 0 or the face drifts to center. */
-.frameScale { position: absolute; inset: 0; display: block; overflow: visible; transform-origin: 0 0; }
+/* A screen's content never reads the camera zoom: pinning --cz here keeps a zoom from restyling every element inside. */
+.frameScale { position: absolute; inset: 0; display: block; overflow: visible; transform-origin: 0 0; --cz: 1; }
 .frameScaleInner {
   position: absolute;
   top: 0;
@@ -688,6 +750,9 @@
 }
 
 .frameBodyRest { pointer-events: none; }
+
+/* A screen resting off view: its frame alone, the live page mounts when it comes near. */
+.frameResting { background: var(--surface); }
 
 .frameBodyLive { pointer-events: auto; }
 
@@ -824,72 +889,88 @@
   stroke-dasharray: 5 4;
 }
 
-/* B5 (spec 35): THE CORNER LEGEND - bottom-right whisper chrome, constant px (the
-   unscaled wrap), collapsible to the ? chip. Quiet by law: --t3, never a tutorial. */
+/* THE CORNER LEGEND - quiet floating chrome at the top-right, clear of the composer at the
+   bottom; constant px (the unscaled wrap), collapsible to the ? chip. Never a tutorial. */
 .legend {
   position: absolute;
+  top: 12px;
   right: 12px;
-  bottom: 12px;
   z-index: 5;
+  min-width: 232px;
   display: flex;
   flex-direction: column;
-  gap: 3px;
-  padding: 8px 22px 8px 10px;
-  background: color-mix(in srgb, var(--panel) 72%, transparent);
-  border: 1px solid var(--border2);
-  border-radius: var(--r1);
-}
-
-.legendLine {
-  color: var(--t3);
-  font-size: 10.5px;
-  line-height: 14px;
-  white-space: nowrap;
+  gap: 2px;
+  padding: 6px 10px 8px 12px;
+  background: color-mix(in srgb, var(--float) 88%, transparent);
+  border-radius: var(--r2);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .28);
   user-select: none;
 }
 
-.legendHide {
-  position: absolute;
-  top: 2px;
-  right: 4px;
-  background: transparent;
-  border: 0;
-  padding: 2px;
-  color: var(--t3);
-  font-size: 11px;
-  cursor: pointer;
+.legendHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 24px;
+  font: 600 11px var(--sans);
+  color: var(--t2);
 }
 
-.legendHide:hover { color: var(--t1); }
+.legendLine {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 22px;
+  font: 400 11.5px var(--sans);
+  color: var(--t2);
+  white-space: nowrap;
+}
 
-.legendChip {
-  position: absolute;
-  right: 12px;
-  bottom: 12px;
-  z-index: 5;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: color-mix(in srgb, var(--panel) 72%, transparent);
-  border: 1px solid var(--border2);
+.legendKeys {
+  padding: 1px 6px;
+  background: var(--well);
+  border-radius: 6px;
+  font: 400 10.5px var(--sans);
+  color: var(--t1);
+}
+
+.legendHide {
+  width: 22px;
+  height: 22px;
+  margin-right: -4px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
   color: var(--t3);
-  font-size: 11px;
+  font-size: 13px;
   line-height: 1;
   cursor: pointer;
 }
 
-.legendChip:hover { color: var(--t1); }
+.legendHide:hover { background: var(--raised); color: var(--t1); }
 
-/* B5 (spec 33): THE EMPTY CANVAS TEACHES ONCE - one centered whisper line, derived
-   from the graph (zero state); it dissolves forever at the first citizen. */
-.emptyTeach {
+.legendChip {
   position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  pointer-events: none;
-  color: var(--t3);
-  font-size: 12px;
-  letter-spacing: 0.02em;
+  top: 12px;
+  right: 12px;
+  z-index: 5;
+  width: 24px;
+  height: 24px;
+  border: 0;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--float) 88%, transparent);
+  color: var(--t2);
+  font: 500 12px var(--sans);
+  line-height: 1;
+  cursor: pointer;
 }
+
+.legendChip:hover { background: var(--raised); color: var(--t0); }
+
+.legendHide:focus-visible,
+.legendChip:focus-visible {
+  outline: 1.5px solid var(--focus);
+  outline-offset: 2px;
+}
+

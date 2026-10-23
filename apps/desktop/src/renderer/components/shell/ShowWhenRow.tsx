@@ -238,7 +238,7 @@ export function ShowWhenRow({ sceneSlug, nodeId, refKey, stored, catalog, projec
           key={currentId}
           className={styles.inspectorEdit}
           defaultValue={whenIsText(current)}
-          placeholder="value"
+          placeholder="Value"
           onKeyDown={(e) => { if (e.key === 'Enter') (e.target as HTMLInputElement).blur(); }}
           onBlur={(e) => put(picked.compose(parseParamValue(e.target.value)))}
         />

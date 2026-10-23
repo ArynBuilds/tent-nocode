@@ -9,12 +9,14 @@
 :root {
   /* Swapped 2026-07-20 (user-directed): the DARKER tone is the main/thread surface,
      the lighter one is the sidebar. */
-  --bg: #171717;
-  --side: #212121;
-  --panel: #2a2a2a;
-  --panel2: #303030;
-  --border: #3a3a3a;
-  --border2: #4a4a4a;
+  /* The older names, mapped onto the soft-surface system so every older screen reads the same way:
+     panels are wells, hover steps are raised, borders are near-invisible hairlines. */
+  --bg: #141414;
+  --side: #1b1b1b;
+  --panel: #242424;
+  --panel2: #2e2e2e;
+  --border: rgba(255, 255, 255, 0.07);
+  --border2: rgba(255, 255, 255, 0.11);
   --t0: #ffffff; /* max contrast — active/selected text only (2026-07-20) */
   --t1: #ececec;
   --t2: #a0a0a0;
@@ -36,7 +38,22 @@
   --float: #363636;   /* floating chrome: menus, popovers, toolbars */
   --lift: none;       /* raised-surface shadow: dark separates by surface alone */
   --hairline: rgba(255, 255, 255, 0.06); /* the rare last-resort separator */
-  --live: #F5C518;    /* THE INTERACTION HUE (gold, user-ruled 2026-08-19): selected/active/focused/pressed */
+  --live: #7b88ff;    /* THE INTERACTION HUE (soft indigo, user-ruled 2026-10-23): selected/active/focused */
+  --focus: rgba(255, 255, 255, 0.34); /* the thin focus ring: neutral light, never a hue */
+  --select: rgba(255, 255, 255, 0.82); /* what is selected: a crisp neutral edge, never a hue */
+  --primary: #ededed;  /* the one main verb on a screen: a quiet light pill, never a hue */
+  --on-primary: #141414;
+  --mark: #5c5c5c;       /* the logo where it signs a surface: soft contrast, never white */
+  --wire: #a3a3a3;       /* every wire on the canvas: one neutral tone; the line style tells the kinds apart */
+  --mark-quiet: #3a3a3a; /* the logo as a placeholder inside a well */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1); /* the one entrance curve (expo out) */
+  /* Code colors in the code editor: calm, low-saturation, readable on the ground. */
+  --code-keyword: #b4b9ff;
+  --code-string: #a8d5ba;
+  --code-number: #e8c39e;
+  --code-comment: #6f6f6f;
+  --code-function: #f0f0f0;
+  --code-type: #9fd3e6;
   --mono: 'JetBrains Mono', ui-monospace, monospace;
   /* Geist ratified 2026-08-11 (the type bake-off): Tent NoCode CHROME wears Geist;
      scenes keep their own faces (the serving font stack is untouched by law). */
@@ -87,8 +104,8 @@
   --side: #f6f6f6;
   --panel: #fdfdfd;
   --panel2: #ffffff;
-  --border: #d8d8d8;
-  --border2: #c0c0c0;
+  --border: rgba(0, 0, 0, 0.08);
+  --border2: rgba(0, 0, 0, 0.13);
   --t0: #000000;
   --t1: #1f1f1f;
   --t2: #5f5f5f;
@@ -106,7 +123,20 @@
   --float: #ffffff;
   --lift: 0 0 0 1px rgba(0, 0, 0, 0.06), 0 2px 8px rgba(0, 0, 0, 0.1); /* white-on-white needs the soft shadow (walk #29) */
   --hairline: rgba(0, 0, 0, 0.07);
-  --live: #F5C518; /* the ONE gold on both themes (user-ruled, lighter tried and reverted) */
+  --live: #4f5bd5;
+  --focus: rgba(0, 0, 0, 0.3);
+  --select: rgba(0, 0, 0, 0.72);
+  --primary: #1a1a1a;
+  --on-primary: #f5f5f5;
+  --mark: #a8a8a8;
+  --mark-quiet: #d2d2d2;
+  --wire: #8a8a8a;
+  --code-keyword: #4f46c8;
+  --code-string: #2f7a4f;
+  --code-number: #9a5b1f;
+  --code-comment: #9a9a9a;
+  --code-function: #111111;
+  --code-type: #1f6f8b;
   --chart-grid: #e6e6e6;
   --chart-axis: #c2c2c2;
   color-scheme: light;

@@ -2,7 +2,7 @@ import { useSyncExternalStore } from 'react';
 import { closeOverlay, openOverlay } from './overlay.js';
 
 /** The project screen's sections; the opener names where it lands. */
-export type ProjectSectionId = 'general' | 'publish' | 'export' | 'server' | 'secrets' | 'people';
+export type ProjectSectionId = 'general' | 'publish' | 'export' | 'server' | 'secrets';
 
 export interface PublishTakeoverState {
   projectId: string;

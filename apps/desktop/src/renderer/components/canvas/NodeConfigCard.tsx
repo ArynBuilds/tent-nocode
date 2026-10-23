@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { NODE_CONTRACTS } from '@tent-nocode/core';
 import type { NodeContract, VerbDoor } from '@tent-nocode/core';
-import { desk } from '../../lib/desk.js';
 import type { CitizenSelection } from '../../lib/canvas/store.js';
 import { kindIcon } from '../../lib/canvas/store.js';
 import { humanLabel } from '../../lib/page-edit/flowWires.js';
@@ -9,6 +8,7 @@ import { StepConfig, useStepWord } from './StepConfig.js';
 import { TriggerConfig } from './TriggerConfig.js';
 import type { TriggerMinted } from './TriggerConfig.js';
 import { IntegrationProperties } from '../shell/IntegrationProperties.js';
+import { NodeDetails } from './NodeDetails.js';
 import styles from './configcard.module.css';
 
 /** Config card shell: unified card for all map node types — steps, triggers, tables, verbs. */
@@ -95,9 +95,9 @@ export function NodeConfigCard({ orgId, projectId, card, datasets, operations, s
   if (pos === null) return null;
   const Icon = kindIcon(kind);
   const name = card.mode === 'trigger-new' ? 'New trigger'
-    : nodeId.startsWith('fstep:') ? humanLabel(stepWord)
+    : nodeId.startsWith('fstep:') ? (humanLabel(stepWord) || 'Step')
       : nodeId.startsWith('trg:') ? 'Trigger'
-        : humanLabel(sel?.label ?? '');
+        : humanLabel(sel?.label ?? '') || 'Node';
 
   return (
     <div ref={boxRef} className={styles.card} style={{ left: pos.left, top: pos.top }}>
@@ -127,8 +127,8 @@ export function NodeConfigCard({ orgId, projectId, card, datasets, operations, s
         <>
           {nodeId.startsWith('intg:') && sel !== null ? (
             <div className={styles.body}><IntegrationProperties selection={sel} /></div>
-          ) : nodeId.startsWith('ds:') && sel !== null ? (
-            <DatasetGrain orgId={orgId} projectId={sel.projectId} dataset={sel.label} say={say} />
+          ) : sel !== null ? (
+            <div className={styles.details}><NodeDetails selection={sel} say={say} /></div>
           ) : null}
           <VerbFoot kind={kind} onVerb={onVerb} />
         </>
@@ -146,49 +146,6 @@ function VerbFoot({ kind, onVerb }: { kind: string; onVerb: (door: VerbDoor) => 
       {verbs.map((v) => (
         <button key={v.door} type="button" className={styles.verb} onClick={() => onVerb(v.door)}>{v.label}</button>
       ))}
-    </div>
-  );
-}
-
-const GRAIN_WORDS: Record<string, string> = {
-  own: 'each person their own rows',
-  shared: 'everyone shares the rows',
-  submitted: 'people submit - the owner sees all',
-  app: "the app's own rows (no user writes)",
-};
-
-/** F9's one behavior knob, re-homed from the panel: "who sees these rows" -
- * app-project Tables alone (absence is the off state). */
-function DatasetGrain({ orgId, projectId, dataset, say }: {
-  orgId: string; projectId: string | null; dataset: string; say: (s: string) => void;
-}) {
-  const [grain, setGrain] = useState<'own' | 'shared' | 'submitted' | 'app' | null>(null);
-  const [projectKind, setProjectKind] = useState<string | null>(null);
-  useEffect(() => {
-    let gone = false;
-    desk.humanDatasetGrain(orgId, dataset, projectId).then((g) => { if (!gone) setGrain(g); }).catch(() => undefined);
-    desk.listProjects(orgId).then((ps) => { if (!gone) setProjectKind(ps.find((p) => p.id === projectId)?.kind ?? null); }).catch(() => undefined);
-    return () => { gone = true; };
-  }, [orgId, projectId, dataset]);
-  if (projectKind !== 'app' || grain === null) return null;
-  return (
-    <div className={styles.body}>
-      <div className={styles.row}>
-        <span className={styles.lbl}>who sees</span>
-        <select
-          className={styles.select} value={grain}
-          onChange={(e) => {
-            const next = e.target.value as 'own' | 'shared' | 'submitted' | 'app';
-            void desk.humanSetDatasetGrain(orgId, dataset, projectId, next).then((r) => {
-              if (!r.ok) say(r.error); else setGrain(next);
-            });
-          }}
-        >
-          {(['own', 'shared', 'submitted', 'app'] as const).map((g) => (
-            <option key={g} value={g}>{GRAIN_WORDS[g]}</option>
-          ))}
-        </select>
-      </div>
     </div>
   );
 }

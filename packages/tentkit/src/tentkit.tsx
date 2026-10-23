@@ -2998,12 +2998,29 @@ function attachEditor(host: HTMLElement, store: SceneStore, emitter: Emitter, fi
 
   const report = (force = false): void => {
     const m = measureHost(host);
-    const key = `${JSON.stringify(m.rects)}:${m.ch}`;
+    // The change test reads host-relative layout units: moving or scaling the host (a camera pan) is no change.
+    const hr = host.getBoundingClientRect();
+    const k = host.offsetWidth > 0 ? hr.width / host.offsetWidth : 1;
+    const key = m.rects.map((r) => `${r.node}:${Math.round((r.x - hr.x) / k)},${Math.round((r.y - hr.y) / k)},${Math.round(r.w / k)},${Math.round(r.h / k)},${r.r ?? ''}`).join('|');
     if (force || key !== last) { last = key; emitter.emit('rects', m); }
   };
-  const tick = (): void => {
+  // Measure only after something inside changed: the observers mark it, the frame reads it once; a slow beat covers transitions.
+  let dirty = true;
+  let lastMeasure = 0;
+  const sizes = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(() => { dirty = true; }) : null;
+  const watchSizes = (): void => {
+    if (sizes === null) return;
+    sizes.observe(host);
+    for (const el of host.querySelectorAll<HTMLElement>('[data-node]')) sizes.observe(el);
+  };
+  const changes = typeof MutationObserver !== 'undefined'
+    ? new MutationObserver(() => { dirty = true; watchSizes(); })
+    : null;
+  changes?.observe(host, { subtree: true, childList: true, attributes: true, characterData: true });
+  watchSizes();
+  const tick = (now: number): void => {
     if (stopped) return;
-    report();
+    if (dirty || now - lastMeasure > 1000) { dirty = false; lastMeasure = now; report(); }
     raf = window.requestAnimationFrame(tick);
   };
   raf = window.requestAnimationFrame(tick);
@@ -3154,6 +3171,8 @@ function attachEditor(host: HTMLElement, store: SceneStore, emitter: Emitter, fi
     stop() {
       stopped = true;
       window.cancelAnimationFrame(raf);
+      sizes?.disconnect();
+      changes?.disconnect();
       if (!hostEvents) {
         document.removeEventListener('click', onClick, opts);
         document.removeEventListener('dblclick', onDbl, opts);

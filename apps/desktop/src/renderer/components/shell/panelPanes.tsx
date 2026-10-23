@@ -1,13 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { ArrowLeft, ArrowRight, ExternalLink, RotateCw } from 'lucide-react';
-import { ChatComposer, ConversationView } from '../chat/ConversationView.js';
 import { desk } from '../../lib/desk.js';
 import { useOrg } from '../../lib/OrgContext.js';
 import type { InspectorSubject, NodeBrowseContext } from '../../lib/canvas/store.js';
 import styles from './sidepanel.module.css';
 
 /**
- * Tier 52 Phase 3: THE ONE TAB SYSTEM's panes — SideChat, FilePane, BrowserPane and the
+ * Tier 52 Phase 3: THE ONE TAB SYSTEM's panes — FilePane, BrowserPane and the
  * PanelTab shape, extracted VERBATIM from SidePanel.tsx (the 500-line law) so the bottom
  * panel hosts the same surfaces without duplicating a line. All original law accounting
  * (headers, lease strip, glass-pane wall) travels with the code unchanged.
@@ -18,9 +17,7 @@ export interface PanelTab {
   /** THE RE-HOUSING R0: the slot registry widened — 'code' (the CodeScreen content as a
    * tab) and 'nodeBrowser' (§1.6 — content lands R2). 'browser' stays as CODE (ruling 8b:
    * entries hidden everywhere; the lease auto-open is the one opener left). */
-  kind: 'chat' | 'browser' | 'file' | 'inspector' | 'workspace' | 'code' | 'nodeBrowser' | 'layers';
-  /** chat tabs: null until the first message creates the thread. */
-  threadId: string | null;
+  kind: 'browser' | 'file' | 'inspector' | 'workspace' | 'code' | 'nodeBrowser' | 'layers';
   /** Tier 35 (FR-363): file tabs — the absolute path the glass pane renders. */
   path?: string;
   /** Tier 38 (FR-386): inspector tabs — the subject (one inspector tab, updated in
@@ -33,23 +30,8 @@ export interface PanelTab {
 }
 
 let nextId = 1;
-export function newTab(kind: PanelTab['kind'], threadId: string | null = null, path?: string, selection?: InspectorSubject): PanelTab {
-  return { id: `pt${nextId++}`, kind, threadId, ...(path !== undefined ? { path } : {}), ...(selection !== undefined ? { selection } : {}) };
-}
-
-export function SideChat({ tab, onThread }: { tab: PanelTab; onThread: (threadId: string) => void }) {
-  const { orgId, role } = useOrg();
-  if (tab.threadId === null) {
-    return (
-      <div className={styles.freshChat}>
-        <div className={styles.freshHint}>A fresh thread — ask away.</div>
-        <ChatComposer orgId={orgId} threadId={null} role={role} onCreated={onThread} />
-      </div>
-    );
-  }
-  // showHeader={false}: the TAB button carries the thread title in the panel (user-directed
-  // 2026-07-20) — rendering it again in-pane would be a second narrator.
-  return <ConversationView threadId={tab.threadId} jobParam={undefined} hotkeys={false} showHeader={false} />;
+export function newTab(kind: PanelTab['kind'], path?: string, selection?: InspectorSubject): PanelTab {
+  return { id: `pt${nextId++}`, kind, ...(path !== undefined ? { path } : {}), ...(selection !== undefined ? { selection } : {}) };
 }
 
 /**

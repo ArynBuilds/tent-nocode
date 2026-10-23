@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
-import { Maximize2, Minimize2, Pin, Plus, Trash2, X } from 'lucide-react';
+import { History, Maximize2, Minimize2, Pin, PinOff, SquarePen, Trash2, X } from 'lucide-react';
 import { ChatComposer, ConversationView } from '../chat/ConversationView.js';
 import { ModeControl } from '../chat/ComposerMeta.js';
+import { ChatWelcome } from '../chat/ChatWelcome.js';
 import { ContextMenu } from '../canvas/ContextMenu.js';
 import { useLive } from '../../lib/data/useLive.js';
 import { useQuery } from '../../lib/data/useQuery.js';
@@ -37,7 +38,7 @@ export function Console({ tabs: propTabs, activeId: propActiveId, mode, sticky, 
   const tabs = room !== undefined ? [{ id: 'room', threadId: room.threadId }] : propTabs ?? [];
   const activeId = room !== undefined ? 'room' : propActiveId ?? '';
   const onTabs = propOnTabs ?? (() => undefined);
-  // The + button opens a popover listing past threads and the new-thread option; right-click deletes silently.
+  // The history button lists the project's past chats; right-click deletes one silently.
   const { focusedProjectId } = useFocusedProject();
   const [pickerOpen, setPickerOpen] = useState(false);
   const [threadMenu, setThreadMenu] = useState<{ x: number; y: number; threadId: string } | null>(null);
@@ -45,6 +46,8 @@ export function Console({ tabs: propTabs, activeId: propActiveId, mode, sticky, 
   // Exit animation plays before folding; region stays mounted during the transition.
   const closeTimer = useRef<number | null>(null);
   const [closing, setClosing] = useState(false);
+  // A picked starting point fills the composer; n changes on every pick.
+  const [seed, setSeed] = useState<{ text: string; n: number } | null>(null);
 
   const threadsQuery = useQuery(`console-threads:${orgId}`, () => desk.listThreads(orgId), [orgId]);
   useLive(['threads', 'runs', 'messages'], () => threadsQuery.refetch());
@@ -54,9 +57,9 @@ export function Console({ tabs: propTabs, activeId: propActiveId, mode, sticky, 
 
   function title(t: ConsoleTab): string {
     if (room !== undefined) return room.title; // the app's own name — the one room tab
-    if (t.threadId === null) return 'New thread';
+    if (t.threadId === null) return 'New chat';
     const raw = overviews.find((o) => o.thread.id === t.threadId)?.thread.title.trim();
-    return raw !== undefined && raw !== '' ? raw : 'untitled thread';
+    return raw !== undefined && raw !== '' ? raw : 'Untitled chat';
   }
 
   function pending(t: ConsoleTab): boolean {
@@ -150,6 +153,7 @@ export function Console({ tabs: propTabs, activeId: propActiveId, mode, sticky, 
           orgId={orgId}
           threadId={active?.threadId ?? null}
           role={role}
+          seed={seed}
           disabled={connected === false}
           placeholder={connected === false ? CONNECT_SENTENCE : undefined}
           trailing={room === undefined && activeThread !== undefined ? (
@@ -191,13 +195,15 @@ export function Console({ tabs: propTabs, activeId: propActiveId, mode, sticky, 
       <div className={styles.wrap}>
         <div className={styles.consoleFull} onMouseEnter={clearShrink}>
           {header()}
-          {body(false)}
+          {tabs.length === 0 && connected !== false ? <ChatWelcome onPick={(text) => setSeed({ text, n: Date.now() })} /> : body(false)}
+          {active === undefined || active.threadId === null ? <div className={styles.fullCapsule}>{capsule()}</div> : null}
         </div>
       </div>
     );
   }
 
   function header() {
+    const past = overviews.filter((o) => o.thread.projectId === focusedProjectId);
     return (
       <div className={styles.header}>
         <div className={styles.tabsScroll} onWheel={(e) => { e.currentTarget.scrollLeft += e.deltaY; }}>
@@ -207,14 +213,15 @@ export function Console({ tabs: propTabs, activeId: propActiveId, mode, sticky, 
               data-tabid={t.id}
               className={t.id === active?.id ? `${styles.tab} ${styles.tabActive}` : styles.tab}
               onClick={() => onTabs(tabs, t.id)}
+              title={title(t)}
             >
-              {pending(t) ? <span className={styles.tabDot} /> : null}
+              {pending(t) ? <span className={styles.tabDot} title="Waiting on you" /> : null}
               <span className={styles.tabTitle}>{title(t)}</span>
               {room === undefined ? (
                 <button
                   type="button"
                   className={styles.tabClose}
-                  aria-label="Close tab"
+                  aria-label="Close this chat"
                   onClick={(e) => {
                     e.stopPropagation();
                     const next = closeTab({ tabs, activeId }, t.id);
@@ -228,34 +235,39 @@ export function Console({ tabs: propTabs, activeId: propActiveId, mode, sticky, 
           ))}
         </div>
         {room === undefined ? (
-          <div className={styles.threadPickWrap}>
+          <>
             <button
               type="button"
               className={styles.headerBtn}
-              aria-label="New thread"
-              onClick={() => setPickerOpen((v) => !v)}
+              aria-label="New chat"
+              title="New chat"
+              onClick={() => {
+                setPickerOpen(false);
+                const draft = tabs.find((t) => t.threadId === null);
+                if (draft !== undefined) { onTabs(tabs, draft.id); return; }
+                const next = addDraftTab({ tabs, activeId });
+                onTabs(next.tabs, next.activeId);
+              }}
             >
-              <Plus size={14} />
+              <SquarePen size={14} />
             </button>
-            {pickerOpen ? (
-              <>
-                <div className={styles.threadPickScrim} onClick={() => setPickerOpen(false)} />
-                <div className={styles.threadPick}>
-                  <button
-                    type="button"
-                    className={styles.threadPickNew}
-                    onClick={() => {
-                      setPickerOpen(false);
-                      const next = addDraftTab({ tabs, activeId });
-                      onTabs(next.tabs, next.activeId);
-                    }}
-                  >
-                    <Plus size={13} />
-                    New thread
-                  </button>
-                  {overviews
-                    .filter((o) => o.thread.projectId === focusedProjectId)
-                    .map((o) => (
+            <div className={styles.threadPickWrap}>
+              <button
+                type="button"
+                className={pickerOpen ? `${styles.headerBtn} ${styles.headerBtnActive}` : styles.headerBtn}
+                aria-label="Earlier chats"
+                title="Earlier chats"
+                onClick={() => setPickerOpen((v) => !v)}
+              >
+                <History size={14} />
+              </button>
+              {pickerOpen ? (
+                <>
+                  <div className={styles.threadPickScrim} onClick={() => setPickerOpen(false)} />
+                  <div className={styles.threadPick}>
+                    <div className={styles.threadPickHead}>Earlier chats</div>
+                    {past.length === 0 ? <div className={styles.threadPickEmpty}>No earlier chats in this project yet.</div> : null}
+                    {past.map((o) => (
                       <button
                         key={o.thread.id}
                         type="button"
@@ -270,55 +282,58 @@ export function Console({ tabs: propTabs, activeId: propActiveId, mode, sticky, 
                           setThreadMenu({ x: e.clientX, y: e.clientY, threadId: o.thread.id });
                         }}
                       >
-                        {(o.openGates ?? 0) > 0 ? <span className={styles.tabDot} /> : null}
+                        {(o.openGates ?? 0) > 0 ? <span className={styles.tabDot} title="Waiting on you" /> : null}
                         <span className={styles.threadPickTitle}>
-                          {o.thread.title.trim() !== '' ? o.thread.title.trim() : 'untitled thread'}
+                          {o.thread.title.trim() !== '' ? o.thread.title.trim() : 'Untitled chat'}
                         </span>
+                        <span className={styles.threadPickWhen}>{o.running > 0 ? 'Working' : ago(o.lastActivityAt)}</span>
                       </button>
                     ))}
-                </div>
-              </>
-            ) : null}
-            {threadMenu !== null ? (
-              <ContextMenu
-                at={threadMenu}
-                groups={[[{
-                  key: 'delete',
-                  label: 'Delete',
-                  icon: Trash2,
-                  onAct: () => {
-                    // Silent by ruling (the deletion doors): tombstone + refetch;
-                    // an open tab for the dead thread closes with it.
-                    void desk.humanDeleteThread(orgId, threadMenu.threadId).then(() => threadsQuery.refetch());
-                    const open = tabs.find((t) => t.threadId === threadMenu.threadId);
-                    if (open !== undefined) {
-                      const next = closeTab({ tabs, activeId }, open.id);
-                      onTabs(next.tabs, next.activeId);
-                    }
-                  },
-                }]]}
-                onClose={() => setThreadMenu(null)}
-              />
-            ) : null}
-          </div>
+                  </div>
+                </>
+              ) : null}
+              {threadMenu !== null ? (
+                <ContextMenu
+                  at={threadMenu}
+                  groups={[[{
+                    key: 'delete',
+                    label: 'Delete',
+                    icon: Trash2,
+                    onAct: () => {
+                      // Silent by ruling (the deletion doors): tombstone + refetch;
+                      // an open tab for the dead thread closes with it.
+                      void desk.humanDeleteThread(orgId, threadMenu.threadId).then(() => threadsQuery.refetch());
+                      const open = tabs.find((t) => t.threadId === threadMenu.threadId);
+                      if (open !== undefined) {
+                        const next = closeTab({ tabs, activeId }, open.id);
+                        onTabs(next.tabs, next.activeId);
+                      }
+                    },
+                  }]]}
+                  onClose={() => setThreadMenu(null)}
+                />
+              ) : null}
+            </div>
+            <span className={styles.headerSep} />
+          </>
         ) : null}
         <button
           type="button"
           className={sticky ? `${styles.headerBtn} ${styles.headerBtnActive}` : styles.headerBtn}
-          aria-label={sticky ? 'Unpin console' : 'Pin console'}
-          title={sticky ? 'Unpin console' : 'Pin console'}
+          aria-label={sticky ? 'Let the chat fold away' : 'Keep the chat open'}
+          title={sticky ? 'Let the chat fold away' : 'Keep the chat open'}
           onClick={() => onSticky(!sticky)}
         >
-          <Pin size={13} />
+          {sticky ? <PinOff size={14} /> : <Pin size={14} />}
         </button>
         <button
           type="button"
           className={styles.headerBtn}
-          aria-label={mode === 'full' ? 'Restore console' : 'Fill the stage'}
-          title={mode === 'full' ? 'Restore console' : 'Fill the stage'}
+          aria-label={mode === 'full' ? 'Back to the floating chat' : 'Make the chat full size'}
+          title={mode === 'full' ? 'Back to the floating chat' : 'Make the chat full size'}
           onClick={() => onMode(mode === 'full' ? 'panel' : 'full')}
         >
-          {mode === 'full' ? <Minimize2 size={13} /> : <Maximize2 size={13} />}
+          {mode === 'full' ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
         </button>
       </div>
     );
@@ -329,7 +344,7 @@ export function Console({ tabs: propTabs, activeId: propActiveId, mode, sticky, 
     return tabs.map((t) => (
       <div key={t.id} className={t.id === active?.id ? styles.pane : styles.paneHidden}>
         {t.threadId === null ? (
-          <div className={styles.freshHint}>a new thread — say the word below</div>
+          <ChatWelcome onPick={(text) => setSeed({ text, n: Date.now() })} />
         ) : (
           <ConversationView
             threadId={t.threadId}
@@ -372,4 +387,17 @@ export function Console({ tabs: propTabs, activeId: propActiveId, mode, sticky, 
       </div>
     </div>
   );
+}
+
+// "now", "5m", "3h", "2d", then the date.
+function ago(iso: string): string {
+  const ms = Date.now() - new Date(iso).getTime();
+  if (!Number.isFinite(ms) || ms < 60_000) return 'now';
+  const m = Math.floor(ms / 60_000);
+  if (m < 60) return `${m}m`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `${h}h`;
+  const d = Math.floor(h / 24);
+  if (d < 7) return `${d}d`;
+  return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
 }

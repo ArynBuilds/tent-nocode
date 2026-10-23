@@ -148,7 +148,7 @@ export function StepConfig({ orgId, projectId, flowId, stepId, tables, say, onVe
               <div key={c.name} className={styles.row}>
                 <span className={styles.lbl}>{cardParamWord(c.name)}</span>
                 <select className={styles.select} value={c.value} onChange={(e) => write({ [c.name]: e.target.value })}>
-                  {c.value === '' ? <option value="">pick a table</option> : null}
+                  {c.value === '' ? <option value="">Pick a table</option> : null}
                   {rows.map((t) => <option key={t} value={t}>{t}</option>)}
                 </select>
               </div>
@@ -170,7 +170,7 @@ export function StepConfig({ orgId, projectId, flowId, stepId, tables, say, onVe
               <div key={c.name} className={styles.row}>
                 <span className={styles.lbl}>{cardParamWord(c.name)}</span>
                 <select className={styles.select} value={c.value} onChange={(e) => write({ [c.name]: e.target.value })}>
-                  {c.value === '' ? <option value="">pick a field</option> : null}
+                  {c.value === '' ? <option value="">Pick a field</option> : null}
                   {fieldOptions(c.value).map((f) => <option key={f} value={f}>{f}</option>)}
                 </select>
               </div>

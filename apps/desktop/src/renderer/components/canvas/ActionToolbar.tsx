@@ -90,7 +90,7 @@ export function ActionToolbar({ x, y, buttons }: {
           key={b.key} type="button" className={styles.toolbarBtn} aria-label={b.label}
           onClick={(e) => { e.stopPropagation(); b.onAct(); }}
         >
-          <b.icon size={13} />
+          <b.icon size={15} />
         </button>
       ))}
     </div>

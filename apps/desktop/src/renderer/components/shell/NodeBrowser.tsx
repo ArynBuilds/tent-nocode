@@ -8,6 +8,7 @@ import { INSERT_ROWS, NAMED_INSERTS, kebabName, store, useValue } from '../../li
 import type { AddKind, CatalogAdd, NodeBrowseContext, NodeRecord } from '../../lib/canvas/store.js';
 import { usePlaceableDoors, usePlaceableIntegrations, usePlaceableSteps, usePlaceableTriggers } from '../../lib/canvas/placeables.js';
 import styles from './sidepanel.module.css';
+import { EmptyMark } from '../brand/EmptyMark.js';
 
 // THE NODE BROWSER (Phase 12, row 12.16): citizens and the five in ONE list. A wire question (mode 'wire')
 // filters the citizens by the contract - legalTargets for a citizen source, the element-port law for an
@@ -52,7 +53,7 @@ export function NodeBrowser({ context }: { context: NodeBrowseContext }) {
   const byKind = new Map<string, NodeRecord[]>();
   for (const n of citizens) byKind.set(n.kind, [...(byKind.get(n.kind) ?? []), n]);
 
-  const add = (a: CatalogAdd): void => { if (!store.requestCatalogAdd(a)) setQuiet('open the workspace to place it'); };
+  const add = (a: CatalogAdd): void => { if (!store.requestCatalogAdd(a)) setQuiet('Open the workspace to place it.'); };
   // A named insert asks for its words first; the kebab name is minted for the human, the words survive on the card.
   const insert = (kind: AddKind): void => {
     if (NAMED_INSERTS.has(kind)) { setNaming(kind); setTyped(''); return; }
@@ -67,7 +68,7 @@ export function NodeBrowser({ context }: { context: NodeBrowseContext }) {
     else context.onPick({ pick: 'insert', kind, name: finalName, typed: typed.trim() }, context);
   };
   const pickNode = (n: NodeRecord): void => {
-    if (catalogMode || context.onPick === undefined) { store.openInspector({ citizen: true, kind: n.kind, nodeId: n.id, label: n.label, projectId: n.projectId }); return; }
+    if (catalogMode || context.onPick === undefined) { if (!store.requestNodeProps(n.id)) setQuiet('Open the workspace to see it.'); return; }
     context.onPick({ pick: 'node', id: n.id, kind: n.kind, label: n.label }, context);
   };
   const row = (key: string, label: string, act: () => void, detail?: string, icon?: React.ReactNode, plus = false): React.ReactNode => (
@@ -78,14 +79,15 @@ export function NodeBrowser({ context }: { context: NodeBrowseContext }) {
     </button>
   );
 
-  const headline = context.headline ?? (catalogMode ? 'Everything you can place' : context.between !== undefined
+  // A naming headline holds only while its create row is open.
+  const headline = (context.naming !== undefined && naming === null ? undefined : context.headline) ?? (catalogMode ? 'Everything you can place' : context.between !== undefined
     ? `Between ${context.between.fromLabel} and ${context.between.toLabel}`
     : context.element !== undefined ? `What does the ${context.element.label} reach?` : 'What happens next?');
 
   return (
     <div className={styles.nodeBrowser}>
       <div className={styles.nodeBrowserHead}>{headline}</div>
-      <input className={styles.nodeBrowserSearch} placeholder="search" value={query} onChange={(e) => setQuery(e.target.value)} />
+      <input className={styles.nodeBrowserSearch} placeholder="Search" aria-label="Search" value={query} onChange={(e) => setQuery(e.target.value)} />
       {quiet !== null ? <div className={styles.nodeBrowserQuiet}>{quiet}</div> : null}
       {context.doors !== undefined && context.doors.length > 0 ? (
         <>
@@ -97,22 +99,22 @@ export function NodeBrowser({ context }: { context: NodeBrowseContext }) {
         <>
           <div className={styles.nodeBrowserCat}>Create</div>
           {INSERT_ROWS.filter((i) => hit(i.word) && (legal === null || legal.has(i.citizenKind))).map((i) => (naming === i.kind ? (
-            <div key={`insert:${i.kind}`} className={styles.nodeBrowserRow}>
-              <span className={styles.nodeBrowserPlus}>+</span>
+            <div key={`insert:${i.kind}`} className={styles.nodeBrowserNaming}>
               <input
                 className={styles.nodeBrowserSearch} autoFocus value={typed}
-                placeholder={i.kind === 'table' ? 'Monthly costs' : `name the ${i.word.slice(4).toLowerCase()}`}
+                aria-label={`Name the ${i.word.slice(4).toLowerCase()}`}
+                placeholder={i.kind === 'table' ? 'For example: Monthly costs' : `Name the ${i.word.slice(4).toLowerCase()}`}
                 onChange={(e) => setTyped(e.target.value)}
                 onKeyDown={(e) => { if (e.key === 'Enter') named(); if (e.key === 'Escape') { setNaming(null); setTyped(''); } }}
               />
-              <button type="button" className={styles.nodeBrowserDetail} disabled={finalName.length === 0} onClick={named}>Add</button>
+              <button type="button" className={styles.nodeBrowserAdd} disabled={finalName.length === 0} onClick={named}>Add</button>
             </div>
           ) : row(`insert:${i.kind}`, i.word, () => insert(i.kind), undefined, undefined, true)))}
         </>
       ) : null}
       {catalogMode ? (
         <>
-          <div className={styles.nodeBrowserCat}>The five</div>
+          <div className={styles.nodeBrowserCat}>Screen parts</div>
           {(Object.keys(PRIMITIVES) as PrimitiveName[]).filter((n): n is Exclude<PrimitiveName, 'instance'> => n !== 'instance' && hit(n)).map((n) => row(`prim:${n}`, PRIMITIVES[n].title, () => add({ primitive: n }), PRIMITIVES[n].breath.split(':')[0], <Shapes size={13} />))}
           {integrations.length > 0 ? <div className={styles.nodeBrowserCat}>Connections</div> : null}
           {integrations.filter((i) => hit(i.displayName)).map((i) => row(`intg:${i.name}`, i.displayName, () => add({ integration: i.name }), undefined, <Plug size={13} />))}
@@ -130,7 +132,7 @@ export function NodeBrowser({ context }: { context: NodeBrowseContext }) {
           {rows.map((n) => row(n.id, n.word ?? n.label, () => pickNode(n), n.detail ?? undefined))}
         </div>
       ))}
-      {citizens.length === 0 && !catalogMode ? <div className={styles.nodeBrowserQuiet}>nothing on the map answers this yet - create one above</div> : null}
+      {citizens.length === 0 && !catalogMode ? <EmptyMark compact line="Nothing on the canvas fits here yet. Create one above." /> : null}
     </div>
   );
 }

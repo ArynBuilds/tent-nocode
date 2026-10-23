@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { ChevronDown, X } from 'lucide-react';
 import type { ThreadIntent } from '../../../shared/ipc.js';
 import { checklistLines, parkedBanner, spendLabel } from '../../lib/feed/intentChecklist.js';
 import styles from './chat.module.css';
@@ -7,7 +8,7 @@ interface IntentChecklistProps {
   intent: ThreadIntent | null;
 }
 
-/** Living mission checklist; renders only while a 2+ part mission is open or parked. */
+/** The living plan: shows only while a plan of 2+ parts is open or paused. */
 export function IntentChecklist({ intent }: IntentChecklistProps) {
   const [collapsedChoice, setCollapsedChoice] = useState<boolean | null>(null);
   const [hiddenByUser, setHiddenByUser] = useState(false);
@@ -24,36 +25,41 @@ export function IntentChecklist({ intent }: IntentChecklistProps) {
     <div className={styles.intentBlock}>
       <div
         className={styles.intentHead}
+        role="button"
+        tabIndex={0}
         onClick={() => setCollapsedChoice(!collapsed)}
-        title={collapsed ? 'Show the mission steps' : 'Collapse to one line'}
-        style={{ cursor: 'pointer' }}
+        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setCollapsedChoice(!collapsed); } }}
+        title={collapsed ? 'Show every step' : 'Fold the steps'}
       >
-        <span>mission</span>
+        <span className={styles.intentTitle}>Plan</span>
         <span className={styles.intentMeta}>{done} of {lines.length}</span>
+        <span className={styles.intentBar} aria-hidden="true">
+          <span className={styles.intentFill} style={{ width: `${(done / lines.length) * 100}%` }} />
+        </span>
         {spend !== null ? <span className={styles.intentMeta}>{spend}</span> : null}
-        <span className={styles.intentMeta}>{collapsed ? '▸' : '▾'}</span>
+        <ChevronDown size={14} className={collapsed ? styles.intentCaret : `${styles.intentCaret} ${styles.intentCaretOpen}`} />
         <button
           type="button"
           className={styles.intentHide}
-          title="Hide this card until the thread reopens"
+          aria-label="Hide the plan"
+          title="Hide the plan until this chat reopens"
           onClick={(e) => { e.stopPropagation(); setHiddenByUser(true); }}
-        >×</button>
+        >
+          <X size={12} />
+        </button>
       </div>
-      {!collapsed && lines.map((l, i) => (
-        <div key={i} className={styles.intentPart}>
-          <span
-            className={[
-              styles.intentGlyph,
-              l.status === 'in_flight' ? styles.intentGlyphLive : '',
-              l.status === 'blocked' ? styles.intentGlyphBlocked : '',
-              l.status === 'done' ? styles.intentGlyphDone : '',
-            ].filter(Boolean).join(' ')}
-          >{l.glyph}</span>
-          <span className={l.status === 'dropped' ? styles.intentDropped : styles.intentPartText}>{l.text}</span>
-          {l.note !== null ? <span className={styles.intentNote}>— {l.note}</span> : null}
+      {!collapsed ? (
+        <div className={styles.intentParts}>
+          {lines.map((l, i) => (
+            <div key={i} className={styles.intentPart} data-status={l.status}>
+              <span className={styles.intentGlyph} aria-hidden="true" />
+              <span className={l.status === 'dropped' ? styles.intentDropped : styles.intentPartText}>{l.text}</span>
+              {l.note !== null ? <span className={styles.intentNote}>{l.note}</span> : null}
+            </div>
+          ))}
         </div>
-      ))}
-      {banner !== null ? <div className={styles.intentParked}>⏸ {banner}</div> : null}
+      ) : null}
+      {banner !== null ? <div className={styles.intentParked}>{banner}</div> : null}
     </div>
   );
 }

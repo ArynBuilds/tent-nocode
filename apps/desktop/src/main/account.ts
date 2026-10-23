@@ -83,12 +83,12 @@ async function hashOf(password: string, salt: Buffer): Promise<Buffer> {
 }
 
 export async function signUp(input: SignUpInput): Promise<MutationResult<undefined>> {
-  if (account !== null) return { ok: false, error: 'an account already exists on this computer - unlock it with its password' };
+  if (account !== null) return { ok: false, error: 'An account already exists on this computer. Unlock it with its password.' };
   const name = input.name.trim();
   const email = input.email.trim();
-  if (name === '') return { ok: false, error: 'enter your name' };
-  if (!/^[^\s@]+@[^\s@]+$/.test(email)) return { ok: false, error: 'enter an email address' };
-  if (input.password.length < 8) return { ok: false, error: 'the password needs at least 8 characters' };
+  if (name === '') return { ok: false, error: 'Enter your name.' };
+  if (!/^[^\s@]+@[^\s@]+$/.test(email)) return { ok: false, error: 'Enter an email address.' };
+  if (input.password.length < 8) return { ok: false, error: 'The password needs at least 8 characters.' };
   const salt = randomBytes(16);
   const next: StoredAccount = {
     userId: randomUUID(), name, email, salt: salt.toString('hex'), hash: (await hashOf(input.password, salt)).toString('hex'),
@@ -102,11 +102,11 @@ export async function signUp(input: SignUpInput): Promise<MutationResult<undefin
 }
 
 export async function signIn(password: string): Promise<MutationResult<undefined>> {
-  if (account === null) return { ok: false, error: 'no account on this computer yet - sign up first' };
+  if (account === null) return { ok: false, error: 'There is no account on this computer yet. Create one first.' };
   const given = await hashOf(password, Buffer.from(account.salt, 'hex'));
   const stored = Buffer.from(account.hash, 'hex');
   if (given.length !== stored.length || !timingSafeEqual(given, stored)) {
-    pendingError = 'that password is not right';
+    pendingError = 'That password is not right.';
     push();
     return { ok: false, error: pendingError };
   }

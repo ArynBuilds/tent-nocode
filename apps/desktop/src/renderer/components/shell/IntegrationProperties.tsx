@@ -170,7 +170,7 @@ export function IntegrationProperties({ selection }: { selection: CitizenSelecti
                     type="password"
                     className={styles.rowText}
                     value={tokenDraft}
-                    placeholder="paste the key"
+                    placeholder="Paste the key"
                     onChange={(e) => setTokenDraft(e.target.value)}
                   />
                 </span>

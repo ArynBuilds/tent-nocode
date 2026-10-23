@@ -8,30 +8,14 @@ import { formatTokens } from './feed.js';
  */
 
 export interface ChecklistLine {
-  glyph: string;
   text: string;
   status: IntentPartDto['status'];
   /** The part's evidence/why note, when the desk wrote one. */
   note: string | null;
 }
 
-/** ✓ done · ● in flight (breathes) · ○ pending · ⚠ blocked (amber) · ✕ dropped (struck) —
- * the CC-task vocabulary (Tier 52 FR-466): blocked forked from dropped so the amber status
- * hue has a glyph of its own; everything else is the same house set. */
-export function partGlyph(status: IntentPartDto['status']): string {
-  switch (status) {
-    case 'done': return '✓';
-    case 'in_flight': return '●';
-    case 'pending': return '○';
-    case 'blocked': return '⚠';
-    case 'dropped': return '✕';
-  }
-}
-
 export function checklistLines(parts: IntentPartDto[]): ChecklistLine[] {
-  return parts.map((p) => ({
-    glyph: partGlyph(p.status), text: p.text, status: p.status, note: p.note ?? null,
-  }));
+  return parts.map((p) => ({ text: p.text, status: p.status, note: p.note ?? null }));
 }
 
 // The `wakes N of M` readout DIED 2026-07-29 (speed arc D-x13): the D-65 budget loop is

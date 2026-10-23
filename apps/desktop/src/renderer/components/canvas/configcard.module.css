@@ -4,11 +4,12 @@
 
 .card {
   position: fixed;
-  z-index: 60;
+  z-index: 70;
   width: 288px;
   background: var(--float);
   border-radius: var(--r2);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, .4);
+  box-shadow: 0 18px 48px -12px rgba(0, 0, 0, .6), var(--lift);
+  animation: cardIn 200ms var(--ease-out) backwards;
   overflow: hidden;
   font-size: 13px;
   color: var(--t1);
@@ -25,8 +26,13 @@
 .close:hover { background: var(--raised); color: var(--t0); }
 
 .body { padding: 3px 14px 12px; display: flex; flex-direction: column; gap: 8px; }
+/* A node's details from its contract (what a screen can do, a tool's lines, the notes): the card scrolls past a height. */
+.details { max-height: 360px; overflow-y: auto; padding: 0 6px 8px; }
+.details:empty { display: none; }
+.details > * { background: transparent; padding-top: 0; }
 .row { display: flex; align-items: center; gap: 9px; min-height: 28px; }
-.lbl { flex: 0 0 68px; color: var(--t1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lbl { flex: 0 0 68px; color: var(--t2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lbl::first-letter, .lblFree::first-letter, .stripHead::first-letter { text-transform: uppercase; }
 .lblFree { flex: 1 1 auto; color: var(--t1); }
 
 .well {
@@ -34,7 +40,7 @@
   background: var(--well); border: 0; border-radius: var(--r1); padding: 0 10px;
   color: var(--t0); font-size: 13px; font-family: var(--sans); text-align: left;
 }
-.well:focus-visible, .select:focus-visible { outline: 2px solid var(--live); outline-offset: 1px; }
+.well:focus-visible, .select:focus-visible { outline: 1.5px solid var(--focus); outline-offset: 1px; }
 .wellNum { flex: 0 0 78px; font-variant-numeric: tabular-nums; }
 .select {
   flex: 1; height: 30px; min-width: 0;
@@ -87,8 +93,8 @@
   transition: background 120ms ease-out;
 }
 .verb:hover { background: color-mix(in srgb, var(--raised) 82%, white 6%); }
-.verbGold { background: var(--live); color: var(--ground); }
-.verbGold:hover { background: var(--live); filter: brightness(1.06); }
+.verbGold { background: var(--primary); color: var(--on-primary); }
+.verbGold:hover { background: var(--primary); filter: brightness(1.08); }
 .verbGold:disabled { opacity: .45; cursor: default; }
 .verbQuiet {
   border: 0; background: none; color: var(--t2); font-size: 13px; font-family: var(--sans);
@@ -102,3 +108,11 @@
 .fireNews { color: var(--green); font-weight: 500; }
 .firePaused { color: var(--amber); font-weight: 500; }
 .fireQuiet { color: var(--t1); }
+
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(4px) scale(0.98); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card { animation: none; }
+}

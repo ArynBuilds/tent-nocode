@@ -3,7 +3,6 @@ import type postgres from 'postgres';
 import { getOrgConfig } from '../config.js';
 import { listEvents } from '../events.js';
 import { z } from 'zod';
-import { orgHealth, type HealthReport } from '../health.js';
 import { assertOwnOrg, read, router } from './registry.js';
 
 interface AgentDbRow {
@@ -96,10 +95,6 @@ export async function threadIntentImpl(sql: postgres.Sql, orgId: string, threadI
   };
 }
 
-export async function orgHealthImpl(sql: postgres.Sql, orgId: string, _userId: string): Promise<HealthReport> {
-  return orgHealth(sql, orgId);
-}
-
 export async function threadUsageImpl(sql: postgres.Sql, orgId: string, threadId: string): Promise<ThreadUsage> {
   const rows = await sql<{ run_id: string; tokens: string | null; spent: string | null }[]>`
     select r.id as run_id, sum(r.tokens_used) as tokens, sum(r.cost_estimate) as spent
@@ -149,10 +144,6 @@ export const orgReadsRouter = router({
   threadIntent: read([orgId, z.string()], async (ctx, org, threadId) => {
     assertOwnOrg(ctx.identity, org);
     return threadIntentImpl(ctx.sql, ctx.identity.orgId, threadId);
-  }),
-  orgHealth: read([orgId], async (ctx, org) => {
-    assertOwnOrg(ctx.identity, org);
-    return orgHealthImpl(ctx.sql, ctx.identity.orgId, ctx.identity.userId);
   }),
   threadUsage: read([orgId, z.string()], async (ctx, org, threadId) => {
     assertOwnOrg(ctx.identity, org);

@@ -1,67 +1,79 @@
-/* B5 ㉙+㊵: THE ONE right-click menu — constant-px chrome, monochrome, the overlay
-   shadow class (menus are overlays — the one legal shadow). */
+/* THE ONE right-click menu: floating chrome on --float with the one soft shadow; rows step up on hover.
+   It sits above the chat box so it is never cut off. */
 
 .menu {
   position: fixed;
-  z-index: 40;
-  min-width: 184px;
-  max-width: 224px;
-  background: var(--panel2);
-  border: 1px solid var(--border2);
-  border-radius: var(--r1);
-  padding: 4px;
-  box-shadow: 0 8px 24px rgb(0 0 0 / 0.35);
+  z-index: 75;
+  min-width: 208px;
+  max-width: 248px;
+  background: var(--float);
+  border-radius: 14px;
+  padding: 6px;
+  box-shadow: 0 18px 48px -12px rgba(0, 0, 0, 0.6), var(--lift);
+  animation: menuIn 160ms var(--ease-out) backwards;
 }
 
 .search {
   display: block;
   width: 100%;
   box-sizing: border-box;
-  margin-bottom: 4px;
-  background: var(--panel);
-  border: 1px solid var(--border2);
-  border-radius: var(--r1);
-  padding: 5px 6px;
+  height: 32px;
+  margin-bottom: 6px;
+  background: var(--well);
+  border: 0;
+  border-radius: 9px;
+  padding: 0 10px;
   color: var(--t1);
-  font-size: 12px;
-  font-family: var(--sans);
+  font: 400 12.5px var(--sans);
   outline: none;
 }
 
+.search::placeholder {
+  color: var(--t3);
+}
+
+.search:focus-visible {
+  outline: 1.5px solid var(--focus);
+  outline-offset: -1.5px;
+}
+
 .rows {
-  max-height: 280px;
+  max-height: 320px;
   overflow-y: auto;
 }
 
 .divider {
   height: 1px;
-  margin: 4px 2px;
-  background: var(--border2);
+  margin: 5px 6px;
+  background: var(--hairline);
 }
 
 .row {
   display: flex;
   align-items: center;
-  gap: 7px;
+  gap: 9px;
   width: 100%;
+  min-height: 32px;
   text-align: left;
   background: transparent;
   border: 0;
-  border-radius: var(--r1);
-  padding: 5px 6px;
+  border-radius: 8px;
+  padding: 0 8px;
   color: var(--t1);
-  font-size: 12px;
-  font-family: var(--sans);
+  font: 400 13px var(--sans);
   cursor: pointer;
+  transition: background 100ms ease-out;
 }
 
-.row:hover {
-  background: var(--panel);
+.row:hover,
+.row:focus-visible {
+  background: var(--raised);
+  outline: none;
 }
 
 .icon {
-  width: 12px;
-  flex: 0 0 12px;
+  width: 14px;
+  flex: 0 0 14px;
   color: var(--t2);
 }
 
@@ -72,9 +84,19 @@
   white-space: nowrap;
 }
 
-/* ㊵: the inline shortcut — the menu teaches, quietly. */
+/* The inline shortcut: the menu teaches, quietly. */
 .shortcut {
+  padding: 1px 6px;
+  border-radius: 5px;
+  background: var(--well);
   color: var(--t3);
-  font-size: 10px;
-  font-family: var(--mono);
+  font: 500 10.5px var(--sans);
+}
+
+@keyframes menuIn {
+  from { opacity: 0; transform: translateY(-3px) scale(0.98); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .menu { animation: none; }
 }

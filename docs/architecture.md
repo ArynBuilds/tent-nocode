@@ -103,7 +103,7 @@ your message → spawnRun → the run spawner → executeSpawnedRun
 ```
 
 - **One prompt.** `packages/kernel/src/charters/charter.ts` composes one charter for chat turns and runs.
-- **A grammar made for the AI.** `packages/kernel/src/dialect.ts` renders a project, a screen or a flow as line-numbered text, and reads edited text back into operations without evaluating anything. Design rules (bans, budgets, direction) are compile errors, so a bad edit is refused with the reason instead of landing.
+- **A grammar made for the AI.** `packages/kernel/src/dialect.ts` renders a project, a screen or a flow as line-numbered text, and reads edited text back into operations without evaluating anything. Design rules (bans, budgets, direction) are compile errors, so a bad edit is refused with the reason instead of landing. The project text ends with a `canvas { }` block (`packages/kernel/src/canvasLens.ts`): where every card sits and which cards are grouped, so the AI can arrange the canvas the same way it edits everything else.
 - **Seven tools** live in one file (`packages/runner/src/tools.ts`): fat definitions, thin handlers, each one gate, then the change, then a receipt.
 - **Claude Code** is found at startup (`claude --version`). When it is there, every run that no API key claims goes to it, on your own sign-in, with `--setting-sources ''`, an explicit allow list of the seven tools, and the tools served by a small MCP process (`apps/desktop/src/main/mcp/toolsMcpEntry.ts`). Work the AI starts from inside that process is left in the runs table and picked up by the host when the database announces it.
 

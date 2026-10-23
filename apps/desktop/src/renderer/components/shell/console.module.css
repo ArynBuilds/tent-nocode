@@ -1,55 +1,61 @@
-/*
- * Tier 52 (D-200, FR-462/463): THE CONSOLE — redesigned 2026-07-28 (user ruling, sketches
- * = the law): THE CAPSULE IS THE CONSOLE. The floating states are VIEWPORT-FIXED and
- * centered on the whole app window ("must NOT be sticky to anything" — the explicit user
- * ruling that supersedes in-main placement for floating). There is NO outer frame: the
- * CHAT REGION (dark, rounded, exactly the capsule's width) grows above the unchanged
- * capsule. FULL-SCREEN keeps the original geometry — it fills the MAIN grid cell only
- * (the T30 never-overlap law holds there; .wrap still owns that case).
- */
+/* The chat window. Floating: the capsule composer sits centered on the whole app window
+   (user ruling 2026-07-28), and the conversation grows above it as a frosted glass panel of
+   the same width. Full size: it fills the main cell only and never covers rails or panels. */
 
-/* ---- FULL-SCREEN (unchanged geometry: the stage cell only) ---------------------- */
+/* ---- full size: the main cell only ---- */
 
 .wrap {
   grid-area: main;
   position: relative;
   z-index: 30;
-  pointer-events: none;
   min-width: 0;
   min-height: 0;
   overflow: hidden;
+  pointer-events: none;
 }
 
 .consoleFull {
   position: absolute;
-  pointer-events: auto;
   inset: 0;
   display: flex;
   flex-direction: column;
-  background: var(--bg);
+  background: var(--ground);
   overflow: hidden;
-  animation: fullIn 200ms ease-out;
+  pointer-events: auto;
+  animation: fullIn 280ms var(--ease-out);
+}
+
+:global([data-theme='light']) .consoleFull {
+  background: #ffffff;
+}
+
+/* A new chat at full size keeps the capsule at the bottom, on the feed's column. */
+.fullCapsule {
+  flex: none;
+  width: min(760px, calc(100% - 48px));
+  margin: auto auto 28px;
+}
+
+.fullCapsule .capsule {
+  filter: none;
 }
 
 @keyframes fullIn {
-  from { opacity: 0.3; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; transform: translateY(10px) scale(0.995); }
 }
 
-/* ---- THE FLOATING LAYER (viewport-centered, never moves with panels) ------------ */
+/* ---- floating: centered on the window, never moves with panels ---- */
 
 .floatLayer {
-  position: fixed; /* USER RULING 2026-07-28: centered on the WHOLE app frame — the
-                      floating console never shifts when rails/panels open. Full-screen
-                      does NOT use this layer (it stays inside the main cell). */
+  position: fixed;
   left: 50%;
-  bottom: 36px;
-  transform: translateX(-50%);
+  bottom: 32px;
   z-index: 60;
-  width: min(680px, calc(100vw - 48px));
   display: flex;
   flex-direction: column;
   gap: 10px;
+  width: min(700px, calc(100vw - 48px));
+  transform: translateX(-50%);
   pointer-events: none;
 }
 
@@ -57,80 +63,79 @@
   pointer-events: auto;
 }
 
-/* The capsule row: the ChatComposer brings its own capsule styling (chat.module.css
-   .composer) — this wrapper makes it fill the column's width and carries the SAME
-   strong shadow as the chat region (user-ruled 2026-07-28); drop-shadow follows the
-   pill's rendered shape, not the wrapper's box. */
 .capsule > * {
   width: 100%;
 }
 
 .capsule {
-  filter: drop-shadow(0 14px 36px rgba(0, 0, 0, 0.6)) drop-shadow(0 3px 10px rgba(0, 0, 0, 0.35));
+  /* The layer sets the width, so the composer drops its own column padding. */
+  --dock-pad: 0;
+  --dock-max: none;
+  filter: drop-shadow(0 16px 32px rgba(0, 0, 0, 0.5)) drop-shadow(0 2px 6px rgba(0, 0, 0, 0.3));
 }
 
-/* Light mode wears lighter shadows (user-ruled 2026-07-28: "decrease just a bit"). */
 :global([data-theme='light']) .capsule {
-  filter: drop-shadow(0 10px 26px rgba(0, 0, 0, 0.22)) drop-shadow(0 2px 8px rgba(0, 0, 0, 0.12));
+  filter: drop-shadow(0 10px 26px rgba(0, 0, 0, 0.14)) drop-shadow(0 2px 6px rgba(0, 0, 0, 0.08));
 }
 
-:global([data-theme='light']) .region {
-  background: #ffffff; /* user-ruled: the chat READS on full white */
-  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.18), 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-:global([data-theme='light']) .consoleFull {
-  background: #ffffff;
-}
-
-/* ---- THE CHAT REGION: the dark rounded column above the capsule ----------------- */
+/* ---- the conversation panel above the capsule: frosted glass ---- */
 
 .region {
   display: flex;
   flex-direction: column;
-  height: min(56vh, 560px);
-  background: var(--bg); /* user-ruled 2026-07-28: the chat wears the SAME background as
-                            the app/tabs — the border + shadow carry the separation */
-  border: 1px solid var(--border);
-  border-radius: 18px;
+  height: min(50vh, 520px);
+  border-radius: 22px;
+  background: color-mix(in srgb, var(--ground) 93%, transparent);
+  backdrop-filter: blur(24px) saturate(1.2);
+  -webkit-backdrop-filter: blur(24px) saturate(1.2);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.07),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 24px 64px -16px rgba(0, 0, 0, 0.7),
+    0 6px 18px rgba(0, 0, 0, 0.3);
   overflow: hidden;
-  box-shadow: 0 18px 56px rgba(0, 0, 0, 0.6), 0 5px 16px rgba(0, 0, 0, 0.35);
+  /* The conversation inside shows the glass, not a solid page. */
+  --chat-surface: transparent;
   transform-origin: 50% 100%;
-  animation: regionIn 200ms cubic-bezier(0.2, 0.8, 0.3, 1);
+  animation: regionIn 320ms var(--ease-out);
 }
+
+:global([data-theme='light']) .region {
+  background: color-mix(in srgb, #ffffff 92%, transparent);
+  box-shadow:
+    inset 0 0 0 1px rgba(0, 0, 0, 0.06),
+    0 20px 56px -16px rgba(0, 0, 0, 0.22),
+    0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
 
 @keyframes regionIn {
-  from { opacity: 0; transform: translateY(12px) scale(0.97); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
+  from { opacity: 0; transform: translateY(14px) scale(0.97); }
 }
 
-/* The closing beat (user-ruled): the same motion, reversed — plays BEFORE the fold. */
+/* The closing beat: the same motion reversed, before the fold. */
 .regionOut {
   animation: regionOut 170ms ease-in forwards;
 }
 
-/* Fix ledger 2026-07-28 wave 1.1: the folded region HIDES, never unmounts — an opened
-   step timeline and the warm thread data survive every hover-fold (the paneHidden idiom
-   applied to the whole region). */
+@keyframes regionOut {
+  to { opacity: 0; transform: translateY(12px) scale(0.97); }
+}
+
+/* Folded hides, never unmounts: an open timeline and the warm data survive each fold. */
 .regionFolded {
   display: none;
 }
 
-@keyframes regionOut {
-  from { opacity: 1; transform: translateY(0) scale(1); }
-  to { opacity: 0; transform: translateY(12px) scale(0.97); }
-}
-
-/* ---- header: the tab strip + controls ------------------------------------------- */
+/* ---- header: the open chats as soft tabs, then the controls ---- */
 
 .header {
   flex: none;
   display: flex;
   align-items: center;
-  gap: 6px;
-  height: 42px;
-  padding: 0 10px;
-  border-bottom: 1px solid var(--border);
+  gap: 2px;
+  height: 48px;
+  padding: 0 8px 0 10px;
   user-select: none;
 }
 
@@ -139,9 +144,10 @@
   min-width: 0;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
   overflow-x: auto;
   scrollbar-width: none;
+  mask-image: linear-gradient(to right, #000 calc(100% - 24px), transparent);
 }
 
 .tabsScroll::-webkit-scrollbar {
@@ -153,21 +159,27 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  max-width: 180px;
-  padding: 5px 12px;
+  max-width: 200px;
+  height: 30px;
+  padding: 0 6px 0 12px;
   border-radius: 999px;
-  color: var(--t2);
-  font-size: 12.5px;
+  color: var(--t3);
+  font: 400 12.5px var(--sans);
   cursor: pointer;
+  transition: background 120ms ease-out, color 120ms ease-out;
 }
 
 .tab:hover {
-  background: var(--panel2);
+  background: var(--well);
+  color: var(--t1);
 }
 
-.tabActive {
+.tabActive,
+.tabActive:hover {
+  background: var(--raised);
   color: var(--t0);
-  background: var(--panel2);
+  font-weight: 500;
+  box-shadow: var(--lift);
 }
 
 .tabTitle {
@@ -176,8 +188,9 @@
   text-overflow: ellipsis;
 }
 
-/* FR-463: the needs-you dot on the affected tab — amber, STATUS meaning only. */
+/* Waiting on you: amber, status meaning alone. */
 .tabDot {
+  position: relative;
   flex: none;
   width: 7px;
   height: 7px;
@@ -185,51 +198,88 @@
   background: var(--amber);
 }
 
+.tabDot::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: var(--amber);
+  animation: ping 2.2s ease-out infinite;
+}
+
+@keyframes ping {
+  0% { transform: scale(1); opacity: 0.6; }
+  70%, 100% { transform: scale(2.6); opacity: 0; }
+}
+
 .tabClose {
   flex: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 16px;
-  height: 16px;
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
   padding: 0;
   border: 0;
   border-radius: 50%;
   background: transparent;
   color: var(--t3);
+  opacity: 0;
   cursor: pointer;
+  transition: opacity 120ms ease-out, background 120ms ease-out;
+}
+
+.tab:hover .tabClose,
+.tabActive .tabClose {
+  opacity: 1;
 }
 
 .tabClose:hover {
+  background: var(--float);
   color: var(--t1);
 }
 
 .headerBtn {
   flex: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
   padding: 0;
   border: 0;
   border-radius: 50%;
   background: transparent;
   color: var(--t2);
   cursor: pointer;
+  transition: background 120ms ease-out, color 120ms ease-out;
 }
 
 .headerBtn:hover {
-  background: var(--panel2);
+  background: var(--well);
   color: var(--t1);
 }
 
-.headerBtnActive {
+.headerBtnActive,
+.headerBtnActive:hover {
+  background: var(--raised);
   color: var(--t0);
-  background: var(--panel2);
 }
 
-/* ---- body ------------------------------------------------------------------------ */
+.headerBtn:focus-visible,
+.tab:focus-visible,
+.threadPickRow:focus-visible {
+  outline: 1.5px solid var(--focus);
+  outline-offset: -1.5px;
+}
+
+.headerSep {
+  flex: none;
+  width: 1px;
+  height: 16px;
+  margin: 0 4px;
+  background: var(--hairline);
+}
+
+/* ---- body ---- */
 
 .pane {
   flex: 1;
@@ -243,17 +293,7 @@
   display: none;
 }
 
-.freshHint {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--t3);
-  font-size: 13px;
-}
-
-/* D-e2 (FR-e3): the connect card — ONE quiet card in place of the conversation while no
-   AI is connected. Quiet tone by law; the form inside is the EXISTING EngineCredentialForm. */
+/* The connect card: one quiet card in place of the conversation while no AI is connected. */
 .connectCard {
   flex: 1;
   min-height: 0;
@@ -266,36 +306,35 @@
 }
 
 .connectLine {
-  color: var(--t2);
-  font-size: var(--fs-body);
+  font: 600 15px var(--sans);
+  color: var(--t1);
 }
 
 .connectHint {
-  color: var(--t3);
   font-size: var(--fs-small);
+  color: var(--t3);
 }
 
-/* THE OWN LOOP: the card's engine pick — raised pills, the active one wears --live. */
+/* The engine pick: raised pills; the chosen one is the primary pill. */
 .connectEngineBtn {
   height: 32px;
-  padding: 0 var(--s3);
   margin-right: var(--s2);
+  padding: 0 var(--s3);
   border: none;
-  border-radius: var(--r1);
+  border-radius: 999px;
   background: var(--raised);
   color: var(--t1);
-  font-size: var(--fs-small);
+  font: 500 var(--fs-small) var(--sans);
   cursor: pointer;
 }
 
 .connectEngineBtn[data-active='1'] {
-  background: var(--live);
-  color: var(--ground);
+  background: var(--primary);
+  color: var(--on-primary);
 }
 
-/* THE CHATS DOOR (user-ruled 2026-08-14, the tree's re-home): the + popover -
-   the focused project's past threads + the new-thread verb. Floating chrome:
-   --float, the one sanctioned shadow. */
+/* ---- earlier chats: a floating list under the history button ---- */
+
 .threadPickWrap {
   position: relative;
   display: flex;
@@ -309,49 +348,80 @@
 
 .threadPick {
   position: absolute;
-  bottom: calc(100% + 6px);
-  right: 0;
+  top: calc(100% + 8px);
+  right: -60px;
   z-index: 81;
-  min-width: 240px;
-  max-width: 320px;
-  max-height: 300px;
-  overflow: auto;
   display: flex;
   flex-direction: column;
-  padding: var(--s1);
-  background: var(--float);
+  gap: 1px;
+  width: 300px;
+  max-height: 340px;
+  padding: 6px;
   border-radius: var(--r2);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.28), 0 4px 10px rgba(0, 0, 0, 0.18);
+  background: var(--float);
+  box-shadow: 0 18px 48px -12px rgba(0, 0, 0, 0.6), var(--lift);
+  overflow: auto;
+  transform-origin: 80% 0;
+  animation: pickIn 180ms var(--ease-out) backwards;
 }
 
-.threadPickNew,
+@keyframes pickIn {
+  from { opacity: 0; transform: translateY(-4px) scale(0.97); }
+}
+
+.threadPickHead {
+  padding: 6px 8px 6px;
+  font: 500 11.5px var(--sans);
+  color: var(--t3);
+}
+
+.threadPickEmpty {
+  padding: 10px 8px 12px;
+  font: 400 12.5px var(--sans);
+  color: var(--t3);
+}
+
 .threadPickRow {
   display: flex;
   align-items: center;
-  gap: var(--s2);
-  min-height: 32px;
-  padding: 0 var(--s2);
+  gap: 8px;
+  min-height: 34px;
+  padding: 0 10px;
   border: 0;
   border-radius: var(--r1);
   background: transparent;
   color: var(--t1);
-  font: 400 var(--fs-small) var(--sans);
-  cursor: pointer;
+  font: 400 13px var(--sans);
   text-align: left;
+  cursor: pointer;
+  transition: background 100ms ease-out;
 }
 
-.threadPickNew {
-  font-weight: 500;
-}
-
-.threadPickNew:hover,
 .threadPickRow:hover {
   background: var(--raised);
 }
 
 .threadPickTitle {
+  flex: 1;
   min-width: 0;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+}
+
+.threadPickWhen {
+  flex: none;
+  font: 400 11.5px var(--sans);
+  font-variant-numeric: tabular-nums;
+  color: var(--t3);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .consoleFull,
+  .region,
+  .regionOut,
+  .threadPick,
+  .tabDot::after {
+    animation: none;
+  }
 }

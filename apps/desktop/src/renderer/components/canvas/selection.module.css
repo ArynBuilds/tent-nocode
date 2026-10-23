@@ -2,18 +2,18 @@
    one dress for cards, screens, loose and in-page elements. Constant screen px
    at any zoom: every dimension divides by --sk (the caller stamps it: 1 in
    screen space, the camera zoom in world space, camera x miniature in frame
-   space). Gold is the one hue (--live); corners are white Figma squares. */
+   space). The interaction hue (--live) is the one hue; corners are white Figma squares. */
 
 .outline {
   position: absolute;
-  outline: calc(1px / var(--sk, 1)) solid var(--live);
+  outline: calc(1px / var(--sk, 1)) solid var(--select);
   pointer-events: auto;
   cursor: default;
 }
 
 .hover {
   position: absolute;
-  outline: calc(2px / var(--sk, 1)) solid var(--live);
+  outline: calc(1.5px / var(--sk, 1)) solid var(--select);
   pointer-events: none;
 }
 
@@ -36,7 +36,7 @@
   height: calc(8px / var(--sk, 1));
   margin: calc(-4px / var(--sk, 1)) 0 0 calc(-4px / var(--sk, 1));
   background: #ffffff;
-  border: calc(1px / var(--sk, 1)) solid var(--live);
+  border: calc(1px / var(--sk, 1)) solid var(--select);
   border-radius: calc(1px / var(--sk, 1));
 }
 
@@ -47,7 +47,7 @@
   margin-top: calc(8px / var(--sk, 1));
   padding: 2px 6px;
   border-radius: 4px;
-  background: var(--live);
+  background: var(--select);
   color: var(--ground);
   font-family: var(--sans);
   font-size: 11px;

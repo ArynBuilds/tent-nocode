@@ -15,7 +15,7 @@ import {
   queryDatasetRows, raiseGovernedAction, readProjectTheme, readRunExcerpt, recentEvents, recordDatasetAppend,
   registerRunSpawner, renderBriefText, renderServiceContract, renderStepTypedef, renderThemeBlock,
   replaceDataset, resolveFlowStepDef, resolveIntegrationDef, resolveLibraryItem, saveNote, sceneDialectLens, setFlowStepPin,
-  setProjectTheme, findOpenRuntimeApproval, requestRuntimeApproval, MAIN_FLOW, createDb, DIALECT_FIX_SENTENCE,
+  setProjectTheme, landCanvasDoor, findOpenRuntimeApproval, requestRuntimeApproval, MAIN_FLOW, createDb, DIALECT_FIX_SENTENCE,
   BRIEF_PROMPT, projectBriefSchema, projectThemeSchema, THEME_COLOR_NAMES,
   type ConstructKind, type GovernedActionResult, type LintFinding, type ProjectBrief, type ProjectOp, type ProjectTheme, type ToolCall,
 } from '@tent-nocode/kernel';
@@ -445,6 +445,11 @@ async function landOp(
       // The theme block lands free through setProjectTheme; the stored brief rides along.
       if (projectId === null) return { refusal: `${op.says}: no project bound` };
       await setProjectTheme(sql, { orgId: ctx.orgId, projectId, theme: d.theme, by: author });
+      return { landed: op.says };
+    }
+    case 'canvas-set': {
+      if (projectId === null) return { refusal: `${op.says}: no project bound` };
+      await landCanvasDoor(sql, { orgId: ctx.orgId, projectId, door: d });
       return { landed: op.says };
     }
     case 'table-create': {

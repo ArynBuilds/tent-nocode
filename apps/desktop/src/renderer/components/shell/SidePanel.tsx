@@ -7,19 +7,12 @@ import type { PanelTab } from './panelPanes.js';
 import styles from './sidepanel.module.css';
 
 /**
- * The side panel (user-directed 2026-07-20, the Codex reference): a right pane with its OWN
- * tab strip — side chats and a user-driven browser — living beside the main thread.
+ * The side panel: a right pane with its own tab strip (Workspace, Code, Node browser, Layers,
+ * Properties, files) beside the canvas. The browser tab is the USER's surface (own persist:
+ * partition), never the agents' walled browser.
  *
- * Law accounting (spec §19): this is APP-SHELL furniture, the same class as the sidebar and
- * title bar — thread chrome laws are untouched. Each side chat renders the SAME
- * ConversationView as the main route (every surface law applies inside it unchanged);
- * window-level hotkeys stay with the primary view (hotkeys={false} here). The browser tab is
- * the USER's surface (own persist: partition) — it is NOT the agents' walled browser (D-73:
- * that one stays hidden and caged; agent-visible browsing is a separate consented design).
- *
- * Tier 52 Phase 3: the tab system (PanelTab/newTab), the panes (SideChat/FilePane/
- * BrowserPane), and the strip (PanelStrip) extracted to their own files so the BOTTOM
- * panel hosts the identical surfaces — one tab system, never a duplicate. This file keeps
+ * The tab system (PanelTab/newTab), the panes and the strip live in their own files so the
+ * bottom panel hosts the identical surfaces. This file keeps
  * only the RIGHT-side geometry (width resize, right overlay, width-pinned clip).
  */
 
@@ -95,10 +88,6 @@ export function SidePanel({
     onTabs(left, left.length === 0 ? '' : activeId === id ? left[left.length - 1]!.id : activeId);
   }
 
-  function setThread(id: string, threadId: string): void {
-    onTabs(tabs.map((t) => (t.id === id ? { ...t, threadId } : t)), activeId);
-  }
-
   const base = side === 'left' ? `${styles.panel} ${styles.panelLeft}` : styles.panel;
   const cls = overlay
     ? `${base} ${styles.panelOverlay}`
@@ -126,7 +115,7 @@ export function SidePanel({
               keeps its scroll when you flip between tabs. */}
           {tabs.map((t) => (
             <div key={t.id} className={t.id === active?.id ? styles.body : styles.bodyHidden}>
-              <PaneBody tab={t} onThread={(threadId) => setThread(t.id, threadId)} />
+              <PaneBody tab={t} />
             </div>
           ))}
         </>

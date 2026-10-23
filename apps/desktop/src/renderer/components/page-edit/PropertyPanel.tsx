@@ -8,7 +8,7 @@ import { desk } from '../../lib/desk.js';
 import { useActiveEditor } from '../canvas/CanvasEngine.js';
 import { PANEL_STATES, rootSectionsFor, scopedBlock, sectionsFor, sharedSectionsFor, visibleRows, withScopedValue } from './panelGroups.js';
 import type { PanelParent, PanelScope, PanelState, RowSpec, SectionSpec } from './panelGroups.js';
-import { PropertyRow } from './PropertyRow.js';
+import { PropertyRow, sentence } from './PropertyRow.js';
 import styles from './editor.module.css';
 
 // THE SCHEMA-DRIVEN PANEL (Phase 12, row 12.16): any primitive renders from primitives.ts - one section per
@@ -76,13 +76,13 @@ export function PropertyPanel({ selection }: { selection: InspectorSelection }) 
         <div className={styles.panelSwitches}>
           <span className={styles.segment}>
             {PANEL_STATES.map((s: PanelState) => (
-              <button key={s} type="button" className={`${styles.segmentBtn} ${scope.state === s ? styles.segmentOn : ''} ${scope.state === s && s !== 'default' ? styles.segmentLive : ''}`} onClick={() => store.setEditing({ previewState: s })}>{s}</button>
+              <button key={s} type="button" className={`${styles.segmentBtn} ${scope.state === s ? styles.segmentOn : ''} ${scope.state === s && s !== 'default' ? styles.segmentLive : ''}`} onClick={() => store.setEditing({ previewState: s })}>{sentence(s)}</button>
             ))}
           </span>
           <span className={styles.segment}>
-            <button type="button" className={`${styles.segmentBtn} ${scope.breakpoint === null ? styles.segmentOn : ''}`} onClick={() => store.setEditing({ breakpoint: null })}>all</button>
+            <button type="button" className={`${styles.segmentBtn} ${scope.breakpoint === null ? styles.segmentOn : ''}`} onClick={() => store.setEditing({ breakpoint: null })}>All</button>
             {breakpoints.map((bp) => (
-              <button key={bp} type="button" className={`${styles.segmentBtn} ${scope.breakpoint === bp ? styles.segmentOn : ''} ${scope.breakpoint === bp ? styles.segmentLive : ''}`} onClick={() => store.setEditing({ breakpoint: bp })}>{bp}</button>
+              <button key={bp} type="button" className={`${styles.segmentBtn} ${scope.breakpoint === bp ? styles.segmentOn : ''} ${scope.breakpoint === bp ? styles.segmentLive : ''}`} onClick={() => store.setEditing({ breakpoint: bp })}>{sentence(bp)}</button>
             ))}
           </span>
         </div>
@@ -97,8 +97,8 @@ export function PropertyPanel({ selection }: { selection: InspectorSelection }) 
           <div key={section.id} className={styles.section}>
             <button type="button" className={styles.sectionHead} onClick={() => setClosed((c) => { const n = new Set(c); if (n.has(section.id)) n.delete(section.id); else n.add(section.id); return n; })}>
               {isClosed ? <ChevronRight size={13} /> : <ChevronDown size={13} />}
-              {section.title}
-              <span className={styles.sectionCount}>{setCount > 0 ? `${setCount}/${rows.length}` : rows.length}</span>
+              {sentence(section.title)}
+              {setCount > 0 ? <span className={styles.sectionCount}>{setCount} set</span> : null}
             </button>
             {isClosed ? null : (
               <div className={styles.sectionBody}>

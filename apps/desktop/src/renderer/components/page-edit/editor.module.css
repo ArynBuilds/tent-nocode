@@ -18,7 +18,7 @@
 .select, .formSelect { padding-right: 8px; }
 .formInput, .formSelect, .pickerInput { font-size: var(--fs-body); }
 .input:focus-visible, .select:focus-visible, .formInput:focus-visible, .formSelect:focus-visible, .pickerInput:focus-visible,
-.ghost:focus-visible, .segmentBtn:focus-visible, .chip:focus-visible, .swatch:focus-visible { outline: 2px solid var(--live); outline-offset: -1px; }
+.ghost:focus-visible, .segmentBtn:focus-visible, .chip:focus-visible, .swatch:focus-visible { outline: 1.5px solid var(--focus); outline-offset: -1px; }
 .input::placeholder, .formInput::placeholder, .pickerInput::placeholder { color: var(--t3); }
 .inputNum { width: 64px; flex: none; font-variant-numeric: tabular-nums; }
 .inputMono { font-family: var(--mono); }
@@ -52,7 +52,8 @@
 .section { display: flex; flex-direction: column; padding: var(--s1) 0 var(--s2); }
 .sectionHead { display: flex; align-items: center; gap: var(--s1); height: 32px; padding: 0 var(--s3); color: var(--t1); font-size: var(--fs-small); font-weight: 600; text-align: left; }
 .sectionHead:hover { color: var(--t0); }
-.sectionCount { margin-left: auto; color: var(--t3); font-weight: 400; font-variant-numeric: tabular-nums; }
+.sectionCount { margin-left: auto; padding: 1px 7px; border-radius: 999px; background: var(--well); color: var(--t2); font-size: var(--fs-caption); font-weight: 500; font-variant-numeric: tabular-nums; }
+.section + .section { border-top: 1px solid var(--hairline); }
 .sectionBody { display: flex; flex-direction: column; gap: 2px; padding: 0 var(--s3); }
 
 .row { display: grid; grid-template-columns: 88px minmax(0, 1fr) 20px; align-items: center; gap: var(--s2); min-height: 32px; }
@@ -74,7 +75,7 @@
 .toggle::after { content: ''; position: absolute; top: 3px; left: 3px; width: 14px; height: 14px; border-radius: 50%; background: var(--t2); transition: transform 150ms ease-out, background 120ms ease-out; }
 .toggleOn { background: var(--live); }
 .toggleOn::after { transform: translateX(16px); background: var(--ground); }
-.toggle:focus-visible { outline: 2px solid var(--live); outline-offset: 2px; }
+.toggle:focus-visible { outline: 1.5px solid var(--focus); outline-offset: 2px; }
 .swatch { width: 20px; height: 20px; flex: none; border-radius: 6px; border: none; background: var(--well); cursor: pointer; box-shadow: inset 0 0 0 1px var(--hairline); }
 .swatchWrap { position: relative; display: flex; align-items: center; gap: var(--s1); flex: 1; min-width: 0; }
 .popover { position: absolute; right: 0; top: 28px; z-index: 20; }
@@ -88,30 +89,30 @@
 
 .frameEditLayer { position: absolute; inset: 0; pointer-events: none; overflow: visible; z-index: 6; }
 .frameEditLayer > * { pointer-events: auto; }
-.outline { position: absolute; box-sizing: border-box; border: calc(1.5px / var(--cz, 1)) solid var(--live); cursor: move; }
-.outlineHover { position: absolute; box-sizing: border-box; border: calc(1px / var(--cz, 1)) solid var(--live); opacity: 0.6; pointer-events: none; }
-.outlineExtra { position: absolute; box-sizing: border-box; border: calc(1px / var(--cz, 1)) solid var(--live); pointer-events: none; }
-.handle, .rotate { position: absolute; background: var(--ground); box-shadow: 0 0 0 calc(1.5px / var(--cz, 1)) var(--live); transform: translate(-50%, -50%); }
+.outline { position: absolute; box-sizing: border-box; border: calc(1.5px / var(--cz, 1)) solid var(--select); cursor: move; }
+.outlineHover { position: absolute; box-sizing: border-box; border: calc(1px / var(--cz, 1)) solid var(--select); opacity: 0.6; pointer-events: none; }
+.outlineExtra { position: absolute; box-sizing: border-box; border: calc(1px / var(--cz, 1)) solid var(--select); pointer-events: none; }
+.handle, .rotate { position: absolute; background: var(--ground); box-shadow: 0 0 0 calc(1.5px / var(--cz, 1)) var(--select); transform: translate(-50%, -50%); }
 .handle { width: calc(8px / var(--cz, 1)); height: calc(8px / var(--cz, 1)); border-radius: calc(2px / var(--cz, 1)); }
 .rotate { width: calc(10px / var(--cz, 1)); height: calc(10px / var(--cz, 1)); border-radius: 50%; cursor: grab; }
-.spacing { position: absolute; background: var(--live); opacity: 0; cursor: ew-resize; transition: opacity 120ms ease-out; }
+.spacing { position: absolute; background: var(--select); opacity: 0; cursor: ew-resize; transition: opacity 120ms ease-out; }
 .spacingY { cursor: ns-resize; }
 .spacing:hover { opacity: 0.25; }
-.landing { position: absolute; background: var(--live); border-radius: 2px; pointer-events: none; }
-.landingParent { position: absolute; box-sizing: border-box; border: calc(1px / var(--cz, 1)) dashed var(--live); pointer-events: none; }
+.landing { position: absolute; background: var(--select); border-radius: 2px; pointer-events: none; }
+.landingParent { position: absolute; box-sizing: border-box; border: calc(1px / var(--cz, 1)) dashed var(--select); pointer-events: none; }
 .guideV { position: absolute; top: -100000px; bottom: -100000px; width: calc(1px / var(--cz, 1)); background: var(--red); pointer-events: none; }
 .guideH { position: absolute; left: -100000px; right: -100000px; height: calc(1px / var(--cz, 1)); background: var(--red); pointer-events: none; }
 .ghostRect { position: absolute; box-sizing: border-box; border: calc(1px / var(--cz, 1)) dashed var(--t3); pointer-events: none; }
 .edgeGripE, .edgeGripS { position: absolute; background: transparent; }
 .edgeGripE { width: calc(8px / var(--cz, 1)); margin-left: calc(-4px / var(--cz, 1)); cursor: ew-resize; }
 .edgeGripS { height: calc(8px / var(--cz, 1)); margin-top: calc(-4px / var(--cz, 1)); cursor: ns-resize; }
-.edgeGripE:hover, .edgeGripS:hover { background: var(--live); opacity: 0.4; }
+.edgeGripE:hover, .edgeGripS:hover { background: var(--select); opacity: 0.4; }
 
 /* ---- the unscaled overlay above the focused screen -------------------- */
 
 .frameEditOverlay { position: absolute; z-index: 8; pointer-events: none; }
 .frameEditOverlay > * { pointer-events: auto; }
-.badge { position: absolute; transform: translate(-50%, 6px); padding: 2px 8px; border-radius: 999px; background: var(--live); color: var(--ground); font-size: var(--fs-caption); font-variant-numeric: tabular-nums; white-space: nowrap; pointer-events: none; }
+.badge { position: absolute; transform: translate(-50%, 6px); padding: 2px 8px; border-radius: 999px; background: var(--select); color: var(--ground); font-size: var(--fs-caption); font-variant-numeric: tabular-nums; white-space: nowrap; pointer-events: none; }
 .runChip { position: absolute; transform: translate(-50%, -100%); display: inline-flex; align-items: center; gap: var(--s1); height: 26px; padding: 0 10px; background: var(--float); color: var(--t1); font-size: var(--fs-caption); box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35); white-space: nowrap; }
 .runChip:hover { color: var(--t0); }
 .wordChip { position: absolute; transform: translate(0, -100%); padding: 2px 8px; border-radius: 999px; background: var(--float); color: var(--t2); font-size: var(--fs-caption); white-space: nowrap; pointer-events: none; }
@@ -139,11 +140,12 @@
 .pickerSample td { color: var(--t2); padding: 3px 8px; white-space: nowrap; max-width: 140px; overflow: hidden; text-overflow: ellipsis; cursor: pointer; }
 .pickerSample td:hover { color: var(--t0); }
 .pickerQuiet { color: var(--t3); font-size: var(--fs-small); line-height: 1.45; }
+.firstCols { display: flex; flex-direction: column; gap: 8px; }
 .pickerVerbs { display: flex; gap: var(--s2); }
-.pickerGo { height: 32px; background: var(--raised); color: var(--t1); padding: 0 14px; }
+.pickerGo { height: 32px; background: var(--primary); color: var(--on-primary); font-weight: 500; padding: 0 16px; }
 .pickerAlt { height: 32px; padding: 0 14px; }
 .pickerGo:disabled { opacity: 0.5; cursor: default; }
-.pickerGo:hover:not(:disabled) { color: var(--t0); background: var(--float); }
+.pickerGo:hover:not(:disabled) { filter: brightness(1.08); }
 .formRow { display: flex; align-items: center; gap: var(--s2); }
 .formWord { flex: none; color: var(--t3); font-size: var(--fs-small); }
 .questions { display: flex; flex-direction: column; gap: var(--s1); min-height: 0; }

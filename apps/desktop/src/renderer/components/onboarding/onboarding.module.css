@@ -1,104 +1,218 @@
-/* The onboarding gate: the app's only surface until it opens. One centered
-   surface card on the ground; inputs are sunken wells, the one verb is gold. */
+/* The onboarding gate: the product picture on the left, one readable column on the right, built
+   from the settings kit. The window stays draggable around both. */
 
-.wrap {
+.gate {
   position: fixed;
   inset: 0;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
   background: var(--ground);
+}
+
+/* The window's own controls ride a bar that melts into the ground. */
+.bar {
+  flex: none;
+  height: 35px;
+  display: flex;
+}
+
+.gate .bar > * {
+  flex: 1;
+  background: transparent;
+  border-bottom: 0;
+}
+
+.wrap {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  gap: 16px;
+  padding: 0 16px 16px;
   -webkit-app-region: drag;
 }
 
-.card {
-  width: min(420px, calc(100vw - 32px));
-  display: flex;
-  flex-direction: column;
-  gap: var(--s4);
-  padding: var(--s6);
-  border-radius: var(--r3);
-  background: var(--surface);
+.wrap > * {
   -webkit-app-region: no-drag;
 }
 
-.brand {
-  font: 600 var(--fs-heading) var(--sans);
-  color: var(--t0);
+.pane {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: auto;
+  padding: 32px;
+}
+
+.column {
+  width: min(420px, 100%);
 }
 
 .form {
   display: flex;
   flex-direction: column;
-  gap: var(--s3);
+  gap: 24px;
+}
+
+/* Each piece arrives a beat after the last. */
+.form > * {
+  animation: rise 560ms var(--ease-out) backwards;
+}
+
+.form > :nth-child(2) { animation-delay: 60ms; }
+.form > :nth-child(3) { animation-delay: 120ms; }
+.form > :nth-child(4) { animation-delay: 180ms; }
+
+.steps {
+  display: flex;
+  gap: 6px;
+}
+
+.step,
+.stepOn {
+  width: 28px;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--raised);
+  transition: background 300ms ease-out;
+}
+
+.stepOn {
+  background: var(--t1);
+}
+
+.head {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.eyebrow {
+  font: 500 var(--fs-small) var(--sans);
+  color: var(--t3);
 }
 
 .title {
-  font: 600 var(--fs-title) var(--sans);
+  margin: 0;
+  font: 600 30px / 1.15 var(--sans);
+  letter-spacing: -0.025em;
   color: var(--t1);
 }
 
-.quiet {
-  font: 400 var(--fs-small) var(--sans);
-  color: var(--t3);
-  line-height: 1.5;
-}
-
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: var(--s1);
-}
-
-.label {
-  font: 400 var(--fs-small) var(--sans);
+.description {
+  margin: 0;
+  font: 400 var(--fs-body) / 1.55 var(--sans);
   color: var(--t2);
 }
 
 .input {
-  height: 36px;
-  padding: 0 var(--s3);
-  background: var(--well);
-  border: 0;
-  border-radius: var(--r1);
+  height: 42px;
+}
+
+.foot {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.footRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.go {
+  flex: none;
+  height: 46px;
+  font-size: var(--fs-body);
+}
+
+.go svg {
+  transition: transform 220ms var(--ease-out);
+}
+
+.go:hover:not(:disabled) svg {
+  transform: translateX(3px);
+}
+
+.footRow .go {
+  flex: 1;
+}
+
+.back {
+  height: 46px;
+}
+
+.avatar {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--raised);
+  box-shadow: 0 0 0 6px var(--surface), var(--lift);
+  font: 600 20px var(--sans);
+  letter-spacing: 0.02em;
   color: var(--t1);
-  font: 400 var(--fs-body) var(--sans);
-  outline: none;
 }
 
-.input:focus {
-  outline: 2px solid var(--live);
-  outline-offset: -2px;
+.shake {
+  animation: shake 420ms cubic-bezier(0.36, 0.07, 0.19, 0.97);
 }
 
-.error {
-  font: 400 var(--fs-small) var(--sans);
-  color: var(--red);
-  line-height: 1.5;
+/* ---- starting ---- */
+
+.loading {
+  flex: 1;
+  display: grid;
+  place-items: center;
+  background: var(--ground);
+  -webkit-app-region: drag;
 }
 
-.primary {
-  align-self: flex-start;
-  height: 36px;
-  padding: 0 var(--s4);
-  border: 0;
-  border-radius: 999px;
-  background: var(--live);
-  color: var(--ground);
-  font: 500 var(--fs-small) var(--sans);
-  cursor: pointer;
+.loadingMark {
+  color: var(--mark);
+  animation: pulse 1.8s ease-in-out infinite;
 }
 
-.primary:hover:not(:disabled) {
-  filter: brightness(1.08);
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 
-.primary:focus-visible {
-  outline: 2px solid var(--live);
-  outline-offset: 2px;
+@keyframes shake {
+  10%, 90% { transform: translateX(-1px); }
+  20%, 80% { transform: translateX(3px); }
+  30%, 50%, 70% { transform: translateX(-6px); }
+  40%, 60% { transform: translateX(6px); }
 }
 
-.primary:disabled {
-  opacity: 0.6;
-  cursor: default;
+@keyframes pulse {
+  0%, 100% { opacity: 0.55; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.04); }
+}
+
+/* Narrow windows: the picture steps aside and the form takes the window. */
+@media (max-width: 900px) {
+  .wrap {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .wrap > :first-child {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .form > *,
+  .shake,
+  .loadingMark {
+    animation: none;
+  }
 }

@@ -43,7 +43,7 @@ export function ModeToolbar({ pickRows, mode, onMode, armed, ask, onAskPick, onA
           at={{ x: ask.client.x, y: ask.client.y }}
           groups={pickRows(onAskPick)}
           search="always"
-          placeholder="what are you drawing?"
+          placeholder="What are you drawing?"
           onClose={onAskClose}
         />
       ) : null}

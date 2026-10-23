@@ -192,7 +192,7 @@ export interface WireSelection {
   binding?: { sceneSlug: string; dataset: string; projectId: string | null };
   actionWire?: { sceneSlug: string; action: string; rule: number; param?: string; projectId: string | null };
 }
-export type InspectorSubject = InspectorSelection | CitizenSelection | WireSelection;
+export type InspectorSubject = InspectorSelection | WireSelection;
 
 export interface NodeBrowseContext {
   mode: 'wire' | 'catalog';
@@ -234,6 +234,8 @@ export interface PanelRecord {
   focusScene: { slug: string; nonce: number } | null;
   descend: { target: WorkshopDescend; nonce: number } | null;
   screenFocus: { sceneId: string; nonce: number } | null;
+  /** A node's properties asked for from outside the canvas (the node browser); the workspace answers. */
+  nodeProps: { nodeId: string; nonce: number } | null;
   catalogAdd: { add: CatalogAdd; nonce: number } | null;
   armed: InspectorSelection | null;
   armedCode: CodeSelection | null;
@@ -313,6 +315,9 @@ const NONE_SET: ReadonlySet<string> = new Set();
 export class CanvasStore {
   private readonly atoms = new Map<string, Atom<CanvasRecord | undefined>>();
   private readonly ids = atom<ReadonlySet<string>>('store.ids', new Set());
+  // Membership per record type and per screen: a camera move or one screen's edit invalidates only its own readers.
+  private readonly byType = new Map<string, Atom<ReadonlySet<string>>>();
+  private readonly byScene = new Map<string, Atom<ReadonlySet<string>>>();
   private readonly listeners = new Set<StoreListener>();
   private pending: RecordsDiff | null = null;
   private source: ChangeSource = 'user';
@@ -330,7 +335,7 @@ export class CanvasStore {
       { typeName: 'runs', id: 'runs', runs: [], states: [], outPorts: {}, replay: null },
       {
         typeName: 'panel', id: 'panel', inspector: null, inspectorNonce: 0, browser: null, browserNonce: 0, file: null, focusScene: null,
-        descend: null, screenFocus: null, catalogAdd: null, armed: null, armedCode: null,
+        descend: null, screenFocus: null, nodeProps: null, catalogAdd: null, armed: null, armedCode: null,
         hosts: { inspector: false, browser: false, file: false, focus: false, workspace: false },
       },
     ], 'remote');
@@ -356,12 +361,16 @@ export class CanvasStore {
     return this.ids.get();
   }
 
-  /** Every record of one type, capturing each; the derived views below ride this. */
+  /** Every record of one type, capturing that type's set and its records alone; the derived views below ride this. */
   ofType<T extends CanvasRecord>(typeName: T['typeName']): T[] {
+    return this.recordsOf<T>(this.indexAtom(this.byType, typeName).get());
+  }
+
+  private recordsOf<T extends CanvasRecord>(ids: ReadonlySet<string>): T[] {
     const out: T[] = [];
-    for (const id of this.ids.get()) {
+    for (const id of ids) {
       const r = this.atoms.get(id)?.get();
-      if (r !== undefined && r.typeName === typeName) out.push(r as T);
+      if (r !== undefined) out.push(r as T);
     }
     return out;
   }
@@ -370,7 +379,7 @@ export class CanvasStore {
     this.atomic(() => {
       const diff = emptyDiff();
       let changed = false;
-      const next = new Set(this.ids.get());
+      const joined: CanvasRecord[] = [];
       for (const r of records) {
         const existing = this.atoms.get(r.id);
         if (existing !== undefined) {
@@ -386,12 +395,12 @@ export class CanvasStore {
         } else {
           this.atoms.set(r.id, atom(`rec:${r.id}`, r as CanvasRecord | undefined));
         }
-        next.add(r.id);
+        joined.push(r);
         diff.added[r.id] = r;
         changed = true;
       }
       if (!changed) return;
-      this.ids.set(next);
+      if (joined.length > 0) this.reindex(joined, []);
       this.record(diff);
     }, source);
   }
@@ -399,22 +408,50 @@ export class CanvasStore {
   remove(ids: string[], source?: ChangeSource): void {
     this.atomic(() => {
       const diff = emptyDiff();
-      const next = new Set(this.ids.get());
-      let changed = false;
+      const left: CanvasRecord[] = [];
       for (const id of ids) {
         const a = this.atoms.get(id);
         if (a === undefined) continue;
         const before = unsafe__withoutCapture(() => a.get());
         if (before === undefined) continue;
         a.set(undefined);
-        next.delete(id);
         diff.removed[id] = before;
-        changed = true;
+        left.push(before);
       }
-      if (!changed) return;
-      this.ids.set(next);
+      if (left.length === 0) return;
+      this.reindex([], left);
       this.record(diff);
     }, source);
+  }
+
+  /** Membership moves: the whole set, the type sets and the screen sets change only when a record joins or leaves. */
+  private reindex(joined: CanvasRecord[], left: CanvasRecord[]): void {
+    const all = new Set(unsafe__withoutCapture(() => this.ids.get()));
+    const touched = new Map<Atom<ReadonlySet<string>>, Set<string>>();
+    const setOf = (index: Map<string, Atom<ReadonlySet<string>>>, key: string): Set<string> => {
+      const a = this.indexAtom(index, key);
+      let s2 = touched.get(a);
+      if (s2 === undefined) { s2 = new Set(unsafe__withoutCapture(() => a.get())); touched.set(a, s2); }
+      return s2;
+    };
+    for (const r of joined) {
+      all.add(r.id);
+      setOf(this.byType, r.typeName).add(r.id);
+      if (r.typeName === 'element') setOf(this.byScene, r.scene).add(r.id);
+    }
+    for (const r of left) {
+      all.delete(r.id);
+      setOf(this.byType, r.typeName).delete(r.id);
+      if (r.typeName === 'element') setOf(this.byScene, r.scene).delete(r.id);
+    }
+    this.ids.set(all);
+    for (const [a, next] of touched) a.set(next);
+  }
+
+  private indexAtom(index: Map<string, Atom<ReadonlySet<string>>>, key: string): Atom<ReadonlySet<string>> {
+    let a = index.get(key);
+    if (a === undefined) { a = atom(`store.index:${key}`, NONE_SET); index.set(key, a); }
+    return a;
   }
 
   /** Applies a diff whole: undo applies the reversed one, a remote merge the server's. */
@@ -569,7 +606,7 @@ export class CanvasStore {
   elementsOf(scene: string): ElementRecord[] {
     let c = this.elementsCache.get(scene);
     if (c === undefined) {
-      c = computed(`store.elements:${scene}`, () => this.ofType<ElementRecord>('element').filter((e) => e.scene === scene));
+      c = computed(`store.elements:${scene}`, () => this.recordsOf<ElementRecord>(this.indexAtom(this.byScene, scene).get()));
       this.elementsCache.set(scene, c);
     }
     return c.get();
@@ -690,6 +727,25 @@ export class CanvasStore {
     return screen !== undefined && origin !== undefined ? { screen, origin } : null;
   }
 
+  /** The free spot nearest `at` for a card of this node's size: rings outward until nothing on the canvas is within a gap. */
+  freeSpotNear(id: string, at: Placed): Placed {
+    const size = this.sizeOf(id);
+    const gap = 32;
+    const others: Rect[] = [];
+    for (const [other, p] of this.layout.get()) if (other !== id) others.push({ x: p.x, y: p.y, ...this.sizeOf(other) });
+    const clear = (p: Placed): boolean => !others.some((r) => p.x < r.x + r.w + gap && r.x < p.x + size.w + gap && p.y < r.y + r.h + gap && r.y < p.y + size.h + gap);
+    if (clear(at)) return at;
+    const step = 48;
+    for (let ring = 1; ring < 60; ring++) {
+      for (let i = -ring; i <= ring; i++) {
+        for (const p of [{ x: at.x + i * step, y: at.y - ring * step }, { x: at.x + i * step, y: at.y + ring * step }, { x: at.x - ring * step, y: at.y + i * step }, { x: at.x + ring * step, y: at.y + i * step }]) {
+          if (clear(p)) return p;
+        }
+      }
+    }
+    return at;
+  }
+
   /** Writes positions into the arrangement (a user change the history records unless `source` says remote). */
   placeNodes(positions: Record<string, Placed>, source?: ChangeSource): void {
     this.update<ArrangementRecord>('arrangement', (a) => ({ ...a, positions: { ...a.positions, ...positions } }), source);
@@ -719,14 +775,14 @@ export class CanvasStore {
   }
   /** Opens the inspector on a subject; false = no inspector panel is mounted to answer. */
   openInspector(subject: InspectorSubject): boolean {
-    if ('nodeId' in subject && !('citizen' in subject) && !('wire' in subject)) this.armSelection(subject);
+    if (!('wire' in subject)) this.armSelection(subject);
     if (!this.panel.hosts.inspector) return false;
     this.bumpPanel((p) => ({ ...p, inspector: subject, inspectorNonce: p.inspectorNonce + 1 }));
     return true;
   }
   /** Re-aims an open inspector without opening one. */
   retargetInspector(subject: InspectorSubject): void {
-    if ('nodeId' in subject && !('citizen' in subject) && !('wire' in subject)) this.armSelection(subject);
+    if (!('wire' in subject)) this.armSelection(subject);
     if (this.panel.inspector === null) return;
     this.bumpPanel((p) => ({ ...p, inspector: subject }));
   }
@@ -751,6 +807,11 @@ export class CanvasStore {
   requestDescend(target: WorkshopDescend): boolean {
     if (!this.panel.hosts.workspace) return false;
     this.bumpPanel((p) => ({ ...p, descend: { target, nonce: (p.descend?.nonce ?? 0) + 1 } }));
+    return true;
+  }
+  requestNodeProps(nodeId: string): boolean {
+    if (!this.panel.hosts.workspace) return false;
+    this.bumpPanel((p) => ({ ...p, nodeProps: { nodeId, nonce: (p.nodeProps?.nonce ?? 0) + 1 } }));
     return true;
   }
   requestScreenFocus(sceneId: string): boolean {
@@ -829,6 +890,9 @@ export class CanvasStore {
       ]);
       this.setSelection(null);
       this.setEditing({ sentence: null });
+      // What rides the next message belongs to the project it was picked in.
+      this.armSelection(null);
+      this.armCodeSelection(null);
     }, 'remote');
     this.canvasDocAtom.set(null);
   }
@@ -844,6 +908,10 @@ export class CanvasStore {
     if (t === 'scenes' || t === 'scene_revisions') this.debounce('docs', 200, () => void this.readDocs());
     if (t === 'component_definitions') this.debounce('catalog', 300, () => void this.readCatalog());
     if (t === 'projects') this.debounce('projects', 300, () => void this.readProjects());
+    // A layout written elsewhere (the AI's canvas block) shows at once; a gesture still settling keeps its own.
+    if (t === 'workspace_arrangements' && event.id === projectId && !this.arrangementDirty) {
+      this.debounce('arrangement-read', 200, () => { if (!this.arrangementDirty) void this.readArrangement(); });
+    }
   }
 
   private debounce(key: string, ms: number, fn: () => void): void {
@@ -1188,6 +1256,9 @@ export const SCREEN_VIEW_SCALE = 0.375;
 export const ZOOM_FAR = 0.5;
 export const ZOOM_CLOSE = 1.6;
 export type ZoomRegime = 'far' | 'rest' | 'close';
+/** The canvas viewport in screen px, kept by the engine's resize watch; what is "on screen" reads it. */
+export const canvasView = atom<{ w: number; h: number }>('canvas.view', { w: 0, h: 0 });
+
 export function zoomRegimeOf(zoom: number): ZoomRegime {
   return zoom < ZOOM_FAR ? 'far' : zoom > ZOOM_CLOSE ? 'close' : 'rest';
 }
@@ -1517,7 +1588,7 @@ export const INSERT_ROWS: ReadonlyArray<{ kind: AddKind; word: string; citizenKi
   { kind: 'table', word: 'New Table', citizenKind: 'dataset' },
   { kind: 'view', word: 'New Screen', citizenKind: 'scene' },
   { kind: 'tool', word: 'New Tool', citizenKind: 'operation' },
-  { kind: 'watcher', word: 'New Watcher', citizenKind: 'trigger' },
+  { kind: 'watcher', word: 'New Trigger', citizenKind: 'trigger' },
   { kind: 'knowledge', word: 'New Notes', citizenKind: 'notes' },
 ];
 

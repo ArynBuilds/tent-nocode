@@ -1,0 +1,200 @@
+/* The empty project's first look: one floating card centered on the canvas; the canvas stays live around it. */
+
+.wrap {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding-bottom: 80px;
+  pointer-events: none;
+}
+
+.card {
+  pointer-events: auto;
+  width: min(520px, calc(100% - 48px));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 28px 24px 22px;
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  border-radius: var(--r3);
+  box-shadow: 0 24px 60px -28px rgba(0, 0, 0, 0.7), var(--lift);
+  backdrop-filter: blur(6px);
+  text-align: center;
+  animation: rise 560ms var(--ease-out) backwards;
+}
+
+.mark {
+  margin-bottom: 6px;
+  color: var(--mark);
+}
+
+.title {
+  font: 600 20px var(--sans);
+  letter-spacing: -0.015em;
+  color: var(--t1);
+}
+
+.line {
+  max-width: 40ch;
+  font: 400 13px / 1.5 var(--sans);
+  color: var(--t2);
+}
+
+.starts {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.start {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 14px 8px 12px;
+  border: 0;
+  border-radius: var(--r2);
+  background: var(--well);
+  color: var(--t2);
+  font: inherit;
+  cursor: pointer;
+  animation: rise 480ms var(--ease-out) backwards;
+  transition: background 140ms ease-out, transform 220ms var(--ease-out), color 140ms ease-out;
+}
+
+.start:hover {
+  background: var(--raised);
+  color: var(--t1);
+  transform: translateY(-2px);
+}
+
+.start:focus-visible {
+  outline: 1.5px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.icon {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  margin-bottom: 4px;
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--t1);
+}
+
+.label {
+  font: 600 13px var(--sans);
+  color: var(--t1);
+}
+
+.sub {
+  font: 400 11.5px / 1.35 var(--sans);
+  color: var(--t3);
+}
+
+.foot {
+  margin-top: 12px;
+  font: 400 12px var(--sans);
+  color: var(--t3);
+}
+
+/* ---- naming in place ---- */
+
+.naming {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  animation: rise 360ms var(--ease-out) backwards;
+}
+
+.input {
+  width: 100%;
+  height: 42px;
+  margin-top: 12px;
+  padding: 0 14px;
+  box-sizing: border-box;
+  background: var(--well);
+  border: 0;
+  border-radius: var(--r1);
+  outline: none;
+  color: var(--t1);
+  font: 400 14px var(--sans);
+  text-align: center;
+}
+
+.input:focus-visible {
+  outline: 1.5px solid var(--focus);
+  outline-offset: -1.5px;
+}
+
+.namingFoot {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+}
+
+.back,
+.create {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 34px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 999px;
+  font: 500 12.5px var(--sans);
+  cursor: pointer;
+}
+
+.back {
+  background: transparent;
+  color: var(--t2);
+}
+
+.back:hover {
+  background: var(--raised);
+  color: var(--t1);
+}
+
+.create {
+  background: var(--primary);
+  color: var(--on-primary);
+}
+
+.create:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.back:focus-visible,
+.create:focus-visible {
+  outline: 1.5px solid var(--focus);
+  outline-offset: 2px;
+}
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (max-width: 640px) {
+  .starts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .start {
+    animation: none;
+  }
+}

@@ -19,6 +19,15 @@
   z-index: 5;
 }
 
+/* The ports ride one layer shifted by the camera offset, so a pan moves the layer alone. */
+.portLayer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+}
+
 /* THE PROXIMITY REVEAL: at rest a mid-gray whisper; near the cursor — full-bright,
    slight growth, a soft dark backplate disc (transform/opacity/shadow only, ~120ms). */
 .portDot {
@@ -70,16 +79,21 @@
   transform: translate(-50%, -100%) scale(calc(1 / var(--cz, 1)));
   display: flex;
   gap: 2px;
-  padding: 3px;
-  background: color-mix(in srgb, var(--panel) 92%, transparent);
-  border: 1px solid var(--border);
-  border-radius: var(--r1);
+  padding: 4px;
+  background: var(--float);
+  border-radius: 12px;
+  box-shadow: 0 10px 28px -8px rgba(0, 0, 0, 0.55), var(--lift);
   pointer-events: auto;
+  animation: toolbarIn 180ms var(--ease-out) backwards;
+}
+
+@keyframes toolbarIn {
+  from { opacity: 0; transform: translate(-50%, calc(-100% + 4px)) scale(calc(0.96 / var(--cz, 1))); }
 }
 
 .toolbarBtn {
-  width: 26px;
-  height: 26px;
+  width: 30px;
+  height: 30px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -93,8 +107,13 @@
 }
 
 .toolbarBtn:hover {
-  color: #ececec;
-  background: color-mix(in srgb, var(--t2) 12%, transparent);
+  color: var(--t0);
+  background: var(--raised);
+}
+
+.toolbarBtn:focus-visible {
+  outline: 1.5px solid var(--focus);
+  outline-offset: -1.5px;
 }
 
 /* N10 THE SENTENCE ON SELECT (the node tile, 2026-08-18): the single selection's

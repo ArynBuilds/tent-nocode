@@ -1,48 +1,54 @@
-import { Layers, MessageSquarePlus, Network, PackageSearch, Settings, SquareCode } from 'lucide-react';
+import { Layers, Network, PackageSearch, Settings, SquareCode } from 'lucide-react';
 import { useQuery } from '../../lib/data/useQuery.js';
 import { desk } from '../../lib/desk.js';
 import { useFocusedProject } from '../../lib/FocusContext.js';
 import { useOrg } from '../../lib/OrgContext.js';
-import { store } from '../../lib/canvas/store.js';
+import { openPublishTakeover } from '../../lib/publishTakeover.js';
+import { Logo } from '../brand/Logo.js';
 import styles from './sidepanel.module.css';
 
-// Panel launcher: picker for side chat, workspace, code, node browser, layers, project settings.
+// Panel launcher: picker for workspace, code, node browser, layers, project settings.
 
-export function PanelLauncher({ onAdd }: { onAdd: (kind: 'chat' | 'workspace' | 'code' | 'nodeBrowser' | 'layers') => void }) {
+export function PanelLauncher({ onAdd }: { onAdd: (kind: 'workspace' | 'code' | 'nodeBrowser' | 'layers') => void }) {
   const { orgId } = useOrg();
   const { focusedProjectId } = useFocusedProject();
   const { data: projects } = useQuery(`launcher:projects:${orgId}`, () => desk.listProjects(orgId), [orgId]);
   const focusedProject = (projects ?? []).find((p) => p.id === focusedProjectId) ?? null;
 
-  function openProjectSettings(projectId: string, name: string): void {
-    store.openInspector({ citizen: true, kind: 'project', nodeId: `project:${projectId}`, label: name, projectId });
-  }
 
+  const items: Array<{ id: 'workspace' | 'code' | 'nodeBrowser' | 'layers'; label: string; line: string; icon: typeof Network }> = [
+    { id: 'layers', label: 'Layers', line: 'Everything on the selected screen', icon: Layers },
+    { id: 'nodeBrowser', label: 'Node browser', line: 'Everything you can place', icon: PackageSearch },
+    { id: 'code', label: 'Code', line: 'Your tools and files', icon: SquareCode },
+    { id: 'workspace', label: 'Workspace', line: 'A second view of the canvas', icon: Network },
+  ];
   return (
     <div className={styles.launcher}>
-      <button type="button" className={styles.launchItem} onClick={() => onAdd('chat')}>
-        <MessageSquarePlus size={15} /> Side chat
-      </button>
-      <button type="button" className={styles.launchItem} onClick={() => onAdd('workspace')}>
-        <Network size={15} /> Workspace
-      </button>
-      <button type="button" className={styles.launchItem} onClick={() => onAdd('code')}>
-        <SquareCode size={15} /> Code
-      </button>
-      <button type="button" className={styles.launchItem} onClick={() => onAdd('nodeBrowser')}>
-        <PackageSearch size={15} /> Node browser
-      </button>
-      <button type="button" className={styles.launchItem} onClick={() => onAdd('layers')}>
-        <Layers size={15} /> Layers
-      </button>
-      {focusedProject !== null ? (
-        <button
-          type="button" className={styles.launchItem}
-          onClick={() => openProjectSettings(focusedProject.id, focusedProject.name)}
-        >
-          <Settings size={15} /> Project settings
-        </button>
-      ) : null}
+      <Logo size={30} className={styles.launchMark} />
+      <div className={styles.launchTitle}>Open a panel</div>
+      <div className={styles.launchList}>
+        {items.map(({ id, label, line, icon: Icon }) => (
+          <button key={id} type="button" className={styles.launchItem} onClick={() => onAdd(id)}>
+            <span className={styles.launchIcon}><Icon size={15} /></span>
+            <span className={styles.launchText}>
+              <span className={styles.launchLabel}>{label}</span>
+              <span className={styles.launchLine}>{line}</span>
+            </span>
+          </button>
+        ))}
+        {focusedProject !== null ? (
+          <button
+            type="button" className={styles.launchItem}
+            onClick={() => openPublishTakeover({ projectId: focusedProject.id, section: 'general' })}
+          >
+            <span className={styles.launchIcon}><Settings size={15} /></span>
+            <span className={styles.launchText}>
+              <span className={styles.launchLabel}>Project settings</span>
+              <span className={styles.launchLine}>Publish, export and secrets</span>
+            </span>
+          </button>
+        ) : null}
+      </div>
     </div>
   );
 }

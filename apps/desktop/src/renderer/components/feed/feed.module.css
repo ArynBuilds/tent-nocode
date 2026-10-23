@@ -1,57 +1,70 @@
-/* The document flow (FR-175, D-39; restyled 2026-07-20, user-ratified against the Codex
- * reference): typographic hierarchy, not borders. The user's texts are RIGHT-ALIGNED rounded
- * pills — the only filled elements; consent questions keep their bordered sections; the
- * assistant is plain quiet text on the bare surface. Generous inter-turn air. */
+/* The conversation document: the user's words are right-aligned raised pills, the assistant is
+   plain text on the bare ground, the work folds into one quiet line that opens a timeline.
+   Typography and surfaces carry the hierarchy; no borders. */
 
 .feed {
   max-width: 760px;
   margin: 0 auto;
-  padding: 16px 4px 24px;
+  padding: 12px 4px 20px;
+  font: 400 13.5px / 1.65 var(--sans);
+  color: var(--t1);
 }
 
 .prompt {
-  background: var(--panel2); /* user-ruled 2026-07-28: sent messages wear the CHATBOX's own
-                                color (the capsule composer's --panel2) — one family */
-  border: none;
-  border-radius: 22px;
-  padding: 10px 18px;
-  margin: 30px 0 22px auto;
   width: fit-content;
-  max-width: 72%;
-  white-space: pre-wrap;
+  max-width: 78%;
+  margin: 26px 0 18px auto;
+  padding: 10px 16px;
+  border-radius: 22px;
+  background: var(--raised);
+  color: var(--t1);
   line-height: 1.5;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  transform-origin: 100% 100%;
+  animation: promptIn 360ms var(--ease-out) backwards;
 }
-/* LIGHT MODE (user-corrected 2026-07-28): the RELATIVE flip only — dark mode's pill is
-   lighter than its ground, so light mode's pill is DARKER than its ground; text stays
-   the theme's own. */
+
+.feed > .prompt:first-child {
+  margin-top: 6px;
+}
+
+/* Light mode: the pill sits a step darker than the white page. */
 :global([data-theme='light']) .prompt,
 :global([data-theme='light']) .mdCode,
 :global([data-theme='light']) .mdTable th {
-  background: #f0f0f0; /* ONE shared tone: pill + inline mentions + table headers (lightened per user, pass 3) */
+  background: #f0f0f0;
+}
+
+@keyframes promptIn {
+  from { opacity: 0; transform: translateY(8px) scale(0.98); }
 }
 
 .narration {
+  margin: 12px 0;
   color: var(--t1);
-  line-height: 1.6;
-  margin: 14px 0;
   white-space: pre-wrap;
+  animation: fadeUp 420ms var(--ease-out) backwards;
 }
-/* A failed turn's reason, in place: error = mono red, the design system's one error face. */
+
+/* A failed turn's reason, in place: mono red, the one error face. */
 .narrationFailed {
+  margin: 12px 0;
+  padding: 10px 12px;
+  border-radius: var(--r1);
+  background: color-mix(in srgb, var(--red) 8%, transparent);
   color: var(--red);
-  font-family: var(--mono);
-  font-size: 12px;
-  line-height: 1.6;
-  margin: 14px 0;
+  font: 400 12px / 1.6 var(--mono);
   white-space: pre-wrap;
 }
-/* The thinking indicator: the working word itself shimmers — a light sweep across the
- * TEXT (background-clip). No wordless markers anywhere; the live element carries its
- * own words, and clicking the word folds the process detail open and closed. */
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(4px); }
+}
+
+/* The working word shimmers: one light band sweeps across the text itself. */
 .shimmer {
-  /* One narrow band on the base tone; the 200% tile with a 100% -> -100% sweep means one band
-   * enters left and exits right per loop, and no repeat ever tiles a second band over the tail. */
-  background: linear-gradient(90deg, var(--t3) 0%, var(--t3) 45%, var(--t0) 50%, var(--t3) 55%, var(--t3) 100%);
+  background: linear-gradient(90deg, var(--t3) 0%, var(--t3) 42%, var(--t0) 50%, var(--t3) 58%, var(--t3) 100%);
   background-size: 200% 100%;
   background-repeat: no-repeat;
   background-color: var(--t3);
@@ -60,306 +73,402 @@
   color: transparent;
   animation: shimmer 2s linear infinite;
 }
+
 @keyframes shimmer {
   from { background-position: 100% 0; }
   to { background-position: -100% 0; }
 }
-@media (prefers-reduced-motion: reduce) {
-  .shimmer { animation: none; background: none; color: var(--t2); }
-}
 
-/* FR-215: the FR-190 status word lives IN the chat, at the document's live edge. */
+/* The status word at the live edge of the document; not clickable. */
 .liveStatus {
-  font-family: var(--mono);
-  font-size: 12px;
+  margin: 12px 0 2px;
+  font: 400 13px var(--sans);
   color: var(--t2);
-  margin: 10px 0 2px;
   user-select: none;
-  /* Fix ledger 2026-07-28 wave 1.2: the edge word is NOT clickable — its live group-header
-   * twin is. Explicit, so the twins' cursors never drift into a false shared affordance. */
   cursor: default;
 }
 
-.step {
-  font-family: var(--mono);
-  font-size: 12px;
+/* A shared disclosure caret: points right when folded, down when open. */
+.caret {
+  flex: none;
   color: var(--t3);
-  margin: 2px 0;
-  line-height: 1.5;
+  opacity: 0.8;
+  transition: transform 240ms var(--ease-out), opacity 120ms ease-out;
 }
+
+.caretOpen {
+  transform: rotate(90deg);
+}
+
+/* ---- the turn: one quiet line for the work, then the reply ---- */
+
+.turn {
+  margin: 2px 0;
+}
+
+.turnChildren {
+  margin: 4px 0 8px;
+}
+
+.turnHeader,
+.groupSummary,
+.machinery {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 26px;
+  margin: 8px 0 0;
+  padding: 0 8px 0 0;
+  border: none;
+  border-radius: var(--r1);
+  background: none;
+  color: var(--t3);
+  font: 400 12.5px var(--sans);
+  text-align: left;
+  cursor: pointer;
+  transition: color 120ms ease-out;
+}
+
+.turnHeader:hover,
+.groupSummary:hover,
+.machinery:hover {
+  color: var(--t1);
+}
+
+.turnHeader:hover .caret,
+.groupSummary:hover .caret,
+.machinery:hover .caret {
+  opacity: 1;
+}
+
+.turnHeader:focus-visible,
+.groupSummary:focus-visible,
+.machinery:focus-visible,
+.pill:focus-visible,
+.chipAction:focus-visible {
+  outline: 1.5px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.group {
+  margin: 6px 0;
+}
+
+.groupLive .groupSummary {
+  color: var(--t2);
+}
+
+/* ---- the timeline: a soft well, a thin rail, one dot per step ---- */
+
+.timeline {
+  position: relative;
+  margin: 6px 0 10px;
+  padding: 10px 14px 10px 30px;
+  border-radius: var(--r2);
+  background: var(--surface);
+  animation: open 280ms var(--ease-out) backwards;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 16px;
+  top: 16px;
+  bottom: 16px;
+  width: 1px;
+  background: var(--hairline);
+}
+
+@keyframes open {
+  from { opacity: 0; transform: translateY(-4px); }
+}
+
+.step {
+  position: relative;
+  margin: 3px 0;
+  font: 400 12.5px / 1.5 var(--sans);
+  color: var(--t3);
+}
+
+.timeline .step::before {
+  content: '';
+  position: absolute;
+  left: -17px;
+  top: 7px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--mark);
+}
+
 .stepTool {
   color: var(--t2);
 }
+
+.stepThought {
+  font-style: italic;
+}
+
 .stepFail {
   color: var(--amber);
 }
 
-.chipRow {
-  margin: 4px 0;
+.timeline .stepFail::before {
+  background: var(--amber);
 }
+
+.timelineEnd {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  color: var(--t2);
+}
+
+.timeline .timelineEnd::before {
+  display: none;
+}
+
+/* Edit size: +N green, -N red; the signs carry it, not the color alone. */
+.statPlus { color: var(--green); }
+.statMinus { color: var(--red); }
+
+/* ---- files: small chips, the path in mono ---- */
+
+.chipRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 8px 0 4px;
+}
+
 .chip {
   display: inline-flex;
+  align-items: center;
   gap: 6px;
-  font-family: var(--mono);
-  font-size: 12px;
+  max-width: 100%;
+  height: 26px;
+  padding: 0 10px;
+  border: none;
+  border-radius: 999px;
+  background: var(--well);
   color: var(--t2);
-  background: var(--panel2);
-  border: 1px solid var(--border);
-  border-radius: var(--r1);
-  padding: 3px 9px;
-  margin: 2px 6px 2px 0;
+  font: 400 11.5px var(--mono);
 }
+
+.chipText {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
 .chipWarn {
-  border-color: var(--amber);
   color: var(--amber);
 }
 
-.machinery {
-  font-family: var(--mono);
-  font-size: 12px;
-  color: var(--t3);
-  margin: 6px 0;
+/* A delivered file opens on click. */
+.chipAction {
   cursor: pointer;
-  background: none;
-  border: none;
-  padding: 0;
-  display: block;
-  text-align: left;
-}
-.machinery:hover {
-  color: var(--t2);
-}
-.machineryDetail {
-  font-family: var(--mono);
-  font-size: 11px;
-  color: var(--t3);
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: var(--r1);
-  padding: 8px 10px;
-  margin: 2px 0 8px;
-  white-space: pre-wrap;
-  word-break: break-all;
-  max-height: 180px;
-  overflow-y: auto;
+  transition: background 120ms ease-out, color 120ms ease-out;
 }
 
-/* User-ratified 2026-07-12: the border bars died — liveness is the constellation mark, and an
-   opened group is contained by a quiet inset panel, never by vertical rules. */
-.group {
-  margin: 8px 0 8px 2px;
-}
-.groupLive .groupSummary {
-  color: var(--accent);
-}
-.groupDetail {
-  background: var(--panel);
-  border-radius: var(--r1);
-  padding: 6px 10px;
-  margin-top: 4px;
-}
-.groupSummary {
-  font-family: var(--mono);
-  font-size: 12px;
-  color: var(--t2);
-  cursor: pointer;
-  background: none;
-  border: none;
-  padding: 0;
-  display: block;
-  text-align: left;
-}
-.groupSummary:hover {
+.chipAction:hover:not(:disabled) {
+  background: var(--raised);
   color: var(--t1);
 }
-/* Fix ledger 2026-07-28 wave 1.2, hover-only ratification: the LIVE header is the clickable
- * twin of the edge status word — at rest the two stay pixel-identical (the 2026-07-12
- * bare-verb ruling holds at rest), so the disclosure cue is hover-only: a faint caret
- * fades in after the verb. Zero-width inline-block + overflow:visible = the space is
- * reserved by construction, no layout shift on hover. */
-.liveCaret {
-  display: inline-block;
-  width: 0;
-  overflow: visible;
-  white-space: nowrap;
-  color: var(--t3);
-  opacity: 0;
-  transition: opacity 120ms ease;
-}
-.groupSummary:hover .liveCaret {
-  opacity: 0.5;
-}
-@media (prefers-reduced-motion: reduce) {
-  .liveCaret { transition: none; }
-}
-.working {
-  color: var(--accent);
+
+.chipAction:disabled {
+  cursor: default;
+  opacity: 0.7;
 }
 
-.outcome {
-  margin: 20px 0;
-  line-height: 1.6;
-  white-space: pre-wrap;
-}
+/* ---- helpers: one pill each where they were sent ---- */
 
-.stopped {
-  font-family: var(--mono);
-  font-size: 12px;
-  color: var(--amber);
+.pillWrap {
   margin: 8px 0;
 }
 
-/* FR-198 (Tier 12): inert markdown inside narration/outcome. Quiet typographic steps, D-19. */
-.mdPara { margin: 0 0 8px; white-space: pre-wrap; }
-.mdPara:last-child { margin-bottom: 0; }
-.mdHeading { margin: 10px 0 6px; font-weight: 600; color: var(--t1, #e8e8e8); }
-h3.mdHeading { font-size: 15px; }
-h4.mdHeading { font-size: 14px; }
-h5.mdHeading { font-size: 13px; }
-.mdCode {
-  font-family: var(--mono, 'JetBrains Mono', monospace); font-size: 12px;
-  background: var(--panel2, #1a1a1a); padding: 1px 5px; border-radius: 4px;
-}
-.mdPre {
-  font-family: var(--mono, 'JetBrains Mono', monospace); font-size: 12px;
-  background: var(--panel2, #1a1a1a); border: 1px solid var(--border, #2a2a2a);
-  border-radius: var(--r1); padding: 8px 10px; margin: 6px 0; overflow-x: auto;
-  white-space: pre;
-}
-.mdList { margin: 4px 0 8px; padding-left: 22px; }
-.mdList li { margin: 2px 0; }
-
-/* Pipe tables (2026-07-20, the investor-table specimen): quiet real tables — headers in the
-   UI face, data cells mono (FR-55), the wrap owns horizontal scroll so the page never does. */
-.mdTableWrap {
-  overflow-x: auto;
-  margin: 10px 0 14px;
-  border: 1px solid var(--border);
-  border-radius: var(--r1);
-}
-.mdTable {
-  border-collapse: collapse;
-  width: 100%;
-  font-size: 12.5px;
-}
-.mdTable th {
-  text-align: left;
-  font-weight: 600;
-  color: var(--t2);
-  padding: 7px 12px;
-  background: var(--panel);
-  border-bottom: 1px solid var(--border);
-}
-.mdTable td {
-  font-family: var(--mono);
-  font-size: 12px;
-  color: var(--t1);
-  padding: 6px 12px;
-  border-bottom: 1px solid var(--border);
-  white-space: nowrap;
-}
-.mdTable tr:last-child td { border-bottom: none; }
-
-/* FR-192 (Tier 12): actionable outcome chips — delivered files open in the file manager, tabs navigate. */
-.chipAction { cursor: pointer; background: none; }
-.chipAction:hover:not(:disabled) { border-color: var(--accent, #ececec); color: var(--t1, #e8e8e8); }
-.chipAction:disabled { cursor: default; opacity: 0.7; }
-
-/* FR-238 (Tier 16): a settled mission's collapsed record in the document. */
-.missionCard { margin: 4px 0; opacity: 0.85; }
-.missionParts { padding: 2px 0 2px 18px; }
-.missionNote { color: var(--t3, #6e6e6e); font-size: 11px; }
-
-/* FR-239 (D-67): the turn container — the reply owns what it caused, nested and quiet. */
-.turn { margin: 2px 0; }
-.turnChildren {
-  margin: 2px 0 6px 10px; padding-left: 12px;
-}
-
-/* ── Tier 35 §9 (D-139) THE WINDOW ─────────────────────────────────────────────────────────
-   The type ladder (spec §9, ruled with the user): three weights total — 400 everywhere, 500
-   spent exactly where the news is (pill role names, settled headlines), 600 never used here
-   (inline report emphasis only, via Markdown strong). LUMINANCE-FIRST, WEIGHT-SECOND. */
-
-/* FR-359/362: the turn shell header — quiet chrome (Codex grammar: never bold). */
-.turnHeader {
-  font-family: var(--sans);
-  font-size: 12px;
-  font-weight: 400;
-  color: var(--t3);
-  cursor: pointer;
-  background: none;
-  border: none;
-  padding: 0;
-  display: block;
-  text-align: left;
-  margin: 10px 0 0;
-}
-.turnHeader:hover { color: var(--t2); }
-
-/* FR-360: member pills — the worker capsules at their dispatch point. */
-.pillWrap { margin: 8px 0; }
 .pillRow {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 6px;
 }
+
 .pill {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-family: var(--sans);
-  font-size: 12px;
+  height: 28px;
+  padding: 0 12px;
+  border: none;
+  border-radius: 999px;
+  background: var(--surface);
   color: var(--t2);
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 999px; /* single-line capsule — the sanctioned capsule class */
-  padding: 3px 10px;
+  font: 400 12.5px var(--sans);
   cursor: pointer;
+  transition: background 120ms ease-out, color 120ms ease-out;
 }
-.pill:hover { border-color: var(--border2); color: var(--t1); }
-.pillLive { color: var(--t1); }
-.pillRole { font-weight: 500; } /* the name is the news (FR-358) */
-.pillState { font-weight: 400; color: var(--t2); }
+
+.pill:hover {
+  background: var(--raised);
+  color: var(--t1);
+}
+
+.pillLive {
+  color: var(--t1);
+}
+
+.pillRole {
+  font-weight: 500;
+}
+
+.pillState {
+  color: var(--t2);
+}
+
 .pillWord {
-  font-family: var(--sans);
-  font-size: 12px;
-  font-weight: 400;
+  font: 400 12.5px var(--sans);
   color: var(--t3);
 }
 
-/* FR-361: the vertical timeline — thin connector, muted past-tense lines, quiet terminal. */
-.timeline {
-  position: relative;
-  background: var(--panel);
-  border-radius: var(--r2);
-  padding: 8px 12px 8px 22px;
-  margin-top: 6px;
-}
-.timeline::before {
-  content: '';
-  position: absolute;
-  left: 12px;
-  top: 10px;
-  bottom: 10px;
-  width: 1px;
-  background: var(--border);
-}
-.timeline .step { position: relative; }
-.timeline .step::before {
-  content: '';
-  position: absolute;
-  left: -13px;
-  top: 7px;
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: var(--border2);
-}
-.timelineEnd { color: var(--t2); margin-top: 6px; }
+/* ---- the outcome and the stop ---- */
 
-/* Tier 35 §9 micro-fork RATIFIED (2026-07-21, the Cursor reference): diff magnitude carries
-   the status hues — +N green, −N red — never color-only (the glyphs are the shape). */
-.statPlus { color: var(--green); }
-.statMinus { color: var(--red); }
+.outcome {
+  margin: 16px 0;
+  white-space: pre-wrap;
+  animation: fadeUp 420ms var(--ease-out) backwards;
+}
+
+.stopped {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 0;
+  font: 400 12.5px var(--sans);
+  color: var(--t3);
+}
+
+/* A finished plan's folded record. */
+.missionCard {
+  margin: 6px 0;
+}
+
+.missionParts {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 4px 0 8px;
+  padding: 8px 14px;
+  border-radius: var(--r2);
+  background: var(--surface);
+}
+
+.missionPart {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 24px;
+  font: 400 12.5px var(--sans);
+  color: var(--t2);
+}
+
+.missionGlyph {
+  width: 10px;
+  height: 10px;
+  flex: none;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1.5px var(--t3);
+}
+
+.missionPart[data-status='done'] .missionGlyph {
+  background: var(--t3);
+  box-shadow: none;
+}
+
+.missionPart[data-status='dropped'],
+.missionPart[data-status='blocked'] {
+  color: var(--t3);
+  text-decoration: line-through;
+}
+
+.missionNote {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 11.5px;
+  color: var(--t3);
+  text-decoration: none;
+}
+
+/* ---- markdown inside replies: quiet typographic steps ---- */
+
+.mdPara { margin: 0 0 8px; white-space: pre-wrap; }
+.mdPara:last-child { margin-bottom: 0; }
+.mdHeading { margin: 14px 0 6px; font-weight: 600; color: var(--t1); }
+h3.mdHeading { font-size: 15px; }
+h4.mdHeading { font-size: 14px; }
+h5.mdHeading { font-size: 13.5px; }
+
+.mdCode {
+  padding: 1px 6px;
+  border-radius: 6px;
+  background: var(--well);
+  font: 400 12px var(--mono);
+}
+
+.mdPre {
+  margin: 8px 0;
+  padding: 12px 14px;
+  border-radius: var(--r1);
+  background: var(--well);
+  font: 400 12px / 1.6 var(--mono);
+  white-space: pre;
+  overflow-x: auto;
+}
+
+.mdList { margin: 4px 0 8px; padding-left: 22px; }
+.mdList li { margin: 3px 0; }
+.mdList li::marker { color: var(--t3); }
+
+/* Tables: header in the UI face, data cells mono; the wrap scrolls sideways so the page never does. */
+.mdTableWrap {
+  margin: 10px 0 14px;
+  border-radius: var(--r1);
+  background: var(--surface);
+  overflow-x: auto;
+}
+
+.mdTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+}
+
+.mdTable th {
+  padding: 8px 12px;
+  background: var(--well);
+  color: var(--t2);
+  font-weight: 500;
+  text-align: left;
+}
+
+.mdTable td {
+  padding: 7px 12px;
+  border-top: 1px solid var(--hairline);
+  color: var(--t1);
+  font: 400 12px var(--mono);
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shimmer { animation: none; background: none; color: var(--t2); }
+  .prompt,
+  .narration,
+  .outcome,
+  .timeline {
+    animation: none;
+  }
+}

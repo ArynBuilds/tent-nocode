@@ -1,0 +1,415 @@
+/* The new-project moment: ambient canvas behind, one centered column - an eyebrow, the name as a
+   big borderless title, two living previews to pick from, one verb. Every color is a token. */
+
+.stage {
+  position: relative;
+  min-height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 72px 32px 56px;
+  box-sizing: border-box;
+  background: var(--ground);
+}
+
+.back {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 34px;
+  padding: 0 14px 0 10px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--t2);
+  font: 400 var(--fs-small) var(--sans);
+  cursor: pointer;
+  transition: background 120ms ease-out, color 120ms ease-out;
+}
+
+.back:hover {
+  background: var(--raised);
+  color: var(--t1);
+}
+
+.column {
+  position: relative;
+  width: min(760px, 100%);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Each piece arrives a beat after the last. */
+.column > * {
+  animation: rise 620ms var(--ease-out) backwards;
+}
+
+.column > :nth-child(2) { animation-delay: 50ms; }
+.column > :nth-child(3) { animation-delay: 100ms; }
+.column > :nth-child(4) { animation-delay: 170ms; }
+.column > :nth-child(5) { animation-delay: 240ms; }
+
+.eyebrow {
+  font: 500 var(--fs-small) var(--sans);
+  letter-spacing: 0.02em;
+  color: var(--t3);
+}
+
+/* The name is the title: no box, a big line you type straight into. */
+.title {
+  width: 100%;
+  margin: 10px 0 0;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  outline: none;
+  caret-color: var(--live);
+  font: 600 44px / 1.15 var(--sans);
+  letter-spacing: -0.03em;
+  color: var(--t1);
+}
+
+.title::placeholder {
+  color: var(--t3);
+  opacity: 0.55;
+}
+
+.lead {
+  max-width: 56ch;
+  margin: 14px 0 36px;
+  font: 400 var(--fs-body) / 1.55 var(--sans);
+  color: var(--t2);
+}
+
+/* ---- the two kinds ---- */
+
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.tile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 14px;
+  padding: 10px 10px 16px;
+  border: 0;
+  border-radius: 20px;
+  background: var(--surface);
+  box-shadow: var(--lift);
+  color: var(--t2);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: transform 260ms var(--ease-out), background 160ms ease-out, box-shadow 260ms var(--ease-out);
+}
+
+.tile:hover {
+  transform: translateY(-2px);
+  background: color-mix(in srgb, var(--surface) 65%, var(--raised));
+}
+
+.tileOn,
+.tileOn:hover {
+  background: var(--raised);
+  box-shadow: 0 0 0 1.5px var(--select), 0 22px 48px -24px rgba(0, 0, 0, 0.6);
+}
+
+.tile:focus-visible {
+  outline: 1.5px solid var(--focus);
+  outline-offset: 3px;
+}
+
+.preview {
+  width: 100%;
+  box-sizing: border-box;
+  aspect-ratio: 16 / 10;
+  padding: 14px;
+  background: var(--well);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.tileText {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 0 8px;
+}
+
+.tileName {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font: 600 var(--fs-title) var(--sans);
+  color: var(--t1);
+}
+
+.tileLine {
+  font: 400 var(--fs-small) / 1.45 var(--sans);
+  color: var(--t3);
+}
+
+/* The chosen tile's mark: a ring that fills. */
+.check {
+  position: absolute;
+  right: 22px;
+  bottom: 24px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1.5px var(--t3);
+  background: color-mix(in srgb, var(--ground) 60%, transparent);
+  transition: box-shadow 200ms ease-out;
+}
+
+.tileOn .check {
+  box-shadow: inset 0 0 0 5px var(--t1);
+}
+
+/* ---- the living previews: built from the same surfaces, they stir when chosen ---- */
+
+.mock {
+  display: flex;
+  gap: 10px;
+  height: 100%;
+}
+
+.mockSide {
+  flex: 0 0 26%;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  padding: 10px 8px;
+  background: var(--surface);
+  border-radius: 8px;
+}
+
+.mockMain {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.mockStats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+.mockStat {
+  height: 26px;
+  background: var(--surface);
+  border-radius: 6px;
+}
+
+.mockChart {
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  gap: 5px;
+  padding: 10px;
+  background: var(--surface);
+  border-radius: 8px;
+}
+
+.mockBar {
+  flex: 1;
+  background: var(--float);
+  border-radius: 3px;
+  transform-origin: bottom;
+}
+
+.mockDot {
+  width: 10px;
+  height: 10px;
+  flex: none;
+  border-radius: 3px;
+  background: var(--float);
+}
+
+.mockLine {
+  display: block;
+  height: 5px;
+  border-radius: 3px;
+  background: var(--float);
+}
+
+.mockSite {
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mockNav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 8px;
+  background: var(--surface);
+  border-radius: 6px;
+}
+
+.mockNavLinks {
+  display: flex;
+  gap: 6px;
+}
+
+.mockHero {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  background: var(--surface);
+  border-radius: 8px;
+}
+
+.mockHeadline {
+  width: 58%;
+  height: 9px;
+  border-radius: 4px;
+  background: var(--t3);
+  opacity: 0.6;
+}
+
+.mockPill {
+  width: 46px;
+  height: 12px;
+  margin-top: 3px;
+  border-radius: 999px;
+  background: var(--float);
+}
+
+.mockSections {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+.mockSections .mockSection {
+  height: 30px;
+  background: var(--surface);
+  border-radius: 6px;
+}
+
+.tileOn .mockBar {
+  background: var(--t3);
+  animation: grow 700ms var(--ease-out) backwards;
+}
+
+.tileOn .mockStat,
+.tileOn .mockSection {
+  animation: fadeUp 520ms var(--ease-out) backwards;
+}
+
+.tileOn .mockStat:nth-child(2),
+.tileOn .mockSection:nth-child(2) { animation-delay: 70ms; }
+
+.tileOn .mockStat:nth-child(3),
+.tileOn .mockSection:nth-child(3) { animation-delay: 140ms; }
+
+.tileOn .mockHeadline {
+  opacity: 1;
+  background: var(--t2);
+  transition: opacity 300ms ease-out;
+}
+
+.tileOn .mockPill {
+  background: var(--primary);
+}
+
+/* ---- the verb ---- */
+
+.foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 32px;
+}
+
+.keys {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font: 400 var(--fs-small) var(--sans);
+  color: var(--t3);
+}
+
+.keys kbd {
+  padding: 2px 7px;
+  background: var(--well);
+  border-radius: 6px;
+  font: 500 var(--fs-caption) var(--sans);
+  color: var(--t2);
+}
+
+.sep {
+  width: 3px;
+  height: 3px;
+  margin: 0 6px;
+  border-radius: 50%;
+  background: var(--t3);
+}
+
+.go {
+  height: 46px;
+  padding: 0 22px 0 24px;
+  font-size: var(--fs-body);
+}
+
+.go svg {
+  transition: transform 220ms var(--ease-out);
+}
+
+.go:hover:not(:disabled) svg {
+  transform: translateX(3px);
+}
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes grow {
+  from { transform: scaleY(0.2); }
+  to { transform: none; }
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (max-width: 720px) {
+  .tiles {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .title {
+    font-size: 34px;
+  }
+
+  .keys {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .column > *,
+  .tileOn .mockBar,
+  .tileOn .mockStat,
+  .tileOn .mockSection {
+    animation: none;
+  }
+}

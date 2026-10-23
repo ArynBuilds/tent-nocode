@@ -97,7 +97,7 @@
   align-items: center;
   padding: 0 0 0 8px;
   background: var(--side);
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--hairline);
   -webkit-app-region: drag;
   user-select: none;
 }
@@ -129,7 +129,7 @@
 }
 
 .winBtn:hover {
-  background: var(--panel);
+  background: var(--raised);
 }
 
 .winBtnClose:hover {
@@ -142,27 +142,99 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 27px;
-  height: 27px;
+  width: 28px;
+  height: 28px;
   border: 0;
-  border-radius: var(--r1);
+  border-radius: 8px;
   background: transparent;
-  color: var(--t1);
+  color: var(--t2);
   cursor: pointer;
   padding: 0;
+  transition: background 120ms ease-out, color 120ms ease-out;
 }
 
 .titlebarBtn:hover {
-  background: var(--panel);
+  background: var(--raised);
+  color: var(--t1);
 }
 
-/* D12: the editor's top-left Publish/Export door - the one text control on
-   the bar (the ruled words; icons stay icons everywhere else). */
-.titlebarTextBtn {
-  width: auto;
-  padding: 0 10px;
+/* D12: the editor's top-left Publish / Export door - a quiet pill beside the project's name. */
+.publishBtn {
+  -webkit-app-region: no-drag;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 26px;
+  margin-left: 10px;
+  padding: 0 12px 0 10px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--raised);
+  color: var(--t1);
   font: 500 12px var(--sans);
   white-space: nowrap;
+  cursor: pointer;
+  transition: background 120ms ease-out;
+}
+
+.publishBtn:hover {
+  background: var(--float);
+}
+
+/* Where you are: the soft mark, Projects (the way back), then this project's name. */
+.crumb {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  margin-left: 4px;
+}
+
+.crumbMark {
+  flex: none;
+  margin-right: 4px;
+  color: var(--mark);
+}
+
+.crumbLink {
+  -webkit-app-region: no-drag;
+  padding: 3px 6px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--t3);
+  font: 400 12.5px var(--sans);
+  cursor: pointer;
+  transition: color 120ms ease-out, background 120ms ease-out;
+}
+
+.crumbLink:hover {
+  background: var(--raised);
+  color: var(--t1);
+}
+
+.crumbSep {
+  flex: none;
+  color: var(--t3);
+  opacity: 0.6;
+}
+
+.crumbName {
+  min-width: 0;
+  max-width: 280px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: 500 12.5px var(--sans);
+  color: var(--t1);
+}
+
+.publishBtn:focus-visible,
+.crumbLink:focus-visible,
+.titlebarBtn:focus-visible,
+.winBtn:focus-visible {
+  outline: 1.5px solid var(--focus);
+  outline-offset: -1.5px;
 }
 
 /* ---- the dashboard frame (user-ruled 2026-08-14, the Canva separation) ----
@@ -173,10 +245,8 @@
    class - its surfaces stay byte-identical. */
 .dashApp {
   background: var(--side); /* the surround shows through the frame's corner */
-  /* THE THIN RAIL (user-ruled 2026-08-17, the landing's shell mirrored):
-     the dashboard rail narrows to the landing's 54px gap - the editor's
-     grid never composes this class. */
-  grid-template-columns: 54px 1fr 0;
+  /* The apps page sidebar: brand, projects by kind, the AI status, the account. */
+  grid-template-columns: 248px 1fr 0;
 }
 
 /* THE LANDING'S COLORS IN LIGHT MODE (user-ruled 2026-08-17, re-scoped the
@@ -197,7 +267,7 @@
   --panel2: #e9e8e4;
   --border: #e2e0dd;
   --border2: #d6d4d1;
-  --accent: #F5C518; /* the ONE gold on both themes (user-ruled 2026-08-19) */
+  --accent: #4f5bd5;
   /* THE DESIGN SYSTEM TOKENS (the law's palette, remapped to the landing):
      the surround is the landing's ground, the frame content's ground is the
      landing's white sheet; surfaces step down from it. */
@@ -213,24 +283,12 @@
   --t1: #1b1b1b;
   --t2: #5f5d5a;
   --t3: #8a8885;
-  --live: #F5C518;
+  --live: #4f5bd5;
+  --primary: #1a1a1a;
+  --on-primary: #f5f5f5;
   --green: #1a7f37;
   --amber: #9a6700;
   --red: #cf222e;
-}
-
-/* The logo's two faces: the white mark in dark, the landing's #3d3c3a mark
-   in light - one img each, the theme picks. */
-:global([data-theme='light']) .dashRailLogoDark {
-  display: none;
-}
-
-.dashRailLogoLight {
-  display: none;
-}
-
-:global([data-theme='light']) .dashRailLogoLight {
-  display: block;
 }
 
 /* The window-chrome bar keeps ONE thin line under it (user-ruled - the
@@ -239,82 +297,10 @@
   border-bottom: 1px solid var(--hairline);
 }
 
-.dashApp .sidebar {
-  border-right: 0;
-  padding: 4px 0 14px;
-  align-items: center;
-}
-
-/* The 220px collapse clamp is the editor rail's; the thin rail centers its
-   icons at their own size. */
+/* The 220px collapse clamp is the editor rail's; the apps page sidebar sizes its own rows. */
 .dashApp .sidebar > * {
   width: auto;
   min-width: 0;
-}
-
-/* The fixed-size tenants win back their geometry from the clamp reset
-   (the child rule above outweighs their single classes). */
-.dashApp .sidebar .dashRailIcon {
-  width: 38px;
-  min-width: 38px;
-}
-
-.dashApp .sidebar .dashAvatar {
-  width: 34px;
-  min-width: 34px;
-}
-
-/* ---- the thin rail's three tenants (logo - settings - the user circle) ---- */
-
-.dashRailLogo {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding-top: 4px;
-}
-
-.dashRailIcon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 38px;
-  height: 38px;
-  border: 0;
-  border-radius: var(--r1);
-  background: transparent;
-  color: var(--t2);
-  cursor: pointer;
-  padding: 0;
-  margin-bottom: 6px;
-  transition: background 120ms ease-out, color 120ms ease-out;
-}
-
-.dashRailIcon:hover {
-  background: var(--panel);
-  color: var(--t1);
-}
-
-.dashRailIconActive {
-  background: var(--panel2);
-  color: var(--t0);
-}
-
-.dashAvatar {
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  background: #2e2e2e;
-  border: 1px solid var(--border2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-  font-weight: 700;
-  /* literal: the dark circle keeps light initials whatever the chrome wears */
-  color: #ececec;
-  flex: none;
-  margin-top: 6px;
-  user-select: none;
 }
 
 /* The main cell is the surround wrapper: a thin top gap (close to the top,

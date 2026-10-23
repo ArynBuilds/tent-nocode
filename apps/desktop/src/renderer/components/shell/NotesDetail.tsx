@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { desk } from '../../lib/desk.js';
 import { useOrg } from '../../lib/OrgContext.js';
 import styles from './sidepanel.module.css';
+import { EmptyMark } from '../brand/EmptyMark.js';
 
 // Notes detail: append-only list; edit creates superseding note; delete via key press, no button.
 
@@ -87,9 +88,7 @@ export function NotesDetail({ projectId }: { projectId: string }) {
   return (
     <div className={styles.notesWrap}>
       {chains.length === 0 ? (
-        <div className={styles.notesEmpty}>
-          No notes yet — when a decision, lesson, or constraint lands, it gets saved here as one plain sentence.
-        </div>
+        <EmptyMark line="No notes yet. Decisions and lessons from your chats are saved here." />
       ) : (
         <div className={styles.notesList}>
           {chains.map(({ head, earlier }) => (

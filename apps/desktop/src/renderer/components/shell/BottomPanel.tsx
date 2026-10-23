@@ -66,10 +66,6 @@ export function BottomPanel({
     onTabs(left, left.length === 0 ? '' : activeId === id ? left[left.length - 1]!.id : activeId);
   }
 
-  function setThread(id: string, threadId: string): void {
-    onTabs(tabs.map((t) => (t.id === id ? { ...t, threadId } : t)), activeId);
-  }
-
   const cls = overlay
     ? `${styles.bottom} ${styles.bottomOverlay}`
     : hidden
@@ -98,7 +94,7 @@ export function BottomPanel({
             {/* Every tab mounted (display-toggled). */}
             {tabs.map((t) => (
               <div key={t.id} className={t.id === active?.id ? panelStyles.body : panelStyles.bodyHidden}>
-                <PaneBody tab={t} onThread={(threadId) => setThread(t.id, threadId)} />
+                <PaneBody tab={t} />
               </div>
             ))}
           </>

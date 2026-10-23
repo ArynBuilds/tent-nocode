@@ -1,4 +1,4 @@
-import { Download, Globe, KeyRound, Server, Settings2, Users } from 'lucide-react';
+import { Download, Globe, KeyRound, Server, Settings2 } from 'lucide-react';
 import type { ComponentType } from 'react';
 import type { ProjectSectionId } from '../../lib/publishTakeover.js';
 
@@ -34,7 +34,6 @@ export const PROJECT_NAV: ProjectNavItem[] = [
     id: 'secrets', label: 'Secrets', icon: KeyRound,
     description: 'Keys and passwords this project uses. Values are stored encrypted and never shown again.',
   },
-  { id: 'people', label: 'People', icon: Users, description: 'Who can open and change this project.' },
 ];
 
 export function navFor(kind: ProjectKind): ProjectNavItem[] {

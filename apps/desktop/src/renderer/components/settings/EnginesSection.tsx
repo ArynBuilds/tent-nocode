@@ -1,109 +1,120 @@
+import { useState } from 'react';
 import { listRegistryModels, type OrgRole } from '@tent-nocode/core';
+import type { EngineStatus } from '../../../shared/ipc.js';
 import { can } from '../../../shared/roles.js';
 import { useQuery } from '../../lib/data/useQuery.js';
 import { desk } from '../../lib/desk.js';
+import { ConfirmAction, Empty, Group, IDLE, Row, StatusLine, errorText, kit, type RowState } from '../kit/kit.js';
 import { EngineCredentialForm } from './EngineCredentialForm.js';
-import threadStyles from '../thread/thread.module.css';
-import styles from './settings.module.css';
-import { useState } from 'react';
 
-// Engine settings: registry-driven rows, per-kind credentials, model picker stores as org chat-model pin.
+// Engines: Claude Code found on this computer first, then the API vendors; the model pick is the account's chat-model pin.
+
+function EngineGroup({ orgId, engine, canManage, onChanged }: {
+  orgId: string;
+  engine: EngineStatus;
+  canManage: boolean;
+  onChanged: () => void;
+}) {
+  const [adding, setAdding] = useState(false);
+  const [state, setState] = useState<RowState>(IDLE);
+  const saved = engine.kinds.filter((k) => k.present);
+  const cli = engine.lane === 'cli';
+
+  const remove = async (kind: string, label: string): Promise<void> => {
+    setState(IDLE);
+    try {
+      const res = await desk.removeEngineCredential(orgId, engine.engineId, kind);
+      if (!res.ok) { setState({ phase: 'failed', sentence: `Could not remove the ${label}.`, detail: res.error }); return; }
+      onChanged();
+    } catch (err) {
+      setState({ phase: 'failed', sentence: `Could not remove the ${label}.`, detail: errorText(err) });
+    }
+  };
+
+  // A CLI engine works on its own sign-in, so its form waits behind a verb; an API engine with no key shows it at once.
+  const showForm = canManage && (adding || (!cli && saved.length === 0));
+  return (
+    <Group title={engine.displayName}>
+      {cli ? (
+        <Row
+          label={engine.binaryVersion !== null ? 'Found on this computer' : 'Not found on this computer'}
+          hint={engine.binaryVersion !== null
+            ? 'Chats use your own Claude Code sign-in. There is nothing to set up.'
+            : engine.installHint}
+        >
+          <span className={engine.binaryVersion !== null ? `${kit.value} ${kit.mono}` : kit.valueQuiet}>
+            {engine.binaryVersion?.replace(/\s*\(.*\)\s*$/, '') ?? 'Not installed'}
+          </span>
+        </Row>
+      ) : null}
+      {saved.map((k) => (
+        <Row key={k.kind} label={k.label} hint="Saved and sealed on this computer. The value is never shown.">
+          {canManage ? (
+            <ConfirmAction label="Remove" prompt={`Remove the ${k.label}?`} confirmLabel="Remove" workingLabel="Removing…" onConfirm={() => remove(k.kind, k.label)} />
+          ) : null}
+        </Row>
+      ))}
+      {showForm ? (
+        <EngineCredentialForm orgId={orgId} engine={engine} onSaved={() => { setAdding(false); onChanged(); }} />
+      ) : canManage ? (
+        <Row
+          label={saved.length > 0 ? 'Replace it' : 'Use a token instead'}
+          hint={saved.length > 0 ? 'Connecting again replaces the saved value everywhere.' : 'Only needed when Claude Code should run on a different account than your sign-in.'}
+        >
+          <button type="button" className={kit.btn} onClick={() => setAdding(true)}>{saved.length > 0 ? 'Replace' : 'Add token'}</button>
+        </Row>
+      ) : null}
+      <StatusLine state={state} />
+    </Group>
+  );
+}
+
 export function EnginesSection({ orgId, role }: { orgId: string; role: OrgRole }) {
   const enginesQuery = useQuery(`settings:engines:${orgId}`, () => desk.listEngines(orgId), [orgId]);
   const configQuery = useQuery(`settings:engines:config:${orgId}`, () => desk.getOrgConfig(orgId), [orgId]);
-  const [error, setError] = useState<string | null>(null);
+  const [modelState, setModelState] = useState<RowState>(IDLE);
   const canManage = can(role, 'config');
-  const engines = enginesQuery.data ?? null;
+  const engines = enginesQuery.data;
 
-  async function remove(engineId: string, kind: string): Promise<void> {
-    setError(null);
-    const res = await desk.removeEngineCredential(orgId, engineId, kind);
-    if (!res.ok) {
-      setError(res.error);
-      return;
+  const pickModel = async (id: string): Promise<void> => {
+    setModelState({ phase: 'working', sentence: 'Saving…' });
+    try {
+      // '' clears the pin back to the engine's own default.
+      const res = await desk.updateOrgConfig(orgId, { deskModel: id === '' ? null : id });
+      if (!res.ok) { setModelState({ phase: 'failed', sentence: 'Could not save the model.', detail: res.error }); return; }
+      setModelState({ phase: 'done', sentence: 'Saved.' });
+      configQuery.refetch();
+    } catch (err) {
+      setModelState({ phase: 'failed', sentence: 'Could not save the model.', detail: errorText(err) });
     }
-    enginesQuery.refetch();
+  };
+
+  if (enginesQuery.error !== undefined) {
+    return <StatusLine state={{ phase: 'failed', sentence: 'Could not read the engines.', detail: enginesQuery.error }} />;
   }
+  if (engines === undefined) return <Empty>Looking for engines on this computer…</Empty>;
 
-  async function pickModel(id: string): Promise<void> {
-    setError(null);
-    // '' = clear the pin back to the default pick.
-    const res = await desk.updateOrgConfig(orgId, { deskModel: id === '' ? null : id });
-    if (!res.ok) setError(res.error);
-    configQuery.refetch();
-  }
-
-  if (engines === null) return <div className={styles.zero}>checking engines…</div>;
-
-  const anyPresent = engines.some((e) => e.kinds.some((k) => k.present));
-  const pinned = configQuery.data?.deskModel ?? '';
-
+  const ordered = [...engines.filter((e) => e.lane === 'cli'), ...engines.filter((e) => e.lane === 'api')];
   return (
     <>
-      <div className={styles.groupDesc}>
-        Chats run on your own AI key. Credentials are validated live, sealed by your operating
-        system&apos;s keychain, and only ever meet requests to their own vendor.
-      </div>
-
-      <div className={styles.row}>
-        <div className={styles.rowText}>
-          <div className={styles.rowMono}>Chat model</div>
-          <div className={styles.rowDesc}>The model your conversations run on.</div>
-        </div>
-        <div className={styles.rowCtl}>
+      <Group title="Model">
+        <Row label="Chats run on" htmlFor="settings-model" hint="Default lets the engine pick its own model.">
           <select
-            className={styles.inpValue}
-            value={pinned}
-            disabled={!canManage}
+            id="settings-model"
+            className={kit.select}
+            value={configQuery.data?.deskModel ?? ''}
+            disabled={!canManage || configQuery.data === undefined}
             onChange={(e) => void pickModel(e.target.value)}
           >
-            <option value="">Default (Claude Sonnet 5)</option>
-            {listRegistryModels().map((m) => (
-              <option key={m.id} value={m.id}>{m.display}</option>
-            ))}
+            <option value="">Default</option>
+            {listRegistryModels().map((m) => <option key={m.id} value={m.id}>{m.display}</option>)}
           </select>
-        </div>
-      </div>
-
-      {engines.map((engine) => (
-        <div key={engine.engineId}>
-          <div className={styles.row}>
-            <div className={styles.rowText}>
-              <div className={styles.rowMono}>{engine.displayName}</div>
-              <div className={styles.rowDesc}>
-                {engine.lane === 'api'
-                  ? 'Direct API — bring your own key.'
-                  : engine.binaryVersion !== null ? engine.binaryVersion : engine.installHint}
-              </div>
-            </div>
-          </div>
-          {engine.kinds.map((k) => (
-            <div className={styles.row} key={`${engine.engineId}:${k.kind}`}>
-              <div className={styles.rowText}>
-                <div className={styles.rowMono}>{k.label}</div>
-                <div className={styles.rowDesc}>{k.present ? '•••••••• sealed' : 'not set'}</div>
-              </div>
-              {canManage && k.present ? (
-                <div className={styles.rowCtl}>
-                  <button type="button" className={styles.rowBtn} onClick={() => void remove(engine.engineId, k.kind)}>
-                    remove
-                  </button>
-                </div>
-              ) : null}
-            </div>
-          ))}
-          {canManage ? (
-            <EngineCredentialForm orgId={orgId} engine={engine} onSaved={() => enginesQuery.refetch()} />
-          ) : null}
-        </div>
+        </Row>
+        <StatusLine state={modelState} />
+      </Group>
+      {ordered.map((engine) => (
+        <EngineGroup key={engine.engineId} orgId={orgId} engine={engine} canManage={canManage} onChanged={() => enginesQuery.refetch()} />
       ))}
-
-      {canManage && anyPresent ? (
-        <div className={styles.groupDesc}>
-          Rotate by connecting the same kind again — the old value is replaced everywhere.
-        </div>
-      ) : null}
-      {error !== null ? <div className={threadStyles.errorText}>{error}</div> : null}
     </>
   );
 }

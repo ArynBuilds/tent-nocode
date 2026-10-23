@@ -1,10 +1,10 @@
-import { createContext, useContext, useEffect, useMemo, useRef } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef } from 'react';
 import type { ReactNode } from 'react';
-import { atom, computed } from '@tldraw/state';
+import { atom, computed, react } from '@tldraw/state';
 import { EDGE_VERB_WIRE_KINDS, elementPortRule, legalTargets } from '@tent-nocode/core';
 import type { VerbDoor } from '@tent-nocode/core';
 import {
-  SCREEN_VIEW_SCALE, fitCameraTo, gridSpacing, isActiveAt, kindHue, sameWire, store, toWorld, trioCamera, useValue, verbSentence, wireAddressOf, zoomAt, zoomRegimeOf,
+  SCREEN_VIEW_SCALE, canvasView, fitCameraTo, gridSpacing, isActiveAt, sameWire, store, toWorld, trioCamera, useValue, verbSentence, wireAddressOf, zoomAt, zoomRegimeOf,
   type EdgeRecord, type NodeRecord, type Placed, type Rect,
 } from '../../lib/canvas/store.js';
 import { History } from '../../lib/canvas/history.js';
@@ -83,6 +83,11 @@ export function CanvasEngine({ doors, decor, camResetKey, children }: {
   children?: ReactNode;
 }) {
   const scrollRef = useRef<HTMLDivElement | null>(null);
+  const layerRef = useRef<HTMLDivElement | null>(null);
+  const gridRef = useRef<HTMLDivElement | null>(null);
+  const lightRef = useRef<HTMLDivElement | null>(null);
+  // The canvas box, read once per resize: a pointer move never asks the browser for layout.
+  const boxRef = useRef<DOMRect | null>(null);
   const doorsRef = useRef(doors);
   doorsRef.current = doors;
   const decorRef = useRef(decor);
@@ -169,7 +174,37 @@ export function CanvasEngine({ doors, decor, camResetKey, children }: {
   // The entry fit: ONE fit when content first appears, then the camera is the user's alone (user-ruled:
   // a screen resize must never zoom the map). A reset key re-arms exactly one more fit.
   const bounds = useValue('engine.bounds', () => store.bounds.get(), []);
-  const cam = useValue('engine.camera', () => store.camera, []);
+  const zoomRegime = useValue('engine.zoomRegime', () => zoomRegimeOf(store.camera.zoom), []);
+
+  // The camera paints straight onto the layer, the grid and the light: a pan or a zoom re-renders nothing.
+  useEffect(() => {
+    let lastZoom = -1;
+    return react('engine.camera.paint', () => {
+      const c = store.camera;
+      const layer = layerRef.current; const grid = gridRef.current; const light = lightRef.current;
+      if (layer === null || grid === null || light === null) return;
+      layer.style.transform = `translate(${c.x}px, ${c.y}px) scale(${c.zoom})`;
+      const gs = gridSpacing(c.zoom);
+      for (const g of [grid, light]) { g.style.backgroundSize = `${gs}px ${gs}px`; g.style.backgroundPosition = `${c.x}px ${c.y}px`; }
+      if (c.zoom !== lastZoom) {
+        lastZoom = c.zoom;
+        // --cz is read by every constant-pixel stroke inside the layer; it moves only when the zoom does.
+        layer.style.setProperty('--cz', String(c.zoom));
+        const r = `${Math.min(2.4, Math.max(1.1, 1.3 * Math.sqrt(c.zoom)))}px`;
+        grid.style.setProperty('--dotr', r); light.style.setProperty('--dotr', r);
+      }
+    });
+  }, []);
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (el === null) return;
+    const read = (): void => { boxRef.current = el.getBoundingClientRect(); canvasView.set({ w: boxRef.current.width, h: boxRef.current.height }); };
+    read();
+    const ro = new ResizeObserver(read);
+    ro.observe(el);
+    window.addEventListener('resize', read);
+    return () => { ro.disconnect(); window.removeEventListener('resize', read); };
+  }, []);
   useEffect(() => { store.setCamera({ x: 0, y: 0, zoom: 1 }, false); store.update('camera', (c) => ({ ...c, fitLive: true }), 'remote'); }, [camResetKey]);
   const hasNodes = useValue('engine.hasNodes', () => store.nodes.get().length > 0, []);
   useEffect(() => {
@@ -199,7 +234,7 @@ export function CanvasEngine({ doors, decor, camResetKey, children }: {
   const gesture = useValue('engine.gesture', () => store.gesture, []);
   const focused = useValue('engine.focused', () => store.focused.get(), []);
   const tapped = useValue('engine.tapped', () => store.editing.tapped, []);
-  const screens = useValue('engine.screens', () => store.screens.get(), []);
+  const screenByNode = useValue('engine.screens', () => store.screenByNodeId.get(), []);
   const selectedIds = sel?.kind === 'cards' ? new Set(sel.ids) : new Set<string>();
   const wireSel = sel?.kind === 'wire' ? sel.address : null;
   const nowMs = Date.now();
@@ -232,7 +267,7 @@ export function CanvasEngine({ doors, decor, camResetKey, children }: {
       const live = decor.activeIds.has(e.from) || decor.activeIds.has(e.to) || isActiveAt(byId.get(e.from)?.lastActivityAt ?? null, nowMs) || isActiveAt(byId.get(e.to)?.lastActivityAt ?? null, nowMs)
         || (decor.replay !== null && decor.replay.prev === e.from && decor.replay.node === e.to);
       return {
-        from: e.from, to: e.to, hue: kindHue(byId.get(e.from)?.kind ?? ''), wireKind: EDGE_VERB_WIRE_KINDS[e.verb] ?? 'data', live,
+        from: e.from, to: e.to, hue: 'var(--wire)', wireKind: EDGE_VERB_WIRE_KINDS[e.verb] ?? 'data', live,
         title: `${byId.get(e.from)?.label ?? ''} ${verbSentence(e.verb)} ${byId.get(e.to)?.label ?? ''}`,
         ...(d.onRemove !== undefined ? { onRemove: d.onRemove } : {}), ...(d.onSplice !== undefined ? { onSplice: d.onSplice } : {}),
         ...(d.countWord !== undefined ? { countWord: d.countWord } : {}), ...(anchor !== null ? { toAnchor: anchor } : {}),
@@ -240,7 +275,7 @@ export function CanvasEngine({ doors, decor, camResetKey, children }: {
       };
     }),
     ...flowEdges.map((f): EngineEdge => ({
-      from: f.from, to: f.to, hue: kindHue('scene'), wireKind: 'flow', live: false, title: f.title, address: { from: f.from, to: f.to },
+      from: f.from, to: f.to, hue: 'var(--wire)', wireKind: 'flow', live: false, title: f.title, address: { from: f.from, to: f.to },
       onRemove: () => {
         const el = store.element(f.scene, f.nodeId);
         const next = el !== undefined ? withoutFlowLink(el.node, f.targetSlug) : null;
@@ -251,8 +286,6 @@ export function CanvasEngine({ doors, decor, camResetKey, children }: {
   ];
   const { landed, chromeWires } = engineWireGeometry(edges, layout, hFor, wFor);
 
-  // The selection plus everything one wire away stays lit; the rest dims.
-  const lit = selectedIds.size > 0 ? (() => { const s = new Set(selectedIds); for (const e of edges) { if (selectedIds.has(e.from)) s.add(e.to); if (selectedIds.has(e.to)) s.add(e.from); } return s; })() : null;
   // A wire in flight lights its legal targets, read from the contract.
   const wireTargets = gesture.wire !== null ? (() => {
     if (gesture.wire.element !== undefined) { const cls = gesture.wire.element.cls; return new Set(nodesRaw.filter((n) => n.id !== gesture.wire!.fromId && elementPortRule(cls, n.kind) !== null).map((n) => n.id)); }
@@ -270,12 +303,22 @@ export function CanvasEngine({ doors, decor, camResetKey, children }: {
   };
 
   function onCanvasPointerDown(e: React.PointerEvent<HTMLDivElement>): void {
-    if (e.target !== e.currentTarget && (e.target as HTMLElement).closest?.('[data-canvas-layer]') !== e.currentTarget.firstElementChild) {
+    if (e.target !== e.currentTarget && (e.target as HTMLElement).closest?.('[data-canvas-layer]') !== layerRef.current) {
       if ((e.target as HTMLElement).closest?.('[data-canvas-node]') !== null) return;
     }
     e.preventDefault();
     editor.inputs.pointerDown(e, { kind: 'canvas' });
   }
+
+  // The cards get the same two functions every render; the latest handlers ride a ref.
+  const cardDoors = useRef({ down: (_e: React.PointerEvent<HTMLDivElement>, _n: CanvasNode): void => undefined, menu: (_e: React.MouseEvent<HTMLDivElement>, _n: CanvasNode): void => undefined });
+  const onCardDown = useCallback((e: React.PointerEvent<HTMLDivElement>, n: CanvasNode) => cardDoors.current.down(e, n), []);
+  const onCardMenu = useCallback((e: React.MouseEvent<HTMLDivElement>, n: CanvasNode) => cardDoors.current.menu(e, n), []);
+
+  const onPortDown = useCallback((e: React.PointerEvent<HTMLSpanElement>, id: string, port?: string): void => {
+    e.preventDefault(); e.stopPropagation();
+    editor.inputs.pointerDown(e, { kind: 'port', id, ...(port !== undefined ? { port } : {}) });
+  }, [editor]);
 
   function onNodePointerDown(e: React.PointerEvent<HTMLDivElement>, n: CanvasNode): void {
     const t = targetOf(e, n);
@@ -287,7 +330,22 @@ export function CanvasEngine({ doors, decor, camResetKey, children }: {
     editor.inputs.pointerDown(e, t);
   }
 
+  function onNodeContextMenu(e: React.MouseEvent<HTMLDivElement>, n: CanvasNode): void {
+    e.preventDefault(); e.stopPropagation();
+    const screen = store.screenOf(n.id);
+    if (screen !== undefined && focused?.nodeId === n.id) {
+      const frame = editor.frameOf(n.id);
+      editor.inputs.rightClick(e, { kind: 'element', scene: screen.slug, screenId: n.id, id: frame?.hitTest({ x: e.clientX, y: e.clientY }) ?? null });
+    } else editor.inputs.rightClick(e, { kind: 'node', id: n.id });
+  }
+  cardDoors.current = { down: onNodePointerDown, menu: onNodeContextMenu };
+
   function onCanvasPointerMove(e: React.PointerEvent<HTMLDivElement>): void {
+    // The cursor's light: variables on the light layer alone (it has no children to restyle).
+    const box = boxRef.current; const light = lightRef.current;
+    if (box !== null && light !== null) {
+      light.style.setProperty('--mx', `${e.clientX - box.left}px`); light.style.setProperty('--my', `${e.clientY - box.top}px`); light.style.setProperty('--spot', '1');
+    }
     if (editor.inputs.isPointing) return;
     const el = (e.target as HTMLElement).closest?.('[data-canvas-node]');
     const id = el?.getAttribute('data-canvas-node') ?? null;
@@ -329,7 +387,6 @@ export function CanvasEngine({ doors, decor, camResetKey, children }: {
     editor.inputs.rightClick(e, { kind: 'canvas' });
   }
 
-  const gs = gridSpacing(cam.zoom);
   const cursor = gesture.cursor ?? (mode === 'create' ? 'crosshair' : mode === 'hand' ? 'grab' : undefined);
   const suppress = gesture.wire !== null || gesture.brush !== null || gesture.grabbing || gesture.createGhost !== null || mode !== 'select';
   const chromeSelectedWire = wireSel === null ? null : (() => { const i = edges.findIndex((e) => sameWire(e.address, wireSel)); return i >= 0 ? i : null; })();
@@ -339,30 +396,29 @@ export function CanvasEngine({ doors, decor, camResetKey, children }: {
     <EditorContext.Provider value={editor}>
       <div
         className={gesture.grabbing ? `${styles.scroll} ${chromeStyles.scrollGrabbing}` : styles.scroll}
-        style={{ backgroundSize: `${gs}px ${gs}px`, backgroundPosition: `${cam.x}px ${cam.y}px`, '--dotr': `${Math.min(2.4, Math.max(1.1, 1.3 * Math.sqrt(cam.zoom)))}px`, cursor } as React.CSSProperties}
+        style={{ cursor }}
         ref={scrollRef} onPointerDown={onCanvasPointerDown} onPointerMove={onCanvasPointerMove} onWheel={onZoomWheel} onContextMenu={onCanvasContextMenu}
-        onPointerLeave={() => store.setHover({ cursor: null, node: null, element: null })}
+        onPointerLeave={() => { lightRef.current?.style.setProperty('--spot', '0'); store.setHover({ cursor: null, node: null, element: null }); }}
       >
+        <div className={styles.grid} ref={gridRef} />
+        <div className={styles.light} ref={lightRef} />
         <div
-          className={styles.canvas} data-canvas-layer
-          style={{ width: bounds.w, height: bounds.h, transform: `translate(${cam.x}px, ${cam.y}px) scale(${cam.zoom})`, transformOrigin: '0 0', '--cz': cam.zoom } as React.CSSProperties}
+          className={styles.canvas} data-canvas-layer ref={layerRef}
+          style={{ width: bounds.w, height: bounds.h, transformOrigin: '0 0' }}
         >
-          <LandedWires wires={landed} pos={layout} hFor={hFor} wFor={wFor} bounds={bounds} onSelect={(i) => { const e = edges[i]; if (e !== undefined) store.selectWire(e.address); }} />
+          <LandedWires wires={landed} pos={layout} hFor={hFor} wFor={wFor} bounds={bounds} selected={chromeSelectedWire} onSelect={(i) => { const e = edges[i]; if (e !== undefined) store.selectWire(e.address); }} />
           {nodes.map((n) => {
             const p = layout.get(n.id);
             if (!p) return null;
             const s = sizeOf(n.id);
-            const screen = screens.find((x) => x.nodeId === n.id);
+            const screen = screenByNode.get(n.id);
             return (
               <NodeCard
-                key={n.id} node={n} zoom={zoomRegimeOf(cam.zoom)}
+                key={n.id} node={n} zoom={zoomRegime}
                 active={decor.activeIds.has(n.id) || isActiveAt(byId.get(n.id)?.lastActivityAt ?? null, nowMs) || decor.replay?.node === n.id}
-                dimmed={lit !== null && !lit.has(n.id)}
                 wireTarget={wireTargets !== null && wireTargets.has(n.id)}
-                height={s.h} width={s.w}
-                style={{ left: p.x, top: p.y, width: s.w, height: s.h }}
-                onPointerDown={(e) => onNodePointerDown(e, n)}
-                onContextMenu={(e) => { e.preventDefault(); e.stopPropagation(); const screenHit = store.screenOf(n.id) !== undefined && focused?.nodeId === n.id; if (screenHit) { const frame = editor.frameOf(n.id); editor.inputs.rightClick(e, { kind: 'element', scene: screen!.slug, screenId: n.id, id: frame?.hitTest({ x: e.clientX, y: e.clientY }) ?? null }); } else editor.inputs.rightClick(e, { kind: 'node', id: n.id }); }}
+                x={p.x} y={p.y} width={s.w} height={s.h}
+                onDown={onCardDown} onMenu={onCardMenu}
                 frame={screen !== undefined ? { screen, focused: focused?.nodeId === n.id || tapped === n.id } : undefined}
               />
             );
@@ -375,12 +431,12 @@ export function CanvasEngine({ doors, decor, camResetKey, children }: {
           {children}
         </div>
         <CanvasChrome
-          scrollRef={scrollRef} cam={cam} nodes={nodes} pos={layout} wFor={wFor} hFor={hFor} wires={chromeWires}
+          scrollRef={scrollRef} nodes={nodes} pos={layout} wFor={wFor} hFor={hFor} wires={chromeWires}
           nodeFold={decor.nodeFold} selectedIds={selectedIds} selectionSentence={decor.selectionSentence}
           selectedWire={chromeSelectedWire}
           naturalOf={(n) => store.screenOf(n.id) !== undefined}
           suppress={suppress}
-          onPortDown={mode === 'select' ? (e, id, port) => { e.preventDefault(); e.stopPropagation(); editor.inputs.pointerDown(e, { kind: 'port', id, ...(port !== undefined ? { port } : {}) }); } : undefined}
+          onPortDown={mode === 'select' ? onPortDown : undefined}
           outPortsFor={decor.outPortsFor} onPortPlus={decor.onPortPlus} onNodeVerb={decor.onNodeVerb} onProps={openProps} nodeExtras={decor.nodeExtras}
         />
         {focused !== null ? <FrameEditOverlay screen={focused} /> : null}

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { Check, ChevronRight, FileText, Square, X } from 'lucide-react';
 import type { ActivityStep } from '@tent-nocode/core';
 import type { MessageRow } from '../../../shared/ipc.js';
 import { groupLiveVerb, toolLabel, type FeedChip, type FeedItem, type FoldedItem } from '../../lib/feed/feed.js';
@@ -70,7 +71,8 @@ function ArtifactChips({ files, onOpenPath }: {
           title={f.absolute ?? 'workspace-internal file'}
           onClick={() => { if (f.absolute !== null) onOpenPath?.(f.absolute); }}
         >
-          {f.path}
+          <FileText size={12} />
+          <span className={styles.chipText}>{f.path}</span>
         </button>
       ))}
     </div>
@@ -112,7 +114,8 @@ export function Feed({ items, renderGate, onOpenPath, statusWord = null }: FeedP
       case 'stopped':
         return (
           <div key={item.id} className={styles.stopped}>
-            ■ stopped by you
+            <Square size={10} fill="currentColor" />
+            Stopped by you
           </div>
         );
       case 'mission':
@@ -209,7 +212,8 @@ function TurnBlock({ turn, renderLeaf }: { turn: TurnItem; renderLeaf: (item: Fe
         >
           {headerLive
             ? <span className={styles.shimmer}>{groupLiveVerb(deskSteps)}</span>
-            : <>{openActivity ? '▾ ' : '› '}{rollup}</>}
+            : <>{rollup}</>}
+          <ChevronRight size={13} className={openActivity ? `${styles.caret} ${styles.caretOpen}` : styles.caret} />
         </button>
       ) : null}
       {openActivity && hasActivity ? (
@@ -221,7 +225,7 @@ function TurnBlock({ turn, renderLeaf }: { turn: TurnItem; renderLeaf: (item: Fe
   );
 }
 
-// Work-run pills: the live verb while running, 'worked' once settled; click to open timeline.
+// Helper pills: the live verb while running, the helper's number once settled; click to open its timeline.
 function PillRow({ groups }: { groups: GroupItem[] }) {
   const [openId, setOpenId] = useState<string | null>(null);
   const allSettled = groups.every((g) => !g.live);
@@ -229,7 +233,7 @@ function PillRow({ groups }: { groups: GroupItem[] }) {
   return (
     <div className={styles.pillWrap}>
       <div className={styles.pillRow}>
-        {groups.map((g) => (
+        {groups.map((g, i) => (
           <button
             key={g.id} type="button"
             className={`${styles.pill}${g.live ? ` ${styles.pillLive}` : ''}`}
@@ -237,10 +241,10 @@ function PillRow({ groups }: { groups: GroupItem[] }) {
           >
             {g.live
               ? <span className={`${styles.pillState} ${styles.shimmer}`}>{groupLiveVerb(g.steps)}</span>
-              : <span className={styles.pillRole}>worked</span>}
+              : <><Check size={12} /><span className={styles.pillRole}>Helper {i + 1}</span></>}
           </button>
         ))}
-        {allSettled && groups.length > 0 ? <span className={styles.pillWord}>finished</span> : null}
+        {allSettled && groups.length > 0 ? <span className={styles.pillWord}>All finished</span> : null}
       </div>
       {open !== undefined ? (
         <Timeline steps={open.steps} chips={open.chips} live={open.live} settledOk={open.settledOk} />
@@ -260,8 +264,9 @@ function Timeline({ steps, chips, live, settledOk }: {
         <div className={styles.chipRow}>
           {chips.map((c) => (
             <span key={c.path} className={`${styles.chip}${c.corroborated === false ? ` ${styles.chipWarn}` : ''}`}
-              title={c.corroborated === false ? 'claimed write not found in the workspace diff' : undefined}>
-              {c.path}
+              title={c.corroborated === false ? 'The AI said it wrote this file, but no change was found' : undefined}>
+              <FileText size={12} />
+              <span className={styles.chipText}>{c.path}</span>
             </span>
           ))}
         </div>
@@ -269,7 +274,7 @@ function Timeline({ steps, chips, live, settledOk }: {
       {!live && settledOk !== null ? (
         // Terminal row: Done / Stopped by you / Failed.
         <div className={`${styles.step} ${styles.timelineEnd}${settledOk === false ? ` ${styles.stepFail}` : ''}`}>
-          {settledOk === true ? '✓ Done' : settledOk === 'stopped' ? '■ Stopped by you' : '✕ Failed'}
+          {settledOk === true ? <><Check size={13} /> Done</> : settledOk === 'stopped' ? <><Square size={10} fill="currentColor" /> Stopped by you</> : <><X size={13} /> Failed</>}
         </div>
       ) : null}
     </div>
@@ -284,18 +289,19 @@ function MissionCard({ status, parts, files, onOpenPath }: {
   onOpenPath?: (absolute: string) => void;
 }) {
   const [open, setOpen] = useState(false);
-  const glyph = (s: string): string => (s === 'done' ? '✓' : s === 'in_flight' ? '●' : s === 'pending' ? '○' : '✕');
   return (
     <div className={styles.missionCard}>
       <button type="button" className={styles.machinery} onClick={() => setOpen((v) => !v)}>
-        {open ? '▾' : '▸'} mission {status === 'done' ? 'complete' : 'cancelled'} — {parts.length} parts
+        {status === 'done' ? 'Plan finished' : 'Plan stopped'} · {parts.length} steps
+        <ChevronRight size={13} className={open ? `${styles.caret} ${styles.caretOpen}` : styles.caret} />
       </button>
       {open ? (
         <div className={styles.missionParts}>
           {parts.map((p, i) => (
-            <div key={i} className={styles.step}>
-              {glyph(p.status)} {p.text}
-              {p.note ? <span className={styles.missionNote}> — {p.note}</span> : null}
+            <div key={i} className={styles.missionPart} data-status={p.status}>
+              <span className={styles.missionGlyph} aria-hidden="true" />
+              {p.text}
+              {p.note ? <span className={styles.missionNote}>{p.note}</span> : null}
             </div>
           ))}
         </div>
@@ -321,7 +327,7 @@ function stepLine(step: ActivityStep, i: number, arr?: ActivityStep[]): ReactNod
   // A wordless thought renders nothing - the shimmer word already says Thinking.
   if (step.kind === 'thinking') {
     if (!step.text) return null;
-    return <div key={i} className={styles.step}>{`Thought - ${step.text}`}</div>;
+    return <div key={i} className={`${styles.step} ${styles.stepThought}`}>{step.text}</div>;
   }
   if (step.kind === 'text') return <div key={i} className={styles.step}>{step.text}</div>;
   if (step.kind === 'tool') {
@@ -339,7 +345,7 @@ function stepLine(step: ActivityStep, i: number, arr?: ActivityStep[]): ReactNod
   const srcLabel = src === undefined ? null : toolLabel(src.tool ?? '', src.target);
   return (
     <div key={i} className={`${styles.step} ${styles.stepFail}`}>
-      {srcLabel !== null ? `${srcLabel} — returned an error` : 'a step returned an error'}
+      {srcLabel !== null ? `${srcLabel} returned an error` : 'A step returned an error'}
     </div>
   );
 }
@@ -357,8 +363,9 @@ function WorkGroup({ live, summary, steps, chips, settledOk }: {
       {/* Live header: the shimmering verb; clicking folds the timeline open and closed. */}
       <button type="button" className={styles.groupSummary} onClick={() => setExpanded((v) => (v === null ? true : !v))}>
         {live
-          ? <><span className={styles.shimmer}>{liveLabel}</span><span className={styles.liveCaret} aria-hidden="true">{' '}▸</span></>
-          : <>{open ? '▾' : '▸'} {summary}</>}
+          ? <span className={styles.shimmer}>{liveLabel}</span>
+          : summary}
+        <ChevronRight size={13} className={open ? `${styles.caret} ${styles.caretOpen}` : styles.caret} />
       </button>
       {open ? (
         <Timeline steps={live && !expanded ? steps.slice(-6) : steps} chips={chips} live={live} settledOk={settledOk} />

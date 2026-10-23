@@ -49,7 +49,7 @@ export function BindingQuestions({ columns, draft, onChange }: {
       <input
         className={styles.pickerInput}
         type={type === 'number' ? 'number' : 'text'}
-        placeholder="value"
+        placeholder="Value"
         value={clause.value}
         onChange={(e) => setClause(i, { value: e.target.value })}
       />

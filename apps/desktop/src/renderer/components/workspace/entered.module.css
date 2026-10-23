@@ -1,0 +1,101 @@
+/* A table's rows or the notes, under one slim bar: back to the canvas, where you are, the table's one setting. */
+
+.wrap {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--ground);
+  animation: enter 280ms var(--ease-out) backwards;
+}
+
+.bar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 0 12px 0 8px;
+  background: var(--surface);
+}
+
+.back {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--t2);
+  cursor: pointer;
+  transition: background 120ms ease-out, color 120ms ease-out;
+}
+
+.back:hover {
+  background: var(--raised);
+  color: var(--t1);
+}
+
+.back:focus-visible,
+.grainSelect:focus-visible {
+  outline: 1.5px solid var(--focus);
+  outline-offset: 1px;
+}
+
+.icon {
+  display: flex;
+  color: var(--t3);
+}
+
+.where {
+  font: 400 13px var(--sans);
+  color: var(--t3);
+}
+
+.sep {
+  color: var(--t3);
+  opacity: 0.6;
+}
+
+.what {
+  font: 500 13px var(--sans);
+  color: var(--t1);
+}
+
+.spacer {
+  flex: 1;
+}
+
+.grain {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.grainWord {
+  font: 400 12px var(--sans);
+  color: var(--t3);
+}
+
+.grainSelect {
+  height: 30px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: var(--r1);
+  background: var(--well);
+  color: var(--t1);
+  font: 400 12.5px var(--sans);
+}
+
+@keyframes enter {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wrap {
+    animation: none;
+  }
+}

@@ -4,7 +4,7 @@ import { desk } from '../../lib/desk.js';
 import { store, useValue } from '../../lib/canvas/store.js';
 import { slugify } from '../../lib/slug.js';
 import { ExportCeremony, allScreens, type CeremonySelection } from './ExportCeremony.js';
-import { Empty, Group, IDLE, Row, SectionHead, StatusLine, errorText, kit, type RowState } from './kit.js';
+import { Empty, Group, IDLE, Row, SectionHead, StatusLine, errorText, kit, type RowState } from '../kit/kit.js';
 import type { ProjectNavItem } from './projectNav.js';
 import type { LoadedProject } from './ProjectScreen.js';
 

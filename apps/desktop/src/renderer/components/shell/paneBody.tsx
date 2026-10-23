@@ -3,9 +3,10 @@ import { InspectorPane } from './InspectorPane.js';
 import { LayersPane } from './LayersPane.js';
 import { NodeBrowser } from './NodeBrowser.js';
 import { WorkspacePane } from '../workspace/WorkspacePane.js';
-import { BrowserPane, FilePane, SideChat } from './panelPanes.js';
+import { BrowserPane, FilePane } from './panelPanes.js';
 import type { PanelTab } from './panelPanes.js';
 import styles from './sidepanel.module.css';
+import { EmptyMark } from '../brand/EmptyMark.js';
 
 /**
  * THE RE-HOUSING R0 (§3.1): THE ONE PANE-KIND SWITCH — both panels (side + bottom)
@@ -18,20 +19,14 @@ import styles from './sidepanel.module.css';
  * one opener left, D-131: a lease can never drive an invisible surface).
  * 'nodeBrowser' is REGISTERED now; its content (§1.6) lands in R2.
  */
-export function PaneBody({ tab, onThread }: {
-  tab: PanelTab;
-  /** chat tabs: the first message creates the thread — the panel records it. */
-  onThread: (threadId: string) => void;
-}) {
+export function PaneBody({ tab }: { tab: PanelTab }) {
   switch (tab.kind) {
-    case 'chat':
-      return <SideChat tab={tab} onThread={onThread} />;
     case 'file':
       return <FilePane path={tab.path ?? ''} />;
     case 'inspector':
       return tab.selection
         ? <InspectorPane selection={tab.selection} />
-        : <div className={styles.fileEmpty}>alt-click a scene node to inspect it</div>;
+        : <EmptyMark line="Select something on a screen to edit it." />;
     case 'workspace':
       return <WorkspacePane />;
     case 'code':

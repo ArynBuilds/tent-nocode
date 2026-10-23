@@ -1,9 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Crosshair, FileText, Globe, Layers, MessageSquarePlus, Network, PackageSearch, Plus, SquareCode, X } from 'lucide-react';
-import { useLive } from '../../lib/data/useLive.js';
-import { useQuery } from '../../lib/data/useQuery.js';
-import { desk } from '../../lib/desk.js';
-import { useOrg } from '../../lib/OrgContext.js';
+import { Crosshair, FileText, Globe, Layers, Network, PackageSearch, Plus, SquareCode, X } from 'lucide-react';
 import type { PanelTab } from './panelPanes.js';
 import styles from './sidepanel.module.css';
 
@@ -11,7 +7,7 @@ import styles from './sidepanel.module.css';
  * Tier 52 Phase 3: THE ONE TAB STRIP — extracted verbatim from SidePanel.tsx so the bottom
  * panel carries the same tabs (reorder, marquee, labels, add menu) without duplicating a
  * line. All original rulings travel with the code: pointer-based reorder ("no icons on my
- * mouse"), active-tab scroll-into-view, thread-title tab labels, the wheel-scrolling strip.
+ * mouse"), active-tab scroll-into-view, the wheel-scrolling strip.
  */
 
 /** Drag-reorder (user-directed 2026-07-20): move the dragged tab to the hovered tab's slot. */
@@ -31,13 +27,13 @@ interface PanelStripProps {
   onTabs: (tabs: PanelTab[], activeId: string) => void;
   onClose: (id: string) => void;
   /** R0: the offerable kinds — Browser is NOT one (ruling 8b: entries hidden). */
-  onAdd: (kind: 'chat' | 'workspace' | 'code' | 'nodeBrowser' | 'layers') => void;
+  onAdd: (kind: 'workspace' | 'code' | 'nodeBrowser' | 'layers') => void;
 }
 
 /** R0: one icon + one label per kind — the strip renders every registered kind (a tab
  * can exist that no menu offers: the lease-opened browser keeps its face). */
 const KIND_ICON = {
-  chat: MessageSquarePlus, file: FileText, inspector: Crosshair, workspace: Network,
+  file: FileText, inspector: Crosshair, workspace: Network,
   code: SquareCode, nodeBrowser: PackageSearch, browser: Globe, layers: Layers,
 } as const;
 
@@ -45,12 +41,11 @@ const KIND_ICON = {
 // internal kind stays plumbing. B4 (spec ㉖): the inspector's display word is
 // PROPERTIES — same law, words only.
 const KIND_LABEL = {
-  chat: 'Side chat', file: '', inspector: 'Properties', workspace: 'Workspace',
+  file: '', inspector: 'Properties', workspace: 'Workspace',
   code: 'Code', nodeBrowser: 'Node browser', browser: 'Browser', layers: 'Layers',
 } as const;
 
 export function PanelStrip({ tabs, activeId, onTabs, onClose, onAdd }: PanelStripProps) {
-  const { orgId } = useOrg();
   const [menuOpen, setMenuOpen] = useState(false);
   const [dragTabId, setDragTabId] = useState<string | null>(null);
   const stripScrollRef = useRef<HTMLDivElement | null>(null);
@@ -100,16 +95,6 @@ export function PanelStrip({ tabs, activeId, onTabs, onClose, onAdd }: PanelStri
   }, [activeId, tabs.length]);
   const active = tabs.find((t) => t.id === activeId) ?? tabs[0];
 
-  // Tab labels carry the THREAD TITLE (user-directed 2026-07-20): the pane hides the thread
-  // header, so the tab button is the title's one home in the panel.
-  const threadsQuery = useQuery(`panel-threads:${orgId}`, () => desk.listThreads(orgId), [orgId]);
-  useLive(['threads'], () => threadsQuery.refetch());
-  function chatLabel(t: PanelTab): string {
-    if (t.threadId === null) return 'Side chat';
-    const title = (threadsQuery.data ?? []).find((o) => o.thread.id === t.threadId)?.thread.title.trim();
-    return title !== undefined && title !== '' ? title : 'Side chat';
-  }
-
   /** Tab-label marquee (same physics as the thread rows): constant 30px/s, measured per
    * label on hover; a fitting label measures zero overflow and never moves. */
   function armMarquee(e: React.MouseEvent<HTMLDivElement>): void {
@@ -147,7 +132,7 @@ export function PanelStrip({ tabs, activeId, onTabs, onClose, onAdd }: PanelStri
             {(() => { const Icon = KIND_ICON[t.kind]; return <Icon size={13} />; })()}
             <span className={styles.tabLabel}>
               <span className={styles.tabLabelInner}>
-                {t.kind === 'chat' ? chatLabel(t) : t.kind === 'file' ? (t.path ?? '').replace(/^.*[\\/]/, '') : KIND_LABEL[t.kind]}
+                {t.kind === 'file' ? (t.path ?? '').replace(/^.*[\\/]/, '') : KIND_LABEL[t.kind]}
               </span>
             </span>
             <button
@@ -170,11 +155,8 @@ export function PanelStrip({ tabs, activeId, onTabs, onClose, onAdd }: PanelStri
         </button>
         {menuOpen ? (
           <div className={styles.addMenu}>
-            <button type="button" className={styles.addItem} onClick={() => { onAdd('chat'); setMenuOpen(false); }}>
-              <MessageSquarePlus size={13} /> Side chat
-            </button>
             <button type="button" className={styles.addItem} onClick={() => { onAdd('workspace'); setMenuOpen(false); }}>
-              <Network size={13} /> Map
+              <Network size={13} /> Workspace
             </button>
             <button type="button" className={styles.addItem} onClick={() => { onAdd('code'); setMenuOpen(false); }}>
               <SquareCode size={13} /> Code

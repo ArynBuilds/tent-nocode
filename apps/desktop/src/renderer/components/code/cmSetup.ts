@@ -1,5 +1,7 @@
 import { EditorView, basicSetup } from 'codemirror';
 import { EditorState, Compartment } from '@codemirror/state';
+import { HighlightStyle, syntaxHighlighting } from '@codemirror/language';
+import { tags as t } from '@lezer/highlight';
 import { javascript } from '@codemirror/lang-javascript';
 import { python } from '@codemirror/lang-python';
 
@@ -9,18 +11,34 @@ const langCompartment = new Compartment();
 const readOnlyCompartment = new Compartment();
 
 const tokenTheme = EditorView.theme({
-  '&': { backgroundColor: 'var(--bg)', color: 'var(--t1)', fontSize: '12.5px', height: '100%' },
-  '.cm-content': { fontFamily: 'var(--mono)', caretColor: 'var(--t0)' },
-  '.cm-cursor': { borderLeftColor: 'var(--t0)' },
-  '.cm-gutters': { backgroundColor: 'var(--side)', color: 'var(--t3)', border: 'none', borderRight: '1px solid var(--border)' },
-  '.cm-activeLine': { backgroundColor: 'color-mix(in srgb, var(--panel2) 60%, transparent)' },
+  '&': { backgroundColor: 'var(--ground)', color: 'var(--t1)', fontSize: '13px', height: '100%' },
+  '.cm-scroller': { lineHeight: '1.6' },
+  '.cm-content': { fontFamily: 'var(--mono)', caretColor: 'var(--live)', padding: '12px 0' },
+  '.cm-cursor': { borderLeftColor: 'var(--live)', borderLeftWidth: '2px' },
+  '.cm-gutters': { backgroundColor: 'var(--ground)', color: 'var(--t3)', border: 'none', borderRight: 'none', paddingLeft: '8px' },
+  '.cm-foldGutter .cm-gutterElement': { color: 'var(--t3)', opacity: '0.5' },
+  '.cm-lineNumbers .cm-gutterElement': { padding: '0 12px 0 4px', opacity: '0.6' },
+  '.cm-activeLine': { backgroundColor: 'color-mix(in srgb, var(--surface) 80%, transparent)' },
   '.cm-activeLineGutter': { backgroundColor: 'transparent', color: 'var(--t1)' },
+  '&.cm-focused': { outline: 'none' },
   '&.cm-focused .cm-selectionBackground, .cm-selectionBackground': {
-    backgroundColor: 'color-mix(in srgb, var(--t3) 25%, transparent)',
+    backgroundColor: 'color-mix(in srgb, var(--live) 22%, transparent)',
   },
-  '.cm-panels': { backgroundColor: 'var(--panel)', color: 'var(--t1)' },
+  '.cm-panels': { backgroundColor: 'var(--surface)', color: 'var(--t1)' },
   '.cm-searchMatch': { backgroundColor: 'color-mix(in srgb, var(--amber) 30%, transparent)' },
 }, { dark: true });
+
+// Code colors come from the --code-* tokens, so both themes stay calm and readable.
+const codeColors = HighlightStyle.define([
+  { tag: [t.keyword, t.controlKeyword, t.operatorKeyword, t.definitionKeyword, t.moduleKeyword], color: 'var(--code-keyword)' },
+  { tag: [t.string, t.special(t.string), t.regexp], color: 'var(--code-string)' },
+  { tag: [t.number, t.bool, t.null, t.atom], color: 'var(--code-number)' },
+  { tag: [t.comment, t.lineComment, t.blockComment], color: 'var(--code-comment)', fontStyle: 'italic' },
+  { tag: [t.function(t.variableName), t.function(t.propertyName), t.definition(t.function(t.variableName))], color: 'var(--code-function)' },
+  { tag: [t.className, t.typeName, t.definition(t.className)], color: 'var(--code-type)' },
+  { tag: [t.variableName, t.propertyName, t.attributeName], color: 'var(--t1)' },
+  { tag: [t.operator, t.punctuation, t.bracket, t.separator], color: 'var(--t2)' },
+]);
 
 export function languageFor(pathOrName: string): 'python' | 'javascript' {
   return /\.(js|jsx|ts|tsx|mjs|cjs)$/i.test(pathOrName) ? 'javascript' : 'python';
@@ -48,6 +66,7 @@ export function mountEditor(parent: HTMLElement, opts: {
         langCompartment.of(opts.language === 'javascript' ? javascript() : python()),
         readOnlyCompartment.of([]),
         tokenTheme,
+        syntaxHighlighting(codeColors),
         EditorView.updateListener.of((u) => { if (u.docChanged) opts.onChange?.(); }),
       ],
     }),

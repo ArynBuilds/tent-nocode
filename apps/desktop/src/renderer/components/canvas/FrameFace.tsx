@@ -6,7 +6,7 @@ import { desk } from '../../lib/desk.js';
 import { useOrg } from '../../lib/OrgContext.js';
 import { useLivePush } from '../../lib/data/useLive.js';
 import { useQuery } from '../../lib/data/useQuery.js';
-import { SCREEN_VIEW_SCALE, store, useValue } from '../../lib/canvas/store.js';
+import { SCREEN_VIEW_SCALE, canvasView, store, useValue } from '../../lib/canvas/store.js';
 import type { Placed, Rect, ScreenRecord } from '../../lib/canvas/store.js';
 import type { FrameGeometry } from '../../lib/canvas/tools/StateNode.js';
 import { EditingText, useEditor } from './CanvasEngine.js';
@@ -29,7 +29,39 @@ const feedOf = (results: ReadonlyArray<{ binding: string; rows: Record<string, u
   return data;
 };
 
+// A screen mounts its live engine when it comes near the view at a readable size, and keeps it while it stays
+// near; far off or too small, it rests as its frame and name. Px are screen px.
+const ENTER_MIN_W = 80;
+const KEEP_MIN_W = 56;
+
 export function FrameFace({ frame, width, height }: { frame: ScreenFrameProps; width: number; height: number }) {
+  const { screen, focused } = frame;
+  const reach = useValue(`face.reach.${screen.nodeId}`, (): 'in' | 'keep' | 'out' => {
+    const v = canvasView.get();
+    const p = store.positionOf(screen.nodeId);
+    if (p === undefined || v.w === 0) return 'in';
+    const cam = store.camera;
+    const w = width * cam.zoom; const h = height * cam.zoom;
+    const x = cam.x + p.x * cam.zoom; const y = cam.y + p.y * cam.zoom;
+    const within = (m: number): boolean => x + w > -m * v.w && y + h > -m * v.h && x < v.w * (1 + m) && y < v.h * (1 + m);
+    if (w >= ENTER_MIN_W && within(0.5)) return 'in';
+    if (w >= KEEP_MIN_W && within(1.5)) return 'keep';
+    return 'out';
+  }, [screen.nodeId, width, height]);
+  const liveRef = useRef(false);
+  liveRef.current = focused || reach === 'in' ? true : reach === 'out' ? false : liveRef.current;
+  if (!liveRef.current) {
+    return (
+      <span className={styles.frameNatural} data-face={screen.id}>
+        <span className={styles.frameName} data-frame-name>{screen.title}</span>
+        <span className={`${styles.frameBody} ${styles.frameBodyRest} ${styles.frameResting}`} style={{ width, height }} />
+      </span>
+    );
+  }
+  return <LiveFrame frame={frame} width={width} height={height} />;
+}
+
+function LiveFrame({ frame, width, height }: { frame: ScreenFrameProps; width: number; height: number }) {
   const { screen, focused } = frame;
   const { orgId } = useOrg();
   const editor = useEditor();

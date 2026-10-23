@@ -64,6 +64,9 @@ export function ExpressionPicker({ request, onPick, onClose }: {
   const [keyColumn, setKeyColumn] = useState<string | undefined>(undefined);
   const [present, setPresent] = useState<string>('table');
   const [bindables, setBindables] = useState<Array<{ id: string; word: string }>>([]);
+  // An empty table names its first columns right here, then the questions continue.
+  const [firstCols, setFirstCols] = useState('');
+  const [shaping, setShaping] = useState<string | null>(null);
 
   useEffect(() => {
     if (request.dataset === undefined) return;
@@ -90,8 +93,19 @@ export function ExpressionPicker({ request, onPick, onClose }: {
   }, [onClose]);
 
   const columns: QuestionColumn[] = (brief?.columns ?? []).map((c) => ({ key: c.key, display: c.display, type: c.type }));
-  // A zero-column table cannot wire; the picker refuses before the questions.
+  // A zero-column table cannot wire yet: the picker asks for its first columns before the questions.
   const shapeless = request.dataset !== undefined && brief !== null && columns.length === 0;
+  const giveShape = async (): Promise<void> => {
+    const names = firstCols.split(',').map((n) => n.trim()).filter((n) => n !== '');
+    if (request.dataset === undefined || names.length === 0) return;
+    setShaping('Adding the columns…');
+    const keyOf = (n: string): string => n.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'column';
+    const res = await desk.humanEvolveDataset(orgId, request.dataset, { add: names.map((n) => ({ col: keyOf(n), type: 'string' as const })) }, pid);
+    if (!res.ok) { setShaping(res.error); return; }
+    await Promise.all(names.filter((n) => keyOf(n) !== n).map((n) => desk.humanSetColumnDisplay(orgId, request.dataset!, keyOf(n), n, pid).catch(() => undefined)));
+    setShaping(null);
+    setBrief(await desk.datasetBrief(orgId, request.dataset, pid).catch(() => null));
+  };
   const allPicked = draft.picked.length === 0; // nothing toggled = everything
   const effKey = keyColumn ?? columns.find((c) => c.type === 'string')?.key ?? columns[0]?.key;
   const screens = request.screens ?? [];
@@ -172,12 +186,29 @@ export function ExpressionPicker({ request, onPick, onClose }: {
                 </tbody>
               </table>
             </div>
-          ) : shapeless ? (
-            <div className={styles.pickerQuiet}>this table has no columns yet — add one first</div>
-          ) : (
-            <div className={styles.pickerQuiet}>no rows yet — the shape still wires</div>
-          )}
+          ) : null}
         </>
+      ) : null}
+      {request.mode === 'binding' && shapeless ? (
+        <form className={styles.firstCols} onSubmit={(e) => { e.preventDefault(); void giveShape(); }}>
+          <div className={styles.questionWord}>This table has no columns yet</div>
+          <div className={styles.pickerQuiet}>Name them to connect it, separated by commas. You can change them later in the rows.</div>
+          <div className={styles.formRow}>
+            <input
+              className={styles.formInput}
+              autoFocus
+              placeholder="Name, Done, Date"
+              aria-label="First columns"
+              value={firstCols}
+              onChange={(e) => { setFirstCols(e.target.value); setShaping(null); }}
+            />
+            <button type="submit" className={styles.pickerGo} disabled={firstCols.trim() === '' || shaping === 'Adding the columns…'}>Add</button>
+          </div>
+          {shaping !== null ? <div className={styles.pickerQuiet}>{shaping}</div> : null}
+        </form>
+      ) : null}
+      {request.dataset !== undefined && !shapeless && brief !== null && brief.sampleRows.length === 0 && columns.length > 0 ? (
+        <div className={styles.pickerQuiet}>No rows yet. The connection still works and fills in as rows arrive.</div>
       ) : null}
       {request.mode === 'write-back' && columns.length > 0 ? (
         <>
@@ -227,7 +258,7 @@ export function ExpressionPicker({ request, onPick, onClose }: {
       {request.mode === 'app-action' ? (
         <input
           className={styles.pickerInput}
-          placeholder="what the button says"
+          placeholder="What the button says"
           value={buttonLabel}
           onChange={(e) => setButtonLabel(e.target.value)}
         />

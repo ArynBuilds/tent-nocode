@@ -15,6 +15,7 @@ import type { FlowStepDef } from './flows/stepTypes.js';
 import { getFlow } from './flows/store.js';
 import { MAIN_FLOW } from './flows/authoring.js';
 import { consentClassOf } from './consent.js';
+import { compileCanvasBlock, loadCanvas, renderCanvasBlock, type CanvasDoor, type CanvasModel } from './canvasLens.js';
 
 // THE DIALECT (AI-surface rebuild, Phase 7; ONE file by ruling - the 500-line law is waived).
 // The model writes a compact constrained authoring syntax over the registries' vocabulary;
@@ -2037,7 +2038,7 @@ export async function landedRevisionOps(
 export type ConstructKind =
   | 'project' | 'theme' | 'table' | 'rows' | 'screen' | 'flow' | 'trigger' | 'service' | 'call'
   | 'chain' | 'operation' | 'run' | 'component' | 'plan' | 'dispatch' | 'mission'
-  | 'package' | 'note' | 'mode' | 'settings' | 'thread' | 'create-project';
+  | 'package' | 'note' | 'mode' | 'settings' | 'thread' | 'create-project' | 'canvas';
 
 /** verb -> the construct it compiles from and the plain words a card or a list speaks. */
 export const CONSTRUCT_OF_VERB: Record<string, { construct: ConstructKind; says: string }> = {
@@ -2127,6 +2128,8 @@ export interface ProjectModel {
   operations: Array<{ name: string; version: number; runtime: string; outputs: string[] }>;
   components: Array<{ name: string; version: number }>;
   notes: Array<{ id: string; body: string }>;
+  /** Where each card sits on the canvas and which rest folded together; absent when not loaded. */
+  canvas?: CanvasModel;
 }
 
 const shortId = (id: string): string => id.slice(0, 8);
@@ -2240,6 +2243,7 @@ export function generateProjectDialect(m: ProjectModel, opts?: ProjectLensOption
   for (const c of m.components) out.push(`# component ${c.name}@${c.version} - contract {names:['${c.name}']} serves it`);
   if (m.notes.length > 0) out.push('');
   for (const n of m.notes) out.push(`note ${JSON.stringify(n.body)}`);
+  if (m.canvas !== undefined) out.push('', ...renderCanvasBlock(m.canvas));
   return out.join('\n');
 }
 
@@ -2297,6 +2301,7 @@ interface ParsedProject {
   services: ParsedService[];
   chains: ParsedChain[];
   notes: Array<{ text: string; line: number }>;
+  canvas?: { body: string; line: number };
   commands: ParsedCommand[];
   mentioned: Set<MentionKind>;
 }
@@ -2361,6 +2366,21 @@ export function parseProjectDialect(code: string): ParsedProject {
     const firstLine = first?.line ?? line;
     return `${header}${firstLine > 1 ? '\n'.repeat(firstLine - 1) : ' '}${renderTokens(body)}`;
   };
+  /** A block's tokens as text, each on its own document line, so the reader's line numbers stay exact. */
+  const linedBlock = (line: number): string => {
+    c.expectP('{', `opening the block on line ${line}`);
+    const rows: string[][] = [];
+    let depth = 1;
+    for (;;) {
+      const t = c.next();
+      if (t.t === 'end') err(line, `the block opened on line ${line} is never closed - add '}'`);
+      if (t.t === 'p' && t.v === '{') depth++;
+      if (t.t === 'p' && t.v === '}') { depth--; if (depth === 0) break; }
+      if (t.t === 'nl') continue;
+      (rows[t.line - 1] ??= []).push(renderTokens([t]));
+    }
+    return Array.from({ length: rows.length }, (_, i) => (rows[i] ?? []).join(' ')).join('\n');
+  };
   const wordList = (what: string): string[] => {
     const list: string[] = [];
     for (;;) {
@@ -2424,7 +2444,7 @@ export function parseProjectDialect(code: string): ParsedProject {
     const t = c.peek(true);
     if (t.t === 'end') break;
     if (t.t === 'dots') { c.next(true); out.keepRest = true; continue; }
-    if (t.t !== 'word') err(t.line, `expected a construct (project / theme / table / rows / screen / flow / trigger / service / call / run / chain / operation / component / import / plan / dispatch / mission / export / note / mode / settings / delete / create), got '${t.t === 'p' ? (t as { v: string }).v : t.t}'`);
+    if (t.t !== 'word') err(t.line, `expected a construct (project / theme / table / rows / screen / flow / trigger / service / call / run / chain / operation / component / import / plan / dispatch / mission / export / note / canvas / mode / settings / delete / create), got '${t.t === 'p' ? (t as { v: string }).v : t.t}'`);
     const w = c.next(true) as { t: 'word'; v: string; line: number };
     const line = w.line;
     switch (w.v) {
@@ -2578,6 +2598,7 @@ export function parseProjectDialect(code: string): ParsedProject {
         break;
       }
       case 'note': out.notes.push({ text: str('the note text'), line }); out.mentioned.add('note'); break;
+      case 'canvas': out.canvas = { body: linedBlock(line), line }; break;
       case 'mode': out.commands.push({ kind: 'mode', mode: word('ask or auto').v, line }); break;
       case 'settings': out.commands.push({ kind: 'settings', patch: objectValue('settings', line), line }); break;
       case 'delete': {
@@ -2599,7 +2620,7 @@ export function parseProjectDialect(code: string): ParsedProject {
         err(line, `'${w.v}' belongs inside the flow block - wrap it: flow main { ... }`);
         break;
       default:
-        err(line, `'${w.v}' is not a construct - the document reads project / theme / table / rows / screen / flow / trigger / service / call / run / chain / operation / component / import / plan / dispatch / mission / export / note / mode / settings / delete / create`);
+        err(line, `'${w.v}' is not a construct - the document reads project / theme / table / rows / screen / flow / trigger / service / call / run / chain / operation / component / import / plan / dispatch / mission / export / note / canvas / mode / settings / delete / create`);
     }
   }
   return out;
@@ -2615,6 +2636,8 @@ export type ProjectDoor =
   | { kind: 'raise'; verb: string; params: Record<string, unknown> }
   /** The theme block: setProjectTheme, free. */
   | { kind: 'theme-set'; theme: ProjectTheme }
+  /** The canvas block: moved cards merge into the saved layout, the groups replace the saved ones; free. */
+  | CanvasDoor
   | { kind: 'table-create'; name: string; rowSchema: Record<string, ColType> }
   | { kind: 'table-evolve'; name: string; add: { col: string; type: ColType }[]; deprecate: string[] }
   | { kind: 'rows-append'; table: string; rows: Record<string, unknown>[] }
@@ -2705,6 +2728,7 @@ export async function compileProjectDialect(
   const kindAtLine = new Map<number, ConstructKind>();
   if (parsed.name !== undefined) kindAtLine.set(parsed.name.line, 'project');
   if (parsed.theme !== undefined) kindAtLine.set(parsed.theme.line, 'theme');
+  if (parsed.canvas !== undefined) kindAtLine.set(parsed.canvas.line, 'canvas');
   for (const t of parsed.tables) kindAtLine.set(t.line, 'table');
   for (const s of parsed.screens) kindAtLine.set(s.line, 'screen');
   if (parsed.flow !== undefined) kindAtLine.set(parsed.flow.line, 'flow');
@@ -2763,6 +2787,15 @@ export async function compileProjectDialect(
       } else {
         creates.push({ construct: 'theme', says: 'set the theme', line: parsed.theme.line, door: { kind: 'theme-set', theme: themeParse.data } });
       }
+    }
+  }
+  // canvas: listed cards move, unlisted ones stay; the groups are exactly the listed ones.
+  if (parsed.canvas !== undefined) {
+    if (model.canvas === undefined) at(parsed.canvas.line, 'canvas: the layout is not loaded here');
+    else {
+      const canvas = compileCanvasBlock(model.canvas, parsed.canvas.body, 1);
+      errors.push(...canvas.errors);
+      if (canvas.door !== null) creates.push({ construct: 'canvas', says: 'arrange the canvas', line: parsed.canvas.line, door: canvas.door });
     }
   }
   // tables
@@ -3071,6 +3104,14 @@ const COMMAND_DOCS: Record<string, CommandDoc> = {
   mission: { grammar: ['mission { part "<text>": done "<evidence>", part "<text>": blocked "<why>" }'], hints: ['marks parts of the open checklist by their text; statuses: done / blocked / dropped / pending / in_flight'] },
   package: { grammar: ['export package "<name>" { scenes: [...], license: "...", workspacePath: "..." }', 'import package "<path>" { onCollision: "refuse"|"skip-existing"|"copy-rename" }'], hints: ['always asks'] },
   note: { grammar: ['note "<one plain sentence>"'], hints: ['saves the why for future turns (8..2000 chars); leaving a live note out deletes it'] },
+  canvas: {
+    grammar: ['canvas { table <name> at <x>, <y>   screen <slug> at <x>, <y>   step <id> at ..   trigger "<id>" at ..   service <name> at ..   chain "<id>" at ..   operation <name> at ..   result <name> at ..   notes at ..   group "<label>" at <x>, <y> { <card>, <card>, ... } }'],
+    hints: [
+      'arranges the canvas the user sees; free; x grows right, y grows down, in canvas pixels; a card is about 112 wide and tall, a group card 196 x 140, a screen 0.375 of its design size (a 1440 x 900 screen takes 540 x 338)',
+      'listed cards move, cards left out stay where they are; the groups are exactly the ones listed - a group left out unfolds; a group folds two or more cards into one card, any kinds mixed',
+      'arrange when the user asks to organize, move or group things - new cards place themselves; keep wired cards near each other, leave 48 or more between cards',
+    ],
+  },
   mode: { grammar: ['mode ask|auto'], hints: ['always asks - a thread never self-promotes'] },
   settings: { grammar: ['settings { <patch> }'], hints: ['always asks'] },
   thread: { grammar: ['delete thread "<words from its title>"'], hints: ['always asks; the current thread refuses'] },
@@ -3146,6 +3187,22 @@ export async function loadProjectModel(sql: postgres.Sql, input: { orgId: string
     });
   }
   const flow = await getFlow(sql, orgId, { projectId, name: MAIN_FLOW });
+  const flowDoc = flow === null ? null : flowDocSchema.parse(flow.doc);
+  const triggers = (await listTriggers(sql, orgId)).filter((t) => t.projectId === projectId && t.revokedAt === null);
+  const services = await listIntegrationConnections(sql, { orgId, projectId });
+  const chains = (await listReactiveChains(sql, orgId)).filter((c) => c.projectId === projectId && c.revokedAt === null);
+  const operations = (await listOperations(sql, orgId, projectId)).filter((o) => o.status === 'active');
+  const placedScreens = (await listTabs(sql, orgId)).filter((t) => t.projectId === projectId && t.sceneId !== null && t.sceneSlug !== null);
+  const canvas = await loadCanvas(sql, {
+    orgId,
+    names: {
+      projectId, flowId: flow?.id ?? null, flowSteps: flowDoc === null ? [] : Object.keys(flowDoc.steps),
+      tables: tableRows.map((r) => r.name),
+      screens: placedScreens.map((t) => ({ slug: t.sceneSlug!, sceneId: t.sceneId! })),
+      triggers: triggers.map((t) => t.id), services: services.map((v) => ({ id: v.id, integration: v.integration })),
+      chains: chains.map((c) => c.id), operations: operations.map((o) => o.name),
+    },
+  });
   return {
     name: project?.name ?? 'untitled',
     theme: theme.success ? theme.data : null,
@@ -3154,19 +3211,16 @@ export async function loadProjectModel(sql: postgres.Sql, input: { orgId: string
       keyColumns: Array.isArray(r.key_columns) ? (r.key_columns as string[]) : null, rowCount: Number(r.n),
     })),
     screens,
-    flow: flow === null ? null : flowDocSchema.parse(flow.doc),
+    flow: flowDoc,
     flowId: flow?.id ?? null,
-    triggers: (await listTriggers(sql, orgId)).filter((t) => t.projectId === projectId && t.revokedAt === null)
-      .map((t) => ({ id: t.id, kind: t.kind, spec: t.spec, action: t.action as unknown as Record<string, unknown>, enabled: t.enabled })),
-    services: (await listIntegrationConnections(sql, { orgId, projectId }))
-      .map((s) => ({ id: s.id, integration: s.integration, label: s.label, status: s.status })),
-    chains: (await listReactiveChains(sql, orgId)).filter((c) => c.projectId === projectId && c.revokedAt === null)
-      .map((c) => ({ id: c.id, operation: c.operation, inputs: c.inputs, enabled: c.enabled })),
-    operations: (await listOperations(sql, orgId, projectId)).filter((o) => o.status === 'active')
-      .map((o) => ({ name: o.name, version: o.version, runtime: o.runtime, outputs: o.outputs })),
+    triggers: triggers.map((t) => ({ id: t.id, kind: t.kind, spec: t.spec, action: t.action as unknown as Record<string, unknown>, enabled: t.enabled })),
+    services: services.map((v) => ({ id: v.id, integration: v.integration, label: v.label, status: v.status })),
+    chains: chains.map((c) => ({ id: c.id, operation: c.operation, inputs: c.inputs, enabled: c.enabled })),
+    operations: operations.map((o) => ({ name: o.name, version: o.version, runtime: o.runtime, outputs: o.outputs })),
     components: (await listOrgComponents(sql, orgId, projectId)).filter((c) => c.status === 'active')
       .map((c) => ({ name: c.name, version: c.version })),
     notes: (await readNotes(sql, { orgId, projectId })).map((n) => ({ id: n.id, body: n.body })),
+    canvas,
   };
 }
 

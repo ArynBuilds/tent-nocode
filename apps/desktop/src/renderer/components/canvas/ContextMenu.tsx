@@ -46,7 +46,7 @@ export function ContextMenu({ at, groups, search = 'auto', placeholder = 'search
   return (
     <div
       className={styles.menu}
-      style={{ left: Math.min(at.x, window.innerWidth - 232), top: Math.min(at.y, window.innerHeight - 320) }}
+      style={{ left: Math.max(8, Math.min(at.x, window.innerWidth - 264)), top: Math.max(8, Math.min(at.y, window.innerHeight - 408)) }}
       onClick={(e) => e.stopPropagation()}
       onContextMenu={(e) => { e.preventDefault(); e.stopPropagation(); }}
       onPointerDown={(e) => e.stopPropagation()}
@@ -70,7 +70,7 @@ export function ContextMenu({ at, groups, search = 'auto', placeholder = 'search
             {gi > 0 ? <div className={styles.divider} /> : null}
             {group.map((r) => (
               <button key={r.key} type="button" className={styles.row} onClick={() => act(r.onAct)}>
-                {r.icon !== undefined ? <r.icon size={12} className={styles.icon} /> : <span className={styles.icon} />}
+                {r.icon !== undefined ? <r.icon size={14} className={styles.icon} /> : <span className={styles.icon} />}
                 <span className={styles.label}>{r.label}</span>
                 {r.shortcut !== undefined ? <span className={styles.shortcut}>{r.shortcut}</span> : null}
               </button>

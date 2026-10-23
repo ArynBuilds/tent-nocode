@@ -1,17 +1,27 @@
-/* The project screen's building blocks on soft surfaces: groups are surface panels,
-   inputs are wells, verbs are raised pills, the gold is spent on focus and the one primary verb. */
+/* The settings building blocks on soft surfaces: groups are surface panels,
+   inputs are wells, verbs are raised pills, the hue is spent on focus alone; the main verb is a light pill. */
+
+/* Settings-like screens read one type step bigger; the editor keeps the app ladder. */
+.readable {
+  --fs-caption: 12px;
+  --fs-small: 13px;
+  --fs-body: 15px;
+  --fs-title: 17px;
+  --fs-heading: 20px;
+}
 
 /* ---- section head ---- */
 
 .head {
   display: flex;
   flex-direction: column;
-  gap: var(--s1);
+  gap: var(--s2);
 }
 
 .title {
   margin: 0;
-  font: 600 var(--fs-heading) var(--sans);
+  font: 600 26px / 1.2 var(--sans);
+  letter-spacing: -0.02em;
   color: var(--t1);
 }
 
@@ -112,6 +122,11 @@
   color: var(--t1);
 }
 
+.valueQuiet {
+  font: 400 var(--fs-body) var(--sans);
+  color: var(--t3);
+}
+
 .empty {
   padding: var(--s3) 0;
   font: 400 var(--fs-small) / 1.45 var(--sans);
@@ -137,6 +152,24 @@
   flex: 1;
 }
 
+/* A short amount: the unit sits in front of a narrow well. */
+.amount {
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+}
+
+.unit {
+  font: 400 var(--fs-body) var(--sans);
+  color: var(--t3);
+}
+
+.inputShort {
+  flex: none;
+  width: 96px;
+  font-variant-numeric: tabular-nums;
+}
+
 .input::placeholder {
   color: var(--t3);
 }
@@ -153,7 +186,7 @@
 
 .input:focus-visible,
 .select:focus-visible {
-  outline: 2px solid var(--live);
+  outline: 1.5px solid var(--focus);
   outline-offset: -2px;
 }
 
@@ -186,7 +219,7 @@
 }
 
 .btn:focus-visible {
-  outline: 2px solid var(--live);
+  outline: 1.5px solid var(--focus);
   outline-offset: 2px;
 }
 
@@ -196,14 +229,14 @@
 }
 
 .btnPrimary {
-  background: var(--live);
-  color: var(--ground);
+  background: var(--primary);
+  color: var(--on-primary);
   box-shadow: none;
 }
 
 .btnPrimary:hover:not(:disabled) {
-  background: var(--live);
-  filter: brightness(1.06);
+  background: var(--primary);
+  filter: brightness(1.08);
 }
 
 .btnQuiet {
@@ -227,6 +260,74 @@
 
 .btnStrong:hover:not(:disabled) {
   background: var(--t0);
+}
+
+/* ---- forms ---- */
+
+.form {
+  display: flex;
+  flex-direction: column;
+}
+
+.formFoot {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: var(--s3);
+  padding: var(--s1) 0 var(--s4);
+}
+
+.formFoot > :first-child:not(:last-child) {
+  flex: 1;
+  min-width: 0;
+}
+
+.inlineForm {
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+  padding: var(--s4) 0;
+}
+
+/* ---- segmented choice: a well track, the chosen segment raised ---- */
+
+.segmented {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  padding: 3px;
+  background: var(--well);
+  border-radius: var(--r1);
+}
+
+.segment {
+  height: 30px;
+  padding: 0 var(--s3);
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--t2);
+  font: 400 var(--fs-small) var(--sans);
+  cursor: pointer;
+  transition: background 120ms ease-out, color 120ms ease-out;
+}
+
+.segment:hover:not(:disabled) {
+  color: var(--t1);
+}
+
+.segmentOn,
+.segmentOn:hover:not(:disabled) {
+  background: var(--raised);
+  box-shadow: var(--lift);
+  color: var(--t0);
+  font-weight: 500;
+}
+
+.segment:focus-visible {
+  outline: 1.5px solid var(--focus);
+  outline-offset: -2px;
 }
 
 /* ---- copyable values ---- */
@@ -291,7 +392,7 @@
 }
 
 .details summary:focus-visible {
-  outline: 2px solid var(--live);
+  outline: 1.5px solid var(--focus);
   outline-offset: 2px;
   border-radius: 4px;
 }

@@ -9,25 +9,43 @@ import styles from './canvas.module.css';
 // wire-kind line grammar, the wire in flight, the element wire overlay in screen space, and the refusal
 // sentence at a drop point.
 
-export interface WireEndsGeom { x1: number; y1: number; x2: number; y2: number; mid: number }
+export interface WireEndsGeom { x1: number; y1: number; x2: number; y2: number; mid: number; /** +1: leaves a right edge into a left edge; -1 the mirror. */ dir?: 1 | -1 }
 export interface EdgeAnchor { left: number; right: number; y: number }
 
-/** Wires leave the facing edges of the two cards (each end its own width), control points at the horizontal midpoint. */
+/** A tall end (a screen's frame) takes the wire at the height nearest the other end, not at its middle. */
+const TALL = 240;
+const along = (y: number, top: number, h: number): number => Math.min(top + h - 32, Math.max(top + 32, y));
+
+/** Wires leave the facing edges of the two cards (each end its own width); a tall end meets the wire where it arrives. */
 export function wireEnds(a: Placed, b: Placed, ha: number, hb: number, wa: number, wb: number): WireEndsGeom {
   const leftToRight = a.x + wa / 2 <= b.x + wb / 2;
   const x1 = leftToRight ? a.x + wa : a.x;
   const x2 = leftToRight ? b.x : b.x + wb;
-  const y1 = a.y + ha / 2;
-  const y2 = b.y + hb / 2;
-  return { x1, y1, x2, y2, mid: (x1 + x2) / 2 };
+  const ca = a.y + ha / 2;
+  const cb = b.y + hb / 2;
+  const y1 = ha > TALL ? along(cb, a.y, ha) : ca;
+  const y2 = hb > TALL ? along(y1, b.y, hb) : cb;
+  return { x1, y1, x2, y2, mid: (x1 + x2) / 2, dir: leftToRight ? 1 : -1 };
 }
-export const wirePath = (e: WireEndsGeom): string => `M ${e.x1} ${e.y1} C ${e.mid} ${e.y1}, ${e.mid} ${e.y2}, ${e.x2} ${e.y2}`;
+/** Horizontal tangents leaving the output side and entering the input side, reaching far enough that a short hop,
+ * a stacked pair or a wire running backwards still curves softly instead of folding into the cards. */
+export const wirePath = (e: WireEndsGeom): string => {
+  const out = e.dir ?? (e.x2 >= e.x1 ? 1 : -1);
+  // Running backwards (the input sits behind the output): swing out, cross through the gap between the cards, swing in.
+  if (out * (e.x2 - e.x1) < 24 && Math.abs(e.y2 - e.y1) > 40) {
+    const r = 44;
+    const ym = (e.y1 + e.y2) / 2;
+    return `M ${e.x1} ${e.y1} C ${e.x1 + out * r * 1.4} ${e.y1}, ${e.x1 + out * r * 1.4} ${ym}, ${e.x1} ${ym} L ${e.x2} ${ym} C ${e.x2 - out * r * 1.4} ${ym}, ${e.x2 - out * r * 1.4} ${e.y2}, ${e.x2} ${e.y2}`;
+  }
+  const reach = Math.max(56, Math.abs(e.x2 - e.x1) / 2, Math.abs(e.y2 - e.y1) / 3);
+  return `M ${e.x1} ${e.y1} C ${e.x1 + out * reach} ${e.y1}, ${e.x2 - out * reach} ${e.y2}, ${e.x2} ${e.y2}`;
+};
 const spreadWireEnds = (e: WireEndsGeom, dy: number): WireEndsGeom => (dy === 0 ? e : { ...e, y1: e.y1 + dy, y2: e.y2 + dy });
 /** The end fans to the reader inside the target frame (entering from whichever side the wire arrives). */
 function anchorWireEnd(ends: WireEndsGeom, target: Placed, anchor: EdgeAnchor): WireEndsGeom {
   const enteringLeft = ends.x2 === target.x;
   const x2 = target.x + (enteringLeft ? anchor.left : anchor.right);
-  return { ...ends, x2, y2: target.y + anchor.y, mid: (ends.x1 + x2) / 2 };
+  return { ...ends, x2, y2: target.y + anchor.y, mid: (ends.x1 + x2) / 2, dir: enteringLeft ? 1 : -1 };
 }
 
 export interface LandedWire {
@@ -81,12 +99,17 @@ function kindClass(kind: WireKindName, live: boolean): string {
   return base;
 }
 
-export function LandedWires({ wires, pos, hFor, wFor, bounds, onSelect }: {
+/** A spark of light rides each wire from its source, so a connection always shows which way it runs. */
+const SPARKS = typeof window === 'undefined' || !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+export function LandedWires({ wires, pos, hFor, wFor, bounds, selected = null, onSelect }: {
   wires: LandedWire[];
   pos: ReadonlyMap<string, Placed>;
   hFor: (id: string) => number;
   wFor: (id: string) => number;
   bounds: { w: number; h: number };
+  /** The selected wire's index: it brightens and thickens so it reads as picked. */
+  selected?: number | null;
   onSelect?: (index: number) => void;
 }) {
   return (
@@ -105,11 +128,19 @@ export function LandedWires({ wires, pos, hFor, wFor, bounds, onSelect }: {
         const d = wirePath(geom);
         return (
           <g key={i}>
-            <path className={kindClass(w.wireKind, w.live === true)} style={{ stroke: w.hue }} d={d} />
+            {selected === i ? <path className={styles.edgeHalo} d={d} vectorEffect="non-scaling-stroke" /> : null}
+            <path className={`${kindClass(w.wireKind, w.live === true)} ${selected === i ? styles.edgeSelected : ''}`} style={{ stroke: selected === i ? 'var(--select)' : w.hue }} d={d} vectorEffect="non-scaling-stroke" />
+            <circle className={styles.wireCap} cx={geom.x1} cy={geom.y1} style={{ fill: w.hue }} />
+            <circle className={styles.wireCap} cx={geom.x2} cy={geom.y2} style={{ fill: w.hue }} />
+            {SPARKS ? (
+              <circle className={styles.wireSpark}>
+                <animateMotion dur={w.live === true ? '1.4s' : '3.6s'} begin={`${(i * 0.53) % 3.6}s`} repeatCount="indefinite" path={d} />
+              </circle>
+            ) : null}
             {w.countWord !== undefined ? (
               <text className={styles.wireCount} x={(geom.x1 + geom.x2) / 2} y={(geom.y1 + geom.y2) / 2 - 6} textAnchor="middle">{w.countWord}</text>
             ) : null}
-            <path className={styles.edgeHit} d={d} onPointerDown={(e) => e.stopPropagation()} onClick={onSelect !== undefined ? () => onSelect(i) : undefined} />
+            <path className={styles.edgeHit} d={d} vectorEffect="non-scaling-stroke" onPointerDown={(e) => e.stopPropagation()} onClick={onSelect !== undefined ? () => onSelect(i) : undefined} />
           </g>
         );
       })}
@@ -119,10 +150,12 @@ export function LandedWires({ wires, pos, hFor, wFor, bounds, onSelect }: {
 
 /** The wire in flight, world units. */
 export function WireLayer({ from, to }: { from: Placed; to: Placed }) {
-  const mid = (from.x + to.x) / 2;
+  const d = wirePath({ x1: from.x, y1: from.y, x2: to.x, y2: to.y, mid: (from.x + to.x) / 2, dir: 1 });
   return (
     <svg className={styles.edges} width={Math.max(from.x, to.x) + 40} height={Math.max(from.y, to.y) + 40}>
-      <path className={styles.wireDrag} d={`M ${from.x} ${from.y} C ${mid} ${from.y}, ${mid} ${to.y}, ${to.x} ${to.y}`} />
+      <path className={styles.wireDrag} d={d} vectorEffect="non-scaling-stroke" />
+      <circle className={styles.wireCap} cx={from.x} cy={from.y} style={{ fill: 'var(--select)' }} />
+      <circle className={styles.wireDragEnd} cx={to.x} cy={to.y} />
     </svg>
   );
 }

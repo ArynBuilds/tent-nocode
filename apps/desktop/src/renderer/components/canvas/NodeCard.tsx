@@ -1,10 +1,9 @@
+import { memo } from 'react';
 import { citizenWord } from '@tent-nocode/core';
 import { FrameFace } from './FrameFace.js';
 import type { ScreenFrameProps } from './FrameFace.js';
 import { NodeFace, faceOf } from './NodeFace.js';
 import styles from './canvas.module.css';
-
-/** Node card: unified card grammar for all depths; delegates body to NodeFace by face id. */
 
 export interface CanvasNode {
   id: string;
@@ -32,29 +31,31 @@ export interface CanvasNode {
   badge?: import('./NodeFace.js').NodeBadge;
 }
 
-export function NodeCard({ node, active, dimmed, wireTarget, height, width, onPointerDown, onClick, onDoubleClick, onContextMenu, frame, title, style, zoom = 'rest' }: {
+/** A card's data, functions left out: the memo compares what the card shows. */
+const sameNode = (a: CanvasNode, b: CanvasNode): boolean => a === b
+  || JSON.stringify(a, (_k, v: unknown) => (typeof v === 'function' ? undefined : v)) === JSON.stringify(b, (_k, v: unknown) => (typeof v === 'function' ? undefined : v));
+
+interface NodeCardProps {
   node: CanvasNode;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
   active?: boolean;
-  /** Dimmed when outside selection neighborhood. */
-  dimmed?: boolean;
   /** Legal landing spot for wire in flight. */
   wireTarget?: boolean;
-  height: number;
-  /** Card width; wide frames on screens canvas. */
-  width?: number;
-  onPointerDown?: (e: React.PointerEvent<HTMLDivElement>) => void;
-  onClick?: () => void;
-  onDoubleClick?: () => void;
-  /** Right-click menu callback. */
-  onContextMenu?: (e: React.MouseEvent<HTMLDivElement>) => void;
+  /** Stable doors: the engine hands the same functions every render, so an untouched card never re-renders. */
+  onDown: (e: React.PointerEvent<HTMLDivElement>, node: CanvasNode) => void;
+  onMenu: (e: React.MouseEvent<HTMLDivElement>, node: CanvasNode) => void;
   /** Present: renders true-size live page instead of tile/fold. */
   frame?: ScreenFrameProps;
-  title?: string;
-  style: React.CSSProperties;
   /** Camera zoom regime. */
   zoom?: 'far' | 'rest' | 'close';
-}) {
-  // Screen frame sheds card cage — hairline and label above.
+}
+
+/** Node card: unified card grammar for all depths; delegates body to NodeFace by face id. */
+export const NodeCard = memo(function NodeCard({ node, x, y, width, height, active, wireTarget, onDown, onMenu, frame, zoom = 'rest' }: NodeCardProps) {
+  // Screen frame sheds card cage - hairline and label above.
   const natural = frame !== undefined;
   const cls = [
     styles.node,
@@ -64,23 +65,22 @@ export function NodeCard({ node, active, dimmed, wireTarget, height, width, onPo
     !natural && faceOf(node.kind) !== 'live-frame' && zoom === 'far' ? styles.nodeFar : '',
     !natural && faceOf(node.kind) !== 'live-frame' && zoom === 'close' ? styles.nodeClose : '',
     active === true ? styles.nodeActive : '',
-    dimmed === true ? styles.nodeDim : '',
     wireTarget === true ? styles.nodeWireTarget : '',
   ].filter(Boolean).join(' ');
   return (
     <div
       className={cls}
-      style={style}
+      style={{ left: x, top: y, width, height }}
       data-canvas-node={node.id}
-      title={title ?? `${citizenWord(node.kind)} · ${node.label}${node.detail !== null ? ` · ${node.detail}` : ''}`}
-      onPointerDown={onPointerDown}
-      onClick={onClick}
-      onDoubleClick={onDoubleClick}
-      onContextMenu={onContextMenu}
+      title={`${citizenWord(node.kind)} · ${node.label}${node.detail !== null ? ` · ${node.detail}` : ''}`}
+      onPointerDown={(e) => onDown(e, node)}
+      onContextMenu={(e) => onMenu(e, node)}
     >
       {frame !== undefined
-        ? <FrameFace frame={frame} width={width ?? 0} height={height} />
+        ? <FrameFace frame={frame} width={width} height={height} />
         : <NodeFace node={node} height={height} width={width} zoom={zoom} />}
     </div>
   );
-}
+}, (a, b) => a.x === b.x && a.y === b.y && a.width === b.width && a.height === b.height && a.active === b.active
+  && a.wireTarget === b.wireTarget && a.zoom === b.zoom && a.onDown === b.onDown && a.onMenu === b.onMenu
+  && a.frame?.screen === b.frame?.screen && a.frame?.focused === b.frame?.focused && sameNode(a.node, b.node));

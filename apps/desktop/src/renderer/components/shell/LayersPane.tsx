@@ -7,6 +7,7 @@ import { store, useValue } from '../../lib/canvas/store.js';
 import type { ElementRecord, ScreenRecord } from '../../lib/canvas/store.js';
 import { useActiveEditor } from '../canvas/CanvasEngine.js';
 import styles from './sidepanel.module.css';
+import { EmptyMark } from '../brand/EmptyMark.js';
 
 // THE LAYERS TREE (Phase 12, row 12.16): the focused screen's elements as the store holds them, one row per
 // element in rail order; a click selects on the canvas, a drag reorders or reparents (one diff), the
@@ -52,7 +53,7 @@ export function LayersPane() {
   const slug = screen?.slug ?? null;
   const version = useValue('layers.version', () => (slug !== null ? store.elementsOf(slug).length + store.elementsOf(slug).map((e) => e.node.parent + e.node.order).join('') : ''), [slug]);
   const sel = useValue('layers.sel', () => store.selectedElement(), []);
-  if (screen === null || slug === null) return <div className={styles.fileEmpty}>select a screen on the canvas to see its layers</div>;
+  if (screen === null || slug === null) return <EmptyMark line="Select a screen to see its layers." />;
   void version;
   const rows = rowsOf(slug, closed);
   const selectedIds = new Set(sel !== null && sel.scene === slug ? [sel.elementId, ...sel.extras] : []);
@@ -99,7 +100,7 @@ export function LayersPane() {
   return (
     <div className={styles.layers}>
       <div className={`${styles.layersHead} ${styles.layersHeadLive}`}>{screen.title}</div>
-      {rows.length === 0 ? <div className={styles.layersQuiet}>an empty screen - draw something on it</div> : null}
+      {rows.length === 0 ? <EmptyMark compact line="This screen is empty. Draw something on it." /> : null}
       {rows.map((r) => {
         const Icon = r.name !== null ? ICONS[r.name] : Box;
         const id = r.el.node.id;

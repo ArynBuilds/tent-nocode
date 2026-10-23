@@ -1,0 +1,204 @@
+/* The onboarding's product picture: a quiet slice of canvas - dot grid, soft light, three nodes,
+   wires that draw themselves and a spark of data moving along them. */
+
+.side {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 40px;
+  padding: 48px;
+  background: var(--surface);
+  border-radius: 24px;
+}
+
+.brand {
+  position: absolute;
+  top: 28px;
+  left: 32px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  animation: fadeIn 700ms var(--ease-out) both;
+}
+
+.brandMark {
+  color: var(--mark);
+}
+
+.brandName {
+  font: 600 15px var(--sans);
+  letter-spacing: -0.01em;
+  color: var(--t2);
+}
+
+/* ---- the stage: one fixed coordinate space for wires, sparks and nodes ---- */
+
+.stage {
+  position: relative;
+  width: 440px;
+  height: 340px;
+  flex: none;
+}
+
+.wires {
+  position: absolute;
+  inset: 0;
+  overflow: visible;
+}
+
+.wire {
+  fill: none;
+  stroke: var(--t3);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  opacity: 0.7;
+  animation: draw 900ms var(--ease-out) var(--d) forwards;
+}
+
+.pulse {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 8px;
+  height: 8px;
+  margin: -4px 0 0 -4px;
+  border-radius: 50%;
+  background: var(--live);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--live) 22%, transparent), 0 0 18px color-mix(in srgb, var(--live) 60%, transparent);
+  offset-rotate: 0deg;
+  offset-distance: 0%;
+  opacity: 0;
+  animation: travel 2600ms cubic-bezier(0.45, 0, 0.25, 1) var(--d) infinite;
+}
+
+.node {
+  position: absolute;
+  animation: rise 700ms var(--ease-out) var(--d) both;
+}
+
+.nodeFloat {
+  padding: 12px 14px 14px;
+  background: var(--raised);
+  border-radius: var(--r3);
+  box-shadow: 0 20px 44px -20px rgba(0, 0, 0, 0.6), var(--lift);
+  animation: float 7s ease-in-out var(--f) infinite;
+}
+
+.nodeHead {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.nodeIcon {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 8px;
+  background: var(--well);
+  color: var(--t1);
+}
+
+.nodeTitle {
+  font: 600 14px var(--sans);
+  color: var(--t1);
+}
+
+.nodeLine {
+  margin-top: 6px;
+  font: 400 12px var(--sans);
+  color: var(--t3);
+}
+
+.mini {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 10px;
+  padding: 10px;
+  background: var(--well);
+  border-radius: 10px;
+}
+
+.miniRow {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font: 400 11px var(--sans);
+  color: var(--t2);
+}
+
+.miniBox {
+  width: 11px;
+  height: 11px;
+  flex: none;
+  border-radius: 4px;
+  background: var(--float);
+}
+
+.miniBoxOn {
+  background: var(--t1);
+}
+
+.caption {
+  position: relative;
+  max-width: 360px;
+  text-align: center;
+  animation: rise 700ms var(--ease-out) 900ms both;
+}
+
+.captionTitle {
+  font: 600 17px / 1.35 var(--sans);
+  letter-spacing: -0.01em;
+  color: var(--t1);
+}
+
+.captionLine {
+  margin-top: 6px;
+  font: 400 14px / 1.5 var(--sans);
+  color: var(--t3);
+}
+
+@keyframes draw {
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes travel {
+  0% { offset-distance: 0%; opacity: 0; }
+  12% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { offset-distance: 100%; opacity: 0; }
+}
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(14px) scale(0.98); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nodeFloat,
+  .pulse {
+    animation: none;
+  }
+
+  .wire {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
+}

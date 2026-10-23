@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { ArrowRight } from 'lucide-react';
-import { CopyValue, Group, SectionHead, kit } from './kit.js';
+import { CopyValue, Group, SectionHead, kit } from '../kit/kit.js';
 import type { ProjectNavItem } from './projectNav.js';
 import styles from './project.module.css';
 

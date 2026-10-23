@@ -13,9 +13,9 @@
   display: flex;
   align-items: center;
   gap: var(--s3);
-  padding: var(--s2) var(--s3);
+  padding: 10px 16px;
   color: var(--t3);
-  font-size: var(--fs-caption);
+  font: 400 12px var(--sans);
 }
 
 .gridNote {
@@ -31,26 +31,30 @@
 
 .table {
   border-collapse: collapse;
-  font-size: var(--fs-small);
+  font-size: 13px;
   min-width: 100%;
 }
 
 .table th {
   position: sticky;
   top: 0;
-  background: var(--side);
+  z-index: 1;
+  background: var(--surface);
   color: var(--t2);
-  font-weight: 600;
+  font-weight: 500;
+  font-size: 12px;
   text-align: left;
-  padding: var(--s2) var(--s3);
-  border-bottom: 1px solid var(--border);
+  height: 38px;
+  padding: 0 16px;
+  border-bottom: 1px solid var(--hairline);
   white-space: nowrap;
   cursor: default;
 }
 
 .table td {
-  padding: 3px var(--s3);
-  border-bottom: 1px solid color-mix(in srgb, var(--border) 55%, transparent);
+  height: 38px;
+  padding: 0 16px;
+  border-bottom: 1px solid var(--hairline);
   color: var(--t1);
   white-space: nowrap;
   max-width: 340px;
@@ -63,15 +67,27 @@
   font-variant-numeric: tabular-nums;
 }
 
+.table tbody tr {
+  transition: background 100ms ease-out;
+}
+
+.table tbody tr:hover {
+  background: color-mix(in srgb, var(--surface) 70%, transparent);
+}
+
 .cellInput {
   width: 100%;
   min-width: 60px;
-  border: 1px solid var(--border2);
-  border-radius: 4px;
-  background: var(--panel2);
+  height: 28px;
+  box-sizing: border-box;
+  border: 0;
+  border-radius: 7px;
+  background: var(--well);
+  outline: 1.5px solid var(--focus);
+  outline-offset: -1.5px;
   color: var(--t0);
   font: inherit;
-  padding: 2px 6px;
+  padding: 0 8px;
 }
 
 .rowTools {
@@ -135,22 +151,23 @@
   z-index: 30;
   display: flex;
   flex-direction: column;
-  min-width: 130px;
-  padding: 4px;
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: var(--r1, 8px);
+  min-width: 160px;
+  padding: 6px;
+  background: var(--float);
+  border-radius: 12px;
+  box-shadow: 0 14px 36px -10px rgba(0, 0, 0, 0.55), var(--lift);
 }
 
 .colMenuItem {
+  min-height: 30px;
   background: none;
   border: none;
-  border-radius: 4px;
+  border-radius: 8px;
   color: var(--t1);
-  font-size: var(--fs-small);
+  font-size: 13px;
   font-weight: 400;
   text-align: left;
-  padding: 5px 8px;
+  padding: 0 10px;
   cursor: pointer;
 }
 
@@ -168,23 +185,25 @@
   align-items: center;
   gap: 8px;
   max-width: 320px;
-  padding: 6px 10px;
-  background: var(--panel);
-  border: 1px solid var(--border2);
-  border-radius: var(--r1, 8px);
+  padding: 8px 12px;
+  background: var(--float);
+  border-radius: 12px;
+  box-shadow: 0 14px 36px -10px rgba(0, 0, 0, 0.55), var(--lift);
   color: var(--t1);
-  font-size: var(--fs-caption);
+  font-size: 12.5px;
   font-weight: 400;
   white-space: normal;
 }
 
 .colConfirmGo {
-  background: var(--panel2);
-  border: 1px solid var(--border2);
-  border-radius: var(--r1, 6px);
-  color: var(--t0);
-  font-size: var(--fs-caption);
-  padding: 2px 8px;
+  height: 26px;
+  background: var(--t1);
+  border: 0;
+  border-radius: 999px;
+  color: var(--ground);
+  font-size: 12px;
+  font-weight: 500;
+  padding: 0 12px;
   cursor: pointer;
 }
 
@@ -198,16 +217,22 @@
 }
 
 .colAdd {
-  background: none;
+  width: 26px;
+  height: 26px;
+  background: var(--well);
   border: none;
-  color: var(--t3);
-  font-size: 13px;
+  border-radius: 8px;
+  color: var(--t2);
+  font-size: 15px;
+  line-height: 1;
   cursor: pointer;
-  padding: 0 4px;
+  padding: 0;
+  transition: background 120ms ease-out, color 120ms ease-out;
 }
 
 .colAdd:hover {
-  color: var(--t1);
+  background: var(--raised);
+  color: var(--t0);
 }
 
 .colAddForm {

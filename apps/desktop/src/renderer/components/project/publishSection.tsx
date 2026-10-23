@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { desk } from '../../lib/desk.js';
 import { slugify } from '../../lib/slug.js';
 import { ExportCeremony, allScreens, selectionSummary, type CeremonySelection } from './ExportCeremony.js';
-import { ConfirmAction, Empty, Group, IDLE, Row, SectionHead, StatusLine, errorText, kit, type RowState } from './kit.js';
+import { ConfirmAction, Empty, Group, IDLE, Row, SectionHead, StatusLine, errorText, kit, type RowState } from '../kit/kit.js';
 import type { ProjectNavItem } from './projectNav.js';
 import type { LoadedProject } from './ProjectScreen.js';
 

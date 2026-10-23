@@ -9,6 +9,10 @@ import styles from './editor.module.css';
 // that clears; the paint row carries its kind and the kind's sub rows; a bound expression renders as one
 // mono line whatever the row's kind. The row never writes - it hands the next value up.
 
+
+/** Labels read as words in sentence case; the schema keeps its own lowercase keys. */
+export const sentence = (s: string): string => (s === '' ? s : s.charAt(0).toUpperCase() + s.slice(1));
+
 export interface RowProps {
   spec: RowSpec;
   /** The value in the panel's scope (undefined = unset here). */
@@ -40,7 +44,7 @@ export function PropertyRow({ spec, value, inherited, scoped, onChange, sub = fa
   return (
     <div className={`${styles.row} ${sub ? styles.rowSub : ''}`} title={spec.hint}>
       <span className={labelClass}>
-        {spec.label}
+        {sentence(spec.label)}
         {set && scoped ? <span className={styles.rowDot} title="overridden in this view - x clears back to auto" /> : null}
       </span>
       <div className={styles.rowValue}>
@@ -101,7 +105,7 @@ function EnumRow({ spec, value, onChange }: { spec: RowSpec; value: unknown; onC
     return (
       <span className={styles.segment}>
         {spec.options.map((o) => (
-          <button key={o} type="button" className={`${styles.segmentBtn} ${value === o ? styles.segmentOn : ''}`} onClick={() => onChange(o)}>{o}</button>
+          <button key={o} type="button" className={`${styles.segmentBtn} ${value === o ? styles.segmentOn : ''}`} onClick={() => onChange(o)}>{sentence(o)}</button>
         ))}
       </span>
     );
@@ -109,7 +113,7 @@ function EnumRow({ spec, value, onChange }: { spec: RowSpec; value: unknown; onC
   return (
     <select className={styles.select} value={typeof value === 'string' ? value : ''} onChange={(e) => onChange(e.target.value === '' ? undefined : e.target.value)}>
       <option value="">-</option>
-      {spec.options.map((o) => <option key={o} value={o}>{o}</option>)}
+      {spec.options.map((o) => <option key={o} value={o}>{sentence(o)}</option>)}
     </select>
   );
 }
@@ -138,7 +142,7 @@ function NumberRow({ spec, value, onChange }: { spec: RowSpec; value: unknown; o
       {spec.options.length > 0 ? (
         <select className={styles.select} style={{ flex: 'none', width: 72 }} value={typeof value === 'string' ? value : ''} onChange={(e) => { if (e.target.value !== '') onChange(e.target.value); }}>
           <option value="">{unitWord || 'n'}</option>
-          {spec.options.map((o) => <option key={o} value={o}>{o}</option>)}
+          {spec.options.map((o) => <option key={o} value={o}>{sentence(o)}</option>)}
         </select>
       ) : <span className={styles.unit}>{unitWord}</span>}
       {spec.range !== null && num !== null ? (
@@ -174,7 +178,7 @@ function PaintRow({ spec, value, onChange }: { spec: RowSpec; value: unknown; on
       <span className={styles.listRow}>
         <span className={styles.segment}>
           {PAINT_KINDS.map((k) => (
-            <button key={k} type="button" className={`${styles.segmentBtn} ${kind === k ? styles.segmentOn : ''}`} onClick={() => { if (k !== kind) onChange(paintOfKind(k, value)); }}>{k}</button>
+            <button key={k} type="button" className={`${styles.segmentBtn} ${kind === k ? styles.segmentOn : ''}`} onClick={() => { if (k !== kind) onChange(paintOfKind(k, value)); }}>{sentence(k)}</button>
           ))}
         </span>
       </span>
@@ -211,7 +215,7 @@ function PinRow({ value, onChange }: { value: unknown; onChange: (v: unknown) =>
           <span className={styles.listWord}>{axis}</span>
           <select className={styles.select} value={typeof obj[axis] === 'string' ? (obj[axis] as string) : ''} onChange={(e) => patchShape(obj, axis, e.target.value, onChange)}>
             <option value="">{axis === 'x' ? 'left' : 'top'}</option>
-            {PIN_WORDS[axis].map((o) => <option key={o} value={o}>{o}</option>)}
+            {PIN_WORDS[axis].map((o) => <option key={o} value={o}>{sentence(o)}</option>)}
           </select>
         </span>
       ))}
@@ -237,10 +241,10 @@ function CellRow({ value, onChange }: { value: unknown; onChange: (v: unknown) =
       </span>
       {(['align-x', 'align-y'] as const).map((k) => (
         <span key={k} className={styles.listRow}>
-          <span className={styles.listWord}>{k}</span>
+          <span className={styles.listWord}>{sentence(k)}</span>
           <select className={styles.select} value={typeof obj[k] === 'string' ? (obj[k] as string) : ''} onChange={(e) => patchShape(obj, k, e.target.value, onChange)}>
             <option value="">-</option>
-            {['start', 'center', 'end'].map((o) => <option key={o} value={o}>{o}</option>)}
+            {['start', 'center', 'end'].map((o) => <option key={o} value={o}>{sentence(o)}</option>)}
           </select>
         </span>
       ))}
@@ -288,7 +292,7 @@ function EncodingRow({ value, onChange }: { value: unknown; onChange: (v: unknow
     <span className={styles.list}>
       {set.map((k) => (
         <span key={k} className={styles.listRow}>
-          <span className={styles.listWord}>{k}</span>
+          <span className={styles.listWord}>{sentence(k)}</span>
           <input
             className={`${styles.input} ${styles.inputMono}`} value={channelText(obj[k])} placeholder="column or {field, ...}"
             onChange={(e) => patchShape(obj, k, parseChannel(e.target.value), onChange)}
@@ -310,7 +314,7 @@ function EncodingRow({ value, onChange }: { value: unknown; onChange: (v: unknow
         <span className={styles.listRow}>
           <select className={styles.select} value="" onChange={(e) => { if (e.target.value !== '') setDraft({ key: e.target.value, text: '' }); }}>
             <option value="">Add channel</option>
-            {unset.map((k) => <option key={k} value={k}>{k}</option>)}
+            {unset.map((k) => <option key={k} value={k}>{sentence(k)}</option>)}
           </select>
         </span>
       ) : null}
@@ -325,7 +329,7 @@ function ShadowsRow({ value, onChange }: { value: unknown; onChange: (v: unknown
   const emit = (next: Array<Record<string, unknown>>): void => onChange(next.length === 0 ? undefined : next.length === 1 ? next[0] : next);
   return (
     <span className={styles.list}>
-      {value === 'theme' ? <span className={styles.listRow}><span className={styles.listWord}>theme</span></span> : null}
+      {value === 'theme' ? <span className={styles.listRow}><span className={styles.listWord}>Theme shadow</span></span> : null}
       {list.map((s, i) => (
         <span key={i} className={styles.listRow}>
           {SHADOW_KEYS.map((k) => (
@@ -334,13 +338,13 @@ function ShadowsRow({ value, onChange }: { value: unknown; onChange: (v: unknown
               onChange={(e) => { const next = list.map((x, j) => (j === i ? { ...x, [k]: e.target.value === '' ? undefined : Number(e.target.value) } : x)); emit(next); }}
             />
           ))}
-          <input className={styles.input} placeholder="color" value={asText(s['color'])} onChange={(e) => emit(list.map((x, j) => (j === i ? { ...x, color: e.target.value } : x)))} />
+          <input className={styles.input} placeholder="Color" value={asText(s['color'])} onChange={(e) => emit(list.map((x, j) => (j === i ? { ...x, color: e.target.value } : x)))} />
           <button type="button" className={styles.rowClear} style={{ opacity: 1 }} aria-label="Remove shadow" onClick={() => emit(list.filter((_, j) => j !== i))}>x</button>
         </span>
       ))}
       <span className={styles.listRow}>
         <button type="button" className={styles.ghost} onClick={() => emit([...list, { x: 0, y: 4, blur: 12, color: 'rgba(0,0,0,.3)' }])}>Add shadow</button>
-        {value === undefined ? <button type="button" className={styles.ghost} onClick={() => onChange('theme')}>theme</button> : null}
+        {value === undefined ? <button type="button" className={styles.ghost} onClick={() => onChange('theme')}>Use theme shadow</button> : null}
       </span>
     </span>
   );

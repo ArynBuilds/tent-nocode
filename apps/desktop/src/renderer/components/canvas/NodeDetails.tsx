@@ -1,24 +1,24 @@
 import { useEffect, useState } from 'react';
-import { NODE_CONTRACTS, citizenWord } from '@tent-nocode/core';
-import type { NodeContract, VerbDoor } from '@tent-nocode/core';
+import { NODE_CONTRACTS } from '@tent-nocode/core';
+import type { NodeContract } from '@tent-nocode/core';
 import { desk } from '../../lib/desk.js';
 import { useOrg } from '../../lib/OrgContext.js';
 import type { CitizenSelection } from '../../lib/canvas/store.js';
-import { idTail, openVerbDoor } from '../../lib/canvas/tools/select/Idle.js';
+import { idTail } from '../../lib/canvas/tools/select/Idle.js';
 import { channelEdgesOf, elementNoun, followsClause } from '../../lib/page-edit/flowWires.js';
 import type { FlowNodeLike } from '../../lib/page-edit/flowWires.js';
-import { humanLabel, paramWord } from '../../lib/page-edit/flowWires.js';
+import { paramWord } from '../../lib/page-edit/flowWires.js';
 import { actionWriteWord, askedOnlyWhen, firesWord, whenWords } from '../../lib/canvas/store.js';
 import type { ActDoc } from '../../lib/canvas/store.js';
 import { openPublishTakeover } from '../../lib/publishTakeover.js';
-import { NotesDetail } from './NotesDetail.js';
-import styles from './sidepanel.module.css';
+import { NotesDetail } from '../shell/NotesDetail.js';
+import styles from '../shell/sidepanel.module.css';
 
-// Renders a citizen's properties from its node contract.
+// A node's details inside its card, read from its node contract; the card's foot carries the verbs.
 
 type Detail = { title: string; kind: string; lines: Array<{ indent: number; text: string; mono?: boolean }>; code: string | null };
 
-export function ContractForm({ selection }: { selection: CitizenSelection }) {
+export function NodeDetails({ selection, say }: { selection: CitizenSelection; say: (sentence: string) => void }) {
   const { orgId } = useOrg();
   const contract: NodeContract | undefined = (NODE_CONTRACTS as Record<string, NodeContract>)[selection.kind];
   const [detail, setDetail] = useState<Detail | null>(null);
@@ -27,7 +27,6 @@ export function ContractForm({ selection }: { selection: CitizenSelection }) {
   // Follows-clauses from landed channel edges; node id -> element noun mapping.
   const [sceneFollows, setSceneFollows] = useState<Map<string, string>>(new Map());
   const [nodeNouns, setNodeNouns] = useState<Map<string, string>>(new Map());
-  const [notice, setNotice] = useState<string | null>(null);
   const [moreOpen, setMoreOpen] = useState(false);
 
   // Only essential and detail-tier property bodies render.
@@ -40,7 +39,6 @@ export function ContractForm({ selection }: { selection: CitizenSelection }) {
     setSceneActs([]);
     setSceneFollows(new Map());
     setNodeNouns(new Map());
-    setNotice(null);
     setMoreOpen(false);
     let cancelled = false;
     if (shows('detail-lines')) {
@@ -83,30 +81,11 @@ export function ContractForm({ selection }: { selection: CitizenSelection }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [orgId, selection.nodeId, selection.kind, selection.projectId, contract]);
 
-  if (contract === undefined) return <div className={styles.fileEmpty}>this node kind declares no contract yet</div>;
-
-  // Open verb doors like the hover toolbar.
-  async function openDoor(door: VerbDoor): Promise<void> {
-    await openVerbDoor({ orgId, say: setNotice }, selection, door);
-  }
+  if (contract === undefined) return null;
 
   return (
     <div className={styles.inspector}>
-      <div className={styles.inspectorHead}>
-        <span className={styles.inspectorScene}>{citizenWord(selection.kind)}</span>
-        <span className={styles.inspectorNode}>{humanLabel(selection.label)}</span>
-      </div>
-      {notice !== null ? <div className={styles.inspectorNotice}>{notice}</div> : null}
       {contract.properties.filter((p) => p.tier === 'essential').map((p) => renderBody(p.body))}
-      {contract.verbs.length > 0 ? (
-        <section className={styles.inspectorSection}>
-          {contract.verbs.map((v) => (
-            <button key={v.door} type="button" className={styles.contractVerb} onClick={() => void openDoor(v.door)}>
-              {v.label}
-            </button>
-          ))}
-        </section>
-      ) : null}
       {contract.properties.some((p) => p.tier === 'detail') ? (
         <section className={styles.inspectorSection}>
           <button type="button" className={styles.contractVerb} onClick={() => setMoreOpen((o) => !o)}>
@@ -152,7 +131,7 @@ export function ContractForm({ selection }: { selection: CitizenSelection }) {
                         const slug = sceneMeta?.slug;
                         if (slug === undefined) return;
                         void desk.humanRemoveAction(orgId, slug, a.name).then((r) => {
-                          if (!r.ok) setNotice(r.error);
+                          if (!r.ok) say(r.error);
                           else setSceneActs((prev) => prev.filter((x) => x.name !== a.name));
                         });
                       }}

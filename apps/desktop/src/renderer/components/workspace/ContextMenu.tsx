@@ -56,7 +56,7 @@ export function WorkspaceContextMenu({ menu, deps, onClose }: {
           (service, trigger) => deps.placeTrigger(service, trigger, menu.canvasAt),
         )}
         search="always"
-        placeholder="type to create…"
+        placeholder="Type to create…"
         onClose={onClose}
       />
     );

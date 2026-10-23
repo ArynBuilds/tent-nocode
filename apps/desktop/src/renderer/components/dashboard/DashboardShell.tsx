@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { SettingsModal } from '../settings/SettingsModal.js';
+import { SettingsScreen } from '../settings/SettingsScreen.js';
 import { PublishTakeover } from '../project/PublishTakeover.js';
 import { Titlebar } from '../shell/Titlebar.js';
 import { CreateSurface } from './CreateSurface.js';
-import { DashboardRail } from './DashboardRail.js';
+import { DashboardRail, type ProjectFilter } from './DashboardRail.js';
 import { NewProjectScreen } from './NewProjectScreen.js';
 import styles from '../shell/shell.module.css';
 
@@ -14,22 +14,22 @@ export function DashboardShell({ onEnterEditor, onPickKind }: {
   // Creates new project with chosen kind and name, opens editor.
   onPickKind: (kind: 'app' | 'website', name: string) => void;
 }) {
-  // The plus opens the birth ceremony (kind + name, one screen).
+  // The plus opens the new-project screen (name + kind, one screen).
   const [asking, setAsking] = useState(false);
+  const [filter, setFilter] = useState<ProjectFilter>('all');
 
   return (
     <div className={`${styles.app} ${styles.dashApp}`}>
       <Titlebar />
-      <DashboardRail />
+      <DashboardRail filter={filter} onFilter={setFilter} />
       <main className={styles.main}>
         <div className={styles.dashFrame}>
-          {asking
-            ? <NewProjectScreen onCreate={onPickKind} />
-            : <CreateSurface onEdit={onEnterEditor} onNew={() => setAsking(true)} />}
+          <CreateSurface filter={filter} onEdit={onEnterEditor} onNew={() => setAsking(true)} />
         </div>
       </main>
+      {asking ? <NewProjectScreen onCreate={onPickKind} onCancel={() => setAsking(false)} /> : null}
       <PublishTakeover />
-      <SettingsModal />
+      <SettingsScreen />
     </div>
   );
 }

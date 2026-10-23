@@ -196,11 +196,11 @@ export function TriggerConfig({ orgId, projectId, mode, datasets, operations, sa
             <div className={styles.row}>
               <span className={styles.lbl}></span>
               <select className={styles.select} value={draft.dataset} onChange={(e) => patch({ dataset: e.target.value })}>
-                {draft.dataset === '' ? <option value="">pick a table</option> : null}
+                {draft.dataset === '' ? <option value="">Pick a table</option> : null}
                 {(draft.dataset !== '' && !datasets.includes(draft.dataset) ? [draft.dataset, ...datasets] : datasets)
                   .map((d) => <option key={d} value={d}>{d}</option>)}
               </select>
-              <input className={`${styles.well} ${styles.wellNum}`} placeholder="column" value={draft.column} onChange={(e) => patch({ column: e.target.value })} />
+              <input className={`${styles.well} ${styles.wellNum}`} placeholder="Column" value={draft.column} onChange={(e) => patch({ column: e.target.value })} />
             </div>
             <div className={styles.row}>
               <span className={styles.lbl}></span>
@@ -211,7 +211,7 @@ export function TriggerConfig({ orgId, projectId, mode, datasets, operations, sa
                 <option value="<=">is at most</option>
                 <option value="==">is exactly</option>
               </select>
-              <input className={`${styles.well} ${styles.wellNum}`} placeholder="value" value={draft.value} onChange={(e) => patch({ value: e.target.value })} />
+              <input className={`${styles.well} ${styles.wellNum}`} placeholder="Value" value={draft.value} onChange={(e) => patch({ value: e.target.value })} />
             </div>
           </>
         ) : draft.kind === 'webhook_in' ? (
@@ -240,7 +240,7 @@ export function TriggerConfig({ orgId, projectId, mode, datasets, operations, sa
         ) : (
           <div className={styles.row}>
             <span className={styles.lbl}></span>
-            <input className={styles.well} placeholder="result name (empty = any)" value={draft.outputName} onChange={(e) => patch({ outputName: e.target.value })} />
+            <input className={styles.well} placeholder="Result name, empty for any" value={draft.outputName} onChange={(e) => patch({ outputName: e.target.value })} />
           </div>
         )}
         <div className={styles.row}>
@@ -261,7 +261,7 @@ export function TriggerConfig({ orgId, projectId, mode, datasets, operations, sa
               </button>
             ) : (
               <select className={styles.select} value={draft.operation} onChange={(e) => patch({ operation: e.target.value })}>
-                {draft.operation === '' ? <option value="">pick a tool</option> : null}
+                {draft.operation === '' ? <option value="">Pick a tool</option> : null}
                 {(draft.operation !== '' && !operations.includes(draft.operation) ? [draft.operation, ...operations] : operations)
                   .map((o) => <option key={o} value={o}>{o}</option>)}
               </select>

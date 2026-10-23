@@ -1,6 +1,6 @@
 import './tokens.css';
 import { useEffect, useRef, useState } from 'react';
-import { SettingsModal } from './components/settings/SettingsModal.js';
+import { SettingsScreen } from './components/settings/SettingsScreen.js';
 import { AgentFrames } from './components/shell/AgentFrames.js';
 import { AnomalyStrip } from './components/shell/AnomalyStrip.js';
 import { Console } from './components/shell/Console.js';
@@ -154,7 +154,7 @@ function Shell() {
       setPanelTabs(panelTabsRef.current.map((t) => (t.id === existing.id ? { ...t, selection: subject } : t)));
       if (opening) { setPanelActive(existing.id); show(); }
     } else if (opening) {
-      const t = newTab('inspector', null, undefined, subject);
+      const t = newTab('inspector', undefined, subject);
       setPanelTabs([...panelTabsRef.current, t]);
       setPanelActive(t.id);
       show();
@@ -185,7 +185,7 @@ function Shell() {
     const existing = panelTabsRef.current.find((t) => t.kind === 'file' && t.path === file.path);
     if (existing) setPanelActive(existing.id);
     else {
-      const t = newTab('file', null, file.path);
+      const t = newTab('file', file.path);
       setPanelTabs([...panelTabsRef.current, t]);
       setPanelActive(t.id);
     }
@@ -204,12 +204,6 @@ function Shell() {
   useProjectChatTabs({
     consoleTabs, consoleActive,
     onConsole: (tabs, activeId) => { setConsoleTabs(tabs); setConsoleActive(activeId); },
-    panelTabs, panelActive,
-    onPanel: (tabs, activeId) => { setPanelTabs(tabs); setPanelActive(activeId); },
-    bottomTabs, bottomActive,
-    onBottom: (tabs, activeId) => { setBottomTabs(tabs); setBottomActive(activeId); },
-    leftTabs, leftActive,
-    onLeft: (tabs, activeId) => { setLeftTabs(tabs); setLeftActive(activeId); },
   });
 
   const { focusedProjectId, focusProject } = useFocusedProject();
@@ -292,6 +286,7 @@ function Shell() {
           }
           setEditing(false);
         }}
+        {...(focusedProjectId !== null ? { projectId: focusedProjectId } : {})}
         {...(focusedProjectId !== null
           ? { onPublish: () => openPublishTakeover({ projectId: focusedProjectId, section: 'publish' }) }
           : {})}
@@ -392,22 +387,13 @@ function Shell() {
         visibleThreadIds={[
           ...(route.name === 'thread' ? [route.threadId] : []),
           ...consoleTabs.flatMap((t) => (t.threadId !== null ? [t.threadId] : [])),
-          ...(panelOpen || panelOverlay
-            ? panelTabs.flatMap((t) => (t.kind === 'chat' && t.threadId !== null ? [t.threadId] : []))
-            : []),
-          ...(bottomOpen || bottomOverlay
-            ? bottomTabs.flatMap((t) => (t.kind === 'chat' && t.threadId !== null ? [t.threadId] : []))
-            : []),
-          ...(leftOpen || leftOverlay
-            ? leftTabs.flatMap((t) => (t.kind === 'chat' && t.threadId !== null ? [t.threadId] : []))
-            : []),
         ]}
       />
       <AnomalyStrip />
       {/* The project screen takeover: a direct grid child spanning main+panel+bottom;
           everything underneath stays mounted so Back restores the prior screen. */}
       <PublishTakeover />
-      <SettingsModal />
+      <SettingsScreen />
     </div>
   );
 }

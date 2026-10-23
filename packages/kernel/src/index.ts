@@ -51,9 +51,7 @@ export type {
 // The one charter and its one compose (text + stubs + provider delta + the tail).
 export { BRIDGE_PROMPT, BRIEF_PROMPT, charterText, compose, providerDelta } from './charters/charter.js';
 export type { ComposeInput } from './charters/charter.js';
-export { orgHealth, RUN_TIMEOUT_MS, GRIND_RATIO } from './health.js';
 export { orgAutomationGraph, automationNodeDetail, projectAssistantName, projectHasAssistant, type AutomationGraph, type AutomationNode, type AutomationEdge, type AutomationNodeKind, type AutomationDetail } from './observatory.js';
-export type { HealthReport } from './health.js';
 export { resolveModel } from './routing.js';
 export { CLI_ENGINE_REGISTRY, ENGINE_VAULT_PREFIX, isEngineReservedSecretName, resolveCliEngine } from './engines.js';
 export type { EngineCredentialKind, CliEngineEntry } from './engines.js';
@@ -120,6 +118,7 @@ export {
   patternShelf, projectDialectLens, renderActionTypedef, renderGrammarBlock,
   renderBriefText, renderServiceContract, renderStepTypedef, renderThemeBlock, renderValue, sceneDialectLens,
 } from './dialect.js';
+export { landCanvasDoor, type CanvasDoor, type CanvasModel } from './canvasLens.js';
 export type {
   ConstructKind, FlowCompileResult, FlowDialectCall, LintFinding, ProjectCompileResult, ProjectDoor, ProjectModel,
   ProjectOp, ProjectTableModel, SceneCompileResult,
@@ -293,7 +292,7 @@ export { getConversationImpl, listThreadsImpl } from './workspace/readsChat.js';
 export { sendChatImpl, setThreadModeImpl } from './workspace/writesChat.js';
 export {
   getOrgConfigImpl, listAgentsImpl, listEventsImpl, listMembersImpl,
-  orgHealthImpl, threadIntentImpl, threadUsageImpl,
+  threadIntentImpl, threadUsageImpl,
 } from './workspace/readsOrg.js';
 export {
   grantImpactImpl, revokeImpactImpl,

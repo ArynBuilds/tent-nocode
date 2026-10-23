@@ -1,88 +1,325 @@
-/*
- * Conversation route (Task 11, Tier 6 FR-121/122/128/130): the merged user/desk bubble timeline,
- * the proposal card, and inline job summary cards. Deliberately its own module (not shared with
- * `thread/thread.module.css`, the shared card/kv/chip styles several sections reuse) — same
- * D-19 graphite/status-hue tokens, just a distinct flow (bubbles, not a single job's linear feed).
- */
+/* The conversation: the feed, the one consent card, the plan, and the composer capsule.
+   Depth by surface, every color a token; the user's pills and the feed live in feed.module.css. */
 
 .conv {
+  --chat-bg: var(--chat-surface, var(--ground));
   display: flex;
   flex-direction: column;
   flex: 1;
   overflow: hidden;
-  position: relative; /* anchors the floating composer capsule — THEME-INDEPENDENT.
-    (Fix ledger 2026-07-28 wave 1.3: the light-mode commit 6052a1d captured this line into
-    the light block, so dark mode's .composerFloat escaped to the viewport.) */
+  position: relative; /* anchors the floating composer, in both themes */
 }
 
-/* LIGHT MODE (user-ruled 2026-07-28): the chat reads on FULL WHITE everywhere the
-   conversation renders (main route, side panel, console). */
+/* Light mode reads on full white wherever the conversation renders. */
 :global([data-theme='light']) .conv {
-  background: #ffffff;
-}
-
-/* The composer floats over the document (user-directed 2026-07-20): the feed scrolls beneath
-   the capsule. The band is an INVISIBLE frame — solid --bg so it vanishes against the thread
-   surface, but opaque so scrolling text never bleeds through the meta row (user-directed,
-   the tokens-overlap fix). */
-.composerFloat {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: var(--bg);
+  --chat-bg: var(--chat-surface, #ffffff);
+  background: var(--chat-surface, #ffffff);
 }
 
 .head {
   display: flex;
   align-items: center;
   gap: 12px;
-  height: var(--barH); /* border-aligns with the side panel's tab strip at any size */
+  height: var(--barH);
   flex: none;
   padding: 0 24px;
-  border-bottom: 1px solid var(--border);
 }
 
 .head h2 {
-  font-size: 14.5px;
-  font-weight: 650;
   margin: 0;
+  font: 600 14px var(--sans);
+  color: var(--t1);
 }
 
-.headMeta {
-  font: 11.5px var(--mono);
+.scroll {
+  flex: 1;
+  overflow: auto;
+  /* Room for the floating composer, so the last message scrolls above it. */
+  padding: 12px 24px 132px;
+}
+
+/* No composer inside this view (the floating chat window keeps its own below). */
+.scrollNoComposer {
+  padding-bottom: 16px;
+  mask-image: linear-gradient(to bottom, transparent 0, #000 18px, #000 calc(100% - 18px), transparent 100%);
+}
+
+.placeholder {
+  flex: 1;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  font: 400 12.5px var(--sans);
   color: var(--t3);
 }
 
-/* ---- mode selector (Task 13, FR-126/127) --------------------------------- */
+/* Three soft dots while a chat loads. */
+.loadingDots,
+.loadingDots::before,
+.loadingDots::after {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--t3);
+  animation: dot 1.1s var(--ease-out) infinite;
+}
 
-.modeCtl {
-  display: inline-flex;
-  align-items: center;
+.loadingDots {
+  position: relative;
+  animation-delay: 0.15s;
+}
+
+.loadingDots::before,
+.loadingDots::after {
+  content: '';
+  position: absolute;
+  top: 0;
+}
+
+.loadingDots::before { left: -10px; animation-delay: 0s; }
+.loadingDots::after { left: 10px; animation-delay: 0.3s; }
+
+@keyframes dot {
+  0%, 100% { opacity: 0.25; transform: translateY(0); }
+  40% { opacity: 1; transform: translateY(-2px); }
+}
+
+/* ---- the composer: one capsule, a growing box, the send circle ---- */
+
+/* The float band: the feed fades out beneath it instead of cutting. */
+.composerFloat {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding-top: 28px;
+  background: linear-gradient(to bottom, transparent, var(--chat-bg) 28px);
+}
+
+/* Width-locked to the feed column: 808 = 760 + 2 x 24 gutters; change with feed.module.css. */
+.composerDock {
+  width: 100%;
+  max-width: var(--dock-max, 808px);
+  margin: 0 auto;
+  padding: var(--dock-pad, 0 28px 8px);
+}
+
+.composer {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: var(--raised);
+  border-radius: 26px;
+  padding: 8px 8px 8px 16px;
+  box-shadow: inset 0 0 0 1px var(--hairline), var(--lift);
+  cursor: text;
+  transition: box-shadow 220ms var(--ease-out);
+}
+
+.composer:focus-within {
+  box-shadow: inset 0 0 0 1px var(--focus), var(--lift);
+}
+
+.composerOff {
+  opacity: 0.7;
+  cursor: default;
+}
+
+.composerRow {
+  display: flex;
+  align-items: flex-end;
   gap: 8px;
 }
 
-/* In-pill mode control (the Cursor model-slot position): quiet text button + a custom
-   popover in the panel add-menu grammar (2026-07-20 — the native select popup was OS chrome). */
+.composerMark {
+  flex: none;
+  align-self: flex-end;
+  margin-bottom: 10px;
+  color: var(--t3);
+  transition: color 220ms var(--ease-out), transform 420ms var(--ease-out);
+}
+
+.composer:focus-within .composerMark {
+  color: var(--live);
+  transform: rotate(12deg) scale(1.06);
+}
+
+.cbox {
+  flex: 1;
+  min-width: 0;
+  min-height: 36px;
+  max-height: 168px;
+  resize: none;
+  border: none;
+  outline: none;
+  background: transparent;
+  padding: 8px 0;
+  color: var(--t1);
+  font: 400 14px / 20px var(--sans);
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+.cbox::placeholder {
+  color: var(--t3);
+}
+
+.cbox:disabled {
+  cursor: default;
+}
+
+.send {
+  flex: none;
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border: none;
+  border-radius: 50%;
+  background: var(--primary);
+  color: var(--on-primary);
+  cursor: pointer;
+  transition: background 160ms ease-out, color 160ms ease-out, transform 220ms var(--ease-out);
+}
+
+.send:hover:not(:disabled) {
+  transform: translateY(-1px) scale(1.04);
+}
+
+.send:active:not(:disabled) {
+  transform: scale(0.94);
+}
+
+.send:disabled {
+  background: var(--well);
+  color: var(--t3);
+  cursor: default;
+}
+
+.send:focus-visible,
+.modeBtn:focus-visible,
+.intentHead:focus-visible,
+.attachDrop:focus-visible {
+  outline: 1.5px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.spin {
+  animation: spin 900ms linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* What rides the next message: small chips at the top of the capsule. */
+.attachRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 2px 0 0;
+}
+
+.attach {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  height: 26px;
+  padding: 0 4px 0 9px;
+  border-radius: 999px;
+  background: var(--well);
+  color: var(--t2);
+  font: 500 12px var(--sans);
+  animation: attachIn 260ms var(--ease-out) backwards;
+}
+
+.attachText {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.attachDrop {
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  flex: none;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--t3);
+  cursor: pointer;
+}
+
+.attachDrop:hover {
+  background: var(--raised);
+  color: var(--t1);
+}
+
+@keyframes attachIn {
+  from { opacity: 0; transform: translateY(4px) scale(0.96); }
+}
+
+.composerNote {
+  margin: 0 auto;
+  padding: 14px 24px;
+  font: 400 12.5px var(--sans);
+  color: var(--t3);
+  text-align: center;
+}
+
+.errorText {
+  margin: 8px 18px 0;
+  font: 400 12px var(--mono);
+  color: var(--red);
+}
+
+/* The quiet line under the composer: tokens, and the cap while work runs. */
+.metaRow {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  justify-content: flex-end;
+  width: 100%;
+  max-width: 808px;
+  margin: 0 auto;
+  padding: 0 46px 10px;
+  font: 400 11px var(--sans);
+  font-variant-numeric: tabular-nums;
+  color: var(--t3);
+  user-select: none;
+}
+
+/* ---- the mode chip and its menu ---- */
+
 .modeWrap {
   position: relative;
   display: inline-flex;
+  align-self: flex-end;
 }
 
 .modeBtn {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  font: 11px var(--mono);
-  color: var(--t2);
-  background: transparent;
+  height: 36px;
+  padding: 0 10px 0 12px;
   border: none;
-  outline: none;
-  padding: 2px 4px;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--t2);
+  font: 500 12.5px var(--sans);
   cursor: pointer;
+  transition: background 120ms ease-out, color 120ms ease-out;
 }
 
-.modeBtn:hover {
+.modeBtn:hover,
+.modeBtnOpen {
+  background: var(--well);
   color: var(--t1);
 }
 
@@ -91,159 +328,309 @@
   cursor: default;
 }
 
+.modeCaret {
+  color: var(--t3);
+  transition: transform 220ms var(--ease-out);
+}
+
+.modeBtnOpen .modeCaret {
+  transform: rotate(180deg);
+}
+
+.modeQuiet {
+  align-self: center;
+  padding: 0 8px;
+  font: 500 12.5px var(--sans);
+  color: var(--t3);
+}
+
 .modeMenu {
   position: absolute;
-  bottom: calc(100% + 10px);
-  right: 0;
+  bottom: calc(100% + 14px);
+  right: -6px;
   z-index: 20;
   display: flex;
   flex-direction: column;
   gap: 2px;
+  min-width: 264px;
   padding: 6px;
-  background: var(--panel);
-  border: 1px solid var(--border);
+  background: var(--float);
   border-radius: var(--r2);
-  white-space: nowrap;
+  box-shadow: 0 18px 48px -12px rgba(0, 0, 0, 0.6), var(--lift);
+  transform-origin: 90% 100%;
+  animation: menuUp 180ms var(--ease-out) backwards;
+  cursor: default;
 }
 
 .modeItem {
   display: flex;
   align-items: center;
-  padding: 6px 18px 6px 12px;
+  gap: 10px;
+  padding: 8px 10px;
   border: 0;
   border-radius: var(--r1);
   background: transparent;
-  color: var(--t1);
-  font: 13px var(--sans);
   text-align: left;
   cursor: pointer;
+  transition: background 100ms ease-out;
 }
 
-.modeItem:hover {
-  background: var(--panel2);
+.modeItem:hover,
+.modeItem:focus-visible {
+  background: var(--raised);
+  outline: none;
 }
 
-.modeItemActive {
-  color: var(--t0);
-  font-weight: 600;
-}
-
-.scroll {
+.modeText {
   flex: 1;
-  overflow: auto;
-  /* Bottom clearance for the floating capsule + meta row — the last message scrolls above it. */
-  padding: 20px 24px 120px;
-}
-
-/* Fix ledger 2026-07-28 wave 1.6: no floating composer in this view (the console panel —
-   the external capsule lives OUTSIDE the region), so no capsule clearance: the 120px was
-   dead air pushing the live edge below the fold. */
-.scrollNoComposer {
-  padding-bottom: 24px;
-}
-
-.placeholder {
-  font: 11.5px var(--mono);
-  color: var(--t3);
-  padding: 8px 0;
-}
-
-/* ---- bubbles ------------------------------------------------------------ */
-
-.row {
   display: flex;
-  margin-bottom: 14px;
+  flex-direction: column;
+  gap: 2px;
 }
 
-.rowUser {
-  justify-content: flex-end;
-}
-
-.rowDesk {
-  justify-content: flex-start;
-}
-
-.bubble {
-  max-width: 72%;
-  padding: 10px 14px;
-  border-radius: var(--r2);
-  font-size: 13.5px;
-  line-height: 1.55;
-  white-space: pre-wrap;
-}
-
-.bubbleUser {
-  background: var(--accent);
-  color: var(--bg);
-  border-bottom-right-radius: 3px;
-}
-
-.bubbleDesk {
-  background: var(--panel);
-  border: 1px solid var(--border);
+.modeName {
+  font: 500 13px var(--sans);
   color: var(--t1);
-  border-bottom-left-radius: 3px;
 }
 
-.bubbleFail {
-  border-color: #f8514966;
-  color: var(--red);
-}
-
-.bubbleMeta {
-  font: 10px var(--mono);
+.modeLine {
+  font: 400 12px var(--sans);
   color: var(--t3);
-  margin-top: 6px;
 }
 
-/* The wordless pulse dot died with the legacy bubbles — liveness now shimmers on the
- * feed's worded status line (feed.module.css .shimmer). */
+.modeCheck {
+  flex: none;
+  color: var(--t1);
+}
 
-.rawToggle {
-  border: none;
+@keyframes menuUp {
+  from { opacity: 0; transform: translateY(4px) scale(0.97); }
+}
+
+/* ---- the plan: a quiet card above the composer, a thin progress line ---- */
+
+.planDock {
+  flex: none;
+  padding: 0 16px 10px;
+}
+
+.planDock:empty {
+  display: none;
+}
+
+.intentBlock {
+  margin: 0 28px 8px;
+  padding: 4px 4px 4px 14px;
+  border-radius: var(--r2);
+  background: var(--surface);
+  animation: attachIn 280ms var(--ease-out) backwards;
+}
+
+.planDock .intentBlock {
+  margin: 0;
+}
+
+.intentHead {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 32px;
+  cursor: pointer;
+  user-select: none;
+  border-radius: var(--r1);
+}
+
+.intentTitle {
+  font: 500 12.5px var(--sans);
+  color: var(--t1);
+}
+
+.intentMeta {
+  font: 400 12px var(--sans);
+  font-variant-numeric: tabular-nums;
+  color: var(--t3);
+  white-space: nowrap;
+}
+
+.intentBar {
+  flex: 1;
+  min-width: 40px;
+  height: 3px;
+  border-radius: 999px;
+  background: var(--well);
+  overflow: hidden;
+}
+
+.intentFill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--t2);
+  transition: width 600ms var(--ease-out);
+}
+
+.intentCaret {
+  flex: none;
+  color: var(--t3);
+  transition: transform 220ms var(--ease-out);
+}
+
+.intentCaretOpen {
+  transform: rotate(180deg);
+}
+
+.intentHide {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  flex: none;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
   background: transparent;
   color: var(--t3);
-  font: 10px var(--sans);
   cursor: pointer;
-  text-decoration: underline;
-  padding: 0;
-  margin-top: 6px;
-  display: inline-block;
 }
 
-.rawBox {
-  margin-top: 6px;
-  padding: 8px 10px;
-  background: #0a0a0a;
-  border: 1px solid var(--border);
-  border-radius: var(--r1);
-  font: 11px/1.6 var(--mono);
-  color: #a8a8a8;
-  white-space: pre-wrap;
+.intentHide:hover {
+  background: var(--raised);
+  color: var(--t1);
 }
 
-/* ---- THE ONE CARD (AI-surface rebuild Phase 3): the single card moment.
-   A soft surface on the ground - depth by surface, no borders; the one hue
-   spent on Approve alone; status as words. Two sizes by container width
-   (the pill-chat face and the full-screen face) via the wrap's query. ---- */
+.intentParts {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 2px 10px 8px 0;
+}
+
+/* One line per step: never wraps, text and note ellipsize. */
+.intentPart {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  min-height: 24px;
+  white-space: nowrap;
+  font: 400 12.5px var(--sans);
+  color: var(--t2);
+}
+
+.intentPartText {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* The step's state, drawn: an empty ring waits, a filled dot breathes, a check is done. */
+.intentGlyph {
+  position: relative;
+  width: 12px;
+  height: 12px;
+  flex: none;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1.5px var(--t3);
+}
+
+.intentPart[data-status='in_flight'] .intentGlyph {
+  box-shadow: inset 0 0 0 1.5px var(--t1);
+}
+
+.intentPart[data-status='in_flight'] .intentGlyph::after {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  border-radius: 50%;
+  background: var(--t1);
+  animation: breathe 1.8s ease-in-out infinite;
+}
+
+.intentPart[data-status='in_flight'] {
+  color: var(--t1);
+}
+
+.intentPart[data-status='done'] .intentGlyph {
+  background: var(--t2);
+  box-shadow: none;
+}
+
+.intentPart[data-status='done'] .intentGlyph::after {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 2px;
+  width: 3px;
+  height: 6px;
+  border: solid var(--chat-bg, var(--ground));
+  border-width: 0 1.5px 1.5px 0;
+  transform: rotate(45deg);
+}
+
+.intentPart[data-status='done'] .intentPartText {
+  color: var(--t3);
+}
+
+.intentPart[data-status='blocked'] .intentGlyph {
+  box-shadow: inset 0 0 0 1.5px var(--amber);
+}
+
+.intentPart[data-status='dropped'] .intentGlyph {
+  box-shadow: inset 0 0 0 1.5px var(--mark-quiet);
+}
+
+.intentDropped {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-decoration: line-through;
+  color: var(--t3);
+}
+
+.intentNote {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 11.5px;
+  color: var(--t3);
+}
+
+.intentParked {
+  padding: 0 10px 10px 0;
+  font: 400 12px var(--sans);
+  color: var(--amber);
+}
+
+@keyframes breathe {
+  0%, 100% { opacity: 0.35; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1); }
+}
+
+/* ---- THE ONE CARD: the consent gate, a soft surface on the ground; the primary pill is the verb ---- */
 
 .cardWrap {
   container-type: inline-size;
   max-width: 560px;
-  margin: 0 0 14px;
+  margin: 6px 0 16px;
+  animation: cardIn 320ms var(--ease-out) backwards;
+}
+
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(6px); }
 }
 
 .card {
-  background: var(--surface);
-  border-radius: var(--r2);
-  padding: var(--s4);
   display: flex;
   flex-direction: column;
   gap: var(--s2);
+  padding: var(--s4);
+  border-radius: var(--r2);
+  background: var(--surface);
+  box-shadow: inset 0 0 0 1px var(--hairline);
 }
 
 .cardTitle {
-  font: 600 13px var(--sans);
+  font: 600 13.5px var(--sans);
   color: var(--t1);
 }
 
@@ -253,54 +640,57 @@
   justify-content: space-between;
   gap: var(--s3);
 }
-.cardRowLabel { font: 400 12px var(--sans); color: var(--t2); flex: none; }
+.cardRowLabel { flex: none; font: 400 12px var(--sans); color: var(--t2); }
 .cardRowValue {
-  font: 400 12.5px var(--sans); color: var(--t1);
-  text-align: right; min-width: 0; overflow-wrap: anywhere;
+  min-width: 0;
+  font: 400 12.5px var(--sans);
+  color: var(--t1);
+  text-align: right;
+  overflow-wrap: anywhere;
 }
 
-.cardLands { font: 400 12.5px/1.5 var(--sans); color: var(--t2); }
-.cardQuiet { font: 400 11.5px/1.5 var(--sans); color: var(--t3); }
+.cardLands { font: 400 12.5px / 1.5 var(--sans); color: var(--t2); }
+.cardQuiet { font: 400 11.5px / 1.5 var(--sans); color: var(--t3); }
 
-/* The mint face: the real rendered candidate frame. */
+/* The rendered preview of what would be made. */
 .cardPreview {
   display: block;
   max-width: 100%;
   border-radius: var(--r1);
 }
 
-/* The app_plan citizen grid - rendered inside the card, never a new surface. */
+/* The app plan, inside the card. */
 .planGrid { display: flex; flex-direction: column; gap: var(--s3); }
 .planSection { display: flex; flex-direction: column; gap: var(--s1); }
 .planLabel { font: 400 12px var(--sans); color: var(--t2); }
 .planRow { display: flex; flex-direction: column; gap: 1px; padding: 2px 0; }
-.planHead { display: flex; align-items: baseline; gap: var(--s2); justify-content: space-between; }
-.planName { font: 500 12.5px var(--sans); color: var(--t1); min-width: 0; }
-.planTag { font: 400 11.5px var(--sans); color: var(--t3); flex: none; text-align: right; }
-.planQuiet { font: 400 11.5px/1.45 var(--sans); color: var(--t3); }
+.planHead { display: flex; align-items: baseline; justify-content: space-between; gap: var(--s2); }
+.planName { min-width: 0; font: 500 12.5px var(--sans); color: var(--t1); }
+.planTag { flex: none; font: 400 11.5px var(--sans); color: var(--t3); text-align: right; }
+.planQuiet { font: 400 11.5px / 1.45 var(--sans); color: var(--t3); }
 
-/* The connect face - the only inputs on any card; the key rides into the vault. */
+/* The connect face: the only inputs on any card; the key goes into the vault. */
 .cardField { display: flex; flex-direction: column; gap: var(--s2); }
 .cardInput {
-  background: var(--well);
-  border: none;
-  border-radius: var(--r1);
   height: 32px;
   padding: 0 12px;
+  border: none;
+  border-radius: var(--r1);
+  background: var(--well);
   color: var(--t1);
   font: 400 12.5px var(--sans);
 }
 .cardInput::placeholder { color: var(--t3); }
-.cardInput:focus { outline: 2px solid var(--live); outline-offset: -2px; }
+.cardInput:focus { outline: 1.5px solid var(--focus); outline-offset: -1.5px; }
 .cardBtnQuiet {
   align-self: flex-start;
+  padding: 7px 14px;
   border: none;
-  cursor: pointer;
+  border-radius: 999px;
   background: var(--raised);
   color: var(--t1);
   font: 500 12px var(--sans);
-  border-radius: 999px;
-  padding: 7px 14px;
+  cursor: pointer;
   transition: background 120ms ease-out;
 }
 .cardBtnQuiet:hover { background: var(--float); }
@@ -308,60 +698,57 @@
 
 .cardBtns {
   display: flex;
-  gap: var(--s2);
-  align-items: center;
   flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s2);
   margin-top: var(--s1);
 }
 
-.pBtnPrimary {
+.pBtnPrimary,
+.pBtnGhost {
+  display: inline-flex;
+  align-items: center;
+  height: 34px;
+  padding: 0 16px;
   border: none;
-  cursor: pointer;
-  background: var(--live);
-  color: var(--ground);
-  font: 600 12.5px var(--sans);
   border-radius: 999px;
-  padding: 8px 18px;
+  font: 500 12.5px var(--sans);
+  cursor: pointer;
+  transition: background 120ms ease-out, transform 200ms var(--ease-out);
+}
+
+.pBtnPrimary {
+  background: var(--primary);
+  color: var(--on-primary);
 }
 
 .pBtnGhost {
-  border: none;
-  cursor: pointer;
   background: var(--raised);
   color: var(--t1);
-  font: 500 12.5px var(--sans);
-  border-radius: 999px;
-  padding: 8px 18px;
-  transition: background 120ms ease-out;
 }
-.pBtnGhost:hover { background: var(--float); }
 
-/* Numbered keyboard hints - 1/Enter answers the newest card's primary, 2 its ghost. */
-.pBtnPrimary::after {
-  content: '1';
-  margin-left: 8px;
-  font: 10px var(--mono);
-  opacity: 0.6;
-  border: 1px solid rgba(0, 0, 0, 0.35);
-  border-radius: 4px;
-  padding: 0 4px;
-}
+.pBtnGhost:hover { background: var(--float); }
+.pBtnPrimary:active,
+.pBtnGhost:active { transform: scale(0.97); }
+
+/* Keyboard hints: 1 or Enter answers the newest card's main button, 2 the other. */
+.pBtnPrimary::after,
 .pBtnGhost::after {
-  content: '2';
-  margin-left: 8px;
-  font: 10px var(--mono);
-  opacity: 0.6;
-  border: 1px solid var(--hairline);
-  border-radius: 4px;
-  padding: 0 4px;
+  margin-left: 10px;
+  padding: 0 5px;
+  border-radius: 5px;
+  font: 500 10px / 16px var(--mono);
+  opacity: 0.55;
 }
+.pBtnPrimary::after { content: '1'; background: rgba(127, 127, 127, 0.22); }
+.pBtnGhost::after { content: '2'; background: var(--well); }
 .pBtnPrimary:disabled,
 .pBtnGhost:disabled { opacity: 0.5; cursor: default; }
 
-/* Ask-once memory line beside the buttons. */
-.cardMemory { font: 400 11.5px var(--sans); color: var(--t3); margin-left: auto; }
+/* The ask-once memory line beside the buttons. */
+.cardMemory { margin-left: auto; font: 400 11.5px var(--sans); color: var(--t3); }
 
-/* The compact pill-chat size: rows stack, padding tightens. */
+/* The narrow chat window: rows stack, padding tightens. */
 @container (max-width: 460px) {
   .card { padding: var(--s3); }
   .cardRow { flex-direction: column; align-items: flex-start; gap: 2px; }
@@ -371,226 +758,47 @@
   .cardMemory { margin-left: 0; flex-basis: 100%; }
 }
 
-.errorText {
-  color: var(--red);
-  font-size: 11.5px;
-  margin-top: 8px;
-  font-family: var(--mono);
-}
-
-/* Answered gates (user-ratified 2026-07-15): ONE quiet full-text line — no chip chrome,
-   no accent border. Visible forever (D-24 floor 3), quiet like every settled fact. */
+/* An answered card leaves one quiet line, for good. */
 .answeredLine {
-  font: 12px var(--mono);
-  color: var(--t3);
   margin: 8px 0;
-}
-
-/* Auto-approved chip (D-24 floor 3): visible, never a silent stand-in for a user name. */
-.chip {
-  display: inline-flex;
-  align-items: center;
-  border: 1px solid var(--accent);
-  color: var(--accent);
-  border-radius: var(--r1);
-  padding: 1px 7px;
-  font: 10.5px var(--mono);
-  font-weight: 600;
-}
-
-/* ---- inline job cards ----------------------------------------------------- */
-
-.jobCard {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  width: 100%;
-  max-width: 72%;
-  margin: 0 0 14px 0;
-  padding: 9px 13px;
-  border: 1px solid var(--border);
-  border-radius: var(--r2);
-  background: var(--panel2);
-  font: 12px var(--mono);
-  color: var(--t2);
-  cursor: pointer;
-  text-align: left;
-}
-
-.jobCardOpen {
-  border-color: rgba(236, 236, 236, 0.5);
-}
-
-.jobId {
+  font: 400 12px var(--sans);
   color: var(--t3);
 }
 
-.jobPrompt {
-  flex: 1;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-family: var(--sans);
-  color: var(--t1);
-}
-
-.jobExpand {
-  max-width: 100%;
-  border: 1px solid var(--border);
-  border-radius: var(--r2);
-  margin: -6px 0 14px 0;
-  overflow: hidden;
-}
-
-/* ---- composer (pill restyle, user-directed 2026-07-20 — the Cursor input idiom:
-   one rounded pill, naked input, quiet in-pill mode slot, circular send; the meta
-   row rides BELOW the pill. LAW 4: same chrome, same one home, new coat.) ------- */
-
-/* Width-locked to the feed's text column (user-directed 2026-07-20): the feed is a centered
-   760px box with 4px inner padding inside the scroll's 24px gutters → content = min(752px,
-   window − 56px). 808 = 760 + 2×24; 28 = 24 + 4. Change these together with feed.module.css. */
-.composerDock {
-  width: 100%;
-  max-width: 808px;
-  margin: 0 auto;
-  padding: 10px 28px 6px;
-}
-
-.composer {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  background: var(--panel2); /* reverted 2026-07-20: only the MESSAGE pills wear --side */
-  border: 1px solid var(--border);
-  border-radius: 999px; /* full capsule, per the reference */
-  padding: 6px 6px 6px 18px;
-  transition: border-color 180ms ease-out;
-}
-
-.composer:focus-within {
-  border-color: var(--border2);
-}
-
-.cbox {
-  flex: 1;
+.rawToggle {
+  display: inline-block;
+  margin-top: 6px;
+  padding: 0;
   border: none;
-  outline: none;
   background: transparent;
-  padding: 8px 0;
-  color: var(--t1);
-  font-size: 13px;
-  font-family: var(--sans);
-}
-
-.cbox::placeholder {
   color: var(--t3);
-}
-
-.send {
-  flex: none;
-  width: 30px;
-  height: 30px;
-  display: grid;
-  place-items: center;
-  border: none;
-  border-radius: 50%;
-  font-size: 15px;
-  line-height: 1;
-  background: var(--accent);
-  color: var(--bg);
+  font: 400 11.5px var(--sans);
+  text-decoration: underline;
+  text-underline-offset: 2px;
   cursor: pointer;
-  transition: opacity 150ms ease-out;
 }
 
-.send:disabled {
-  background: var(--panel);
-  color: var(--t3);
-  border: 1px solid var(--border);
-  cursor: default;
+.rawToggle:hover { color: var(--t2); }
+
+.rawBox {
+  margin-top: 6px;
+  padding: 10px 12px;
+  border-radius: var(--r1);
+  background: var(--well);
+  font: 400 11.5px / 1.6 var(--mono);
+  color: var(--t2);
+  white-space: pre-wrap;
 }
 
-.composerNote {
-  border-top: 1px solid var(--border);
-  padding: 13px 24px;
-  font: 11.5px var(--mono);
-  color: var(--t3);
+@media (prefers-reduced-motion: reduce) {
+  .loadingDots,
+  .loadingDots::before,
+  .loadingDots::after,
+  .intentPart[data-status='in_flight'] .intentGlyph::after,
+  .cardWrap,
+  .intentBlock,
+  .attach,
+  .modeMenu {
+    animation: none;
+  }
 }
-
-.pDetails {
-  margin: 2px 0 6px;
-}
-.pDetailsSummary {
-  cursor: pointer;
-  color: var(--text-tertiary, #6e6e6e);
-  font-size: 12px;
-  user-select: none;
-}
-.jobRow { display: flex; align-items: stretch; gap: 6px; }
-.jobRow > button:first-child { flex: 1; }
-.jobCancel {
-  flex: none; padding: 0 10px; font-size: 12px; cursor: pointer;
-  background: transparent; border: 1px solid var(--border, #333);
-  border-radius: var(--r1); color: var(--text-secondary, #9a9a9a);
-}
-.jobCancel:hover { color: var(--status-red, #e5534b); border-color: var(--status-red, #e5534b); }
-
-/* The composer meta row's quiet clear button (selection chips). */
-.schedToggle {
-  background: none; border: none; padding: 0; cursor: pointer;
-  font-size: 11px; color: var(--accent, #ececec); text-decoration: underline;
-}
-
-/* FR-190 + FR-200 (Tier 12): the thread status strip — quiet one-line truth above the composer. */
-.statusStrip {
-  display: flex; gap: 14px; align-items: baseline;
-  padding: 3px 14px; font-size: 12px;
-  color: var(--text-tertiary, #6e6e6e); user-select: none;
-}
-.statusTokens { font-family: var(--font-mono, 'JetBrains Mono', monospace); font-size: 11px; }
-
-/* FR-232 (Tier 15): the living checklist — the mission pinned above the composer.
-   Tier 52 (FR-466, D-203): CC-TASK-SHAPED — compact one-line rows, a state glyph per row
-   (breathing ● in flight, amber ⚠ blocked, struck ✕ dropped), quiet "n of m" header.
-   A restyle only; the data and the LAW 5 floor are untouched. */
-.intentBlock {
-  margin: 0 14px 4px; padding: 6px 10px;
-  border: 1px solid var(--border, #2a2a2a); border-radius: var(--r1);
-  font-size: 12px; line-height: 1.5;
-}
-.intentSettled { opacity: 0.55; }
-.intentHead {
-  display: flex; gap: 12px; align-items: baseline;
-  color: var(--text-tertiary, #6e6e6e); margin-bottom: 2px;
-}
-.intentMeta { font-family: var(--font-mono, 'JetBrains Mono', monospace); font-size: 11px; }
-.intentHide {
-  margin-left: auto; width: 18px; height: 18px; padding: 0;
-  border: 1px solid var(--border, #2a2a2a); border-radius: var(--r1, 4px);
-  background: transparent; color: var(--text-tertiary, #6e6e6e);
-  font: 11px var(--font-mono, 'JetBrains Mono', monospace); line-height: 1; cursor: pointer;
-}
-.intentHide:hover { color: var(--text-primary, #ddd); }
-/* One line per part: the row never wraps — text and note ellipsize instead. */
-.intentPart { display: flex; gap: 8px; align-items: baseline; padding: 1px 0; min-width: 0; white-space: nowrap; }
-.intentPartText { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
-.intentGlyph { font-family: var(--font-mono, 'JetBrains Mono', monospace); width: 14px; flex: none; }
-.intentGlyphDone { color: var(--text-tertiary, #6e6e6e); }
-.intentGlyphBlocked { color: var(--status-amber, #d4a72c); }
-.intentGlyphLive { animation: intentBreathe 2s ease-in-out infinite; }
-@keyframes intentBreathe { 0%, 100% { opacity: 0.35; } 50% { opacity: 1; } }
-@media (prefers-reduced-motion: reduce) { .intentGlyphLive { animation: none; } }
-.intentDropped { text-decoration: line-through; opacity: 0.6; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
-.intentNote { color: var(--text-tertiary, #6e6e6e); font-size: 11px; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
-.intentParked { margin-top: 4px; color: var(--status-amber, #d4a72c); }
-
-/* FR-240 (D-68): the composer meta row — quiet thread chrome BELOW the pill (the Cursor
-   bottom-row idiom; the mode control moved into the pill itself, 2026-07-20). Same column
-   lock as .composerDock, nudged 6px inward so the tiny text sits inside the pill's edge. */
-.metaRow {
-  display: flex; gap: 14px; align-items: center;
-  width: 100%; max-width: 808px; margin: 0 auto;
-  padding: 2px 34px 10px; font-size: 11px;
-  color: var(--text-tertiary, #6e6e6e); user-select: none;
-}
-.metaQuiet { font-size: 11px; }

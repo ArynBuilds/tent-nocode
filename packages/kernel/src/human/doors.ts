@@ -105,6 +105,22 @@ export async function setArrangement(
     do update set doc = excluded.doc, updated_at = now()`;
 }
 
+/** Merges moved cards into the saved layout and, when given, replaces the groups; one locked read-modify-write. */
+export async function mergeArrangement(
+  sql: postgres.Sql,
+  input: { orgId: string; projectId: string; positions: Record<string, { x: number; y: number }>; folds: unknown[] | null },
+): Promise<void> {
+  await sql.begin(async (tx) => {
+    const [row] = await tx<{ doc: Record<string, unknown> }[]>`
+      select doc from workspace_arrangements
+      where org_id = ${input.orgId} and project_id = ${input.projectId} for update`;
+    const doc = row?.doc ?? {};
+    const saved = typeof doc['positions'] === 'object' && doc['positions'] !== null ? doc['positions'] as Record<string, unknown> : {};
+    const next = { ...doc, positions: { ...saved, ...input.positions }, ...(input.folds !== null ? { folds: input.folds } : {}) };
+    await setArrangement(tx as unknown as postgres.Sql, { orgId: input.orgId, projectId: input.projectId, doc: next });
+  });
+}
+
 /** Creates a trigger; the trigger row itself is the standing grant. */
 export async function mintTrigger(
   sql: postgres.Sql,

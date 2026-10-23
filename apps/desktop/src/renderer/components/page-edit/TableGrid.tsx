@@ -4,6 +4,7 @@ import { useLive } from '../../lib/data/useLive.js';
 import { useOrg } from '../../lib/OrgContext.js';
 import { useFocusedProject } from '../../lib/FocusContext.js';
 import styles from './tablegrid.module.css';
+import { EmptyMark } from '../brand/EmptyMark.js';
 
 // Spreadsheet grid for a Table node: cell edits, row add/delete, and column rename/add/delete.
 // Changing a column's type is not offered; add a new column and delete the old one instead.
@@ -246,7 +247,7 @@ export function TableGrid({ dataset, onDidEdit }: {
                 </td>
               </tr>
             ) : (
-              <tr><td className={styles.quiet}>no columns yet — click + above to add one, or paste rows from the chat</td></tr>
+              <tr><td colSpan={99}><EmptyMark line="No columns yet. Add one with the + above, or ask for rows in the chat." /></td></tr>
             )}
           </tbody>
         </table>

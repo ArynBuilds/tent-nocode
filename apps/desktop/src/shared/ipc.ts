@@ -52,55 +52,6 @@ export interface ProjectRow {
 
 // Conversation turn: user message or agent run reply.
 
-/** Org owner's forensic read: deterministic kernel numbers and weekly note. */
-export interface HealthReport {
-  spend: {
-    tokens30d: number;
-    usd30d: number;
-    topThreads: { threadId: string; title: string | null; tokens: number; usd: number }[];
-    grindRuns30d: number;
-    /** Cache hit rate (cache_read/(input+read+write)); 0 when none. */
-    cacheHitRate30d: number;
-    /** Avg effective tokens per chat turn. */
-    avgChatTurnTokens30d: number;
-  };
-  honesty: {
-    succeededRuns30d: number;
-    failedRuns30d: number;
-    honestEmptyJobs30d: number;
-    /** Rows the tab write door refused (schema drift surfaces here). */
-    tabWriteRejects30d: number;
-  };
-  loop: {
-    openIntents: number;
-    parkedIntents: number;
-    parkedOver24h: number;
-    /** Budget-exhausted missions. */
-    budgetExhausted: number;
-    rescueFirings30d: number;
-    cancelled30d: number;
-  };
-  /** Work-diet gauges (numbers that should decline). */
-  discipline: {
-    avgReportChars30d: number;
-    doubleReporterWakes30d: number;
-    effPerSettledPart30d: number;
-  };
-  errors: {
-    clusters7d: { type: string; count: number }[];
-    daemonRestarts7d: number;
-  };
-  /** Browse reach spend (pages, connector calls, per-domain page counts). */
-  browse: {
-    pages30d: number;
-    connectorCalls30d: number;
-    /** External MCP connection tool calls (mcp__ext-*), 30d. */
-    externalMcpCalls30d: number;
-    topDomains: { domain: string; pages: number }[];
-  };
-  generatedAt: string;
-}
-
 // Mission part: outcome with acceptance line and status.
 
 // Thread conversation data and work jobs.

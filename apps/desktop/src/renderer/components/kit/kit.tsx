@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Check, Copy, ExternalLink } from 'lucide-react';
 import styles from './kit.module.css';
 
-// The project screen's building blocks: section head, group, row, status line, copy, inline confirm.
+// The settings building blocks, shared by every settings-like screen: section head, group, row, status line, copy, inline confirm.
 
 export type RowState =
   | { phase: 'idle' }

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { desk } from '../../lib/desk.js';
 import { closePublishTakeover } from '../../lib/publishTakeover.js';
-import { ConfirmAction, Group, IDLE, Row, SectionHead, StatusLine, errorText, kit, refusalOf, type RowState } from './kit.js';
+import { ConfirmAction, Group, IDLE, Row, SectionHead, StatusLine, errorText, kit, refusalOf, type RowState } from '../kit/kit.js';
 import type { ProjectNavItem } from './projectNav.js';
 import type { LoadedProject } from './ProjectScreen.js';
 

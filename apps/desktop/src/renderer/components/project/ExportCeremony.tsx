@@ -1,7 +1,7 @@
 import type { ExportPreviewEntryDto } from '../../../shared/ipc.js';
 import { desk } from '../../lib/desk.js';
 import { useQuery } from '../../lib/data/useQuery.js';
-import { Empty } from './kit.js';
+import { Empty } from '../kit/kit.js';
 import styles from './project.module.css';
 
 // What travels: screens toggle, the parts they need come along locked, table rows and notes opt in.

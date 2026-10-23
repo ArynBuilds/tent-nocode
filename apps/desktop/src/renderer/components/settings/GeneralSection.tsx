@@ -4,27 +4,20 @@ import type { AuthState } from '../../../shared/ipc.js';
 import { can } from '../../../shared/roles.js';
 import { useQuery } from '../../lib/data/useQuery.js';
 import { desk } from '../../lib/desk.js';
-import threadStyles from '../thread/thread.module.css';
-import { fieldPatch } from './configPatch.js';
-import type { ConfigField, NumberField } from './configPatch.js';
-import styles from './settings.module.css';
+import { Empty, Group, IDLE, Row, StatusLine, errorText, kit, type RowState } from '../kit/kit.js';
+import { fieldPatch, type ConfigField } from './configPatch.js';
 
-// General settings section: Account + Chat rows, save-on-change; numbers commit on blur/Enter.
+// General: the account (sign out locks the app) and the chat defaults, each saved the moment it changes.
 
-interface NumberDraft {
-  autoBudgetUsdPerJob: string;
-}
+const MODES: Array<{ id: ThreadMode; label: string }> = [
+  { id: 'ask', label: 'Ask' },
+  { id: 'auto', label: 'Auto' },
+  { id: 'agent', label: 'Agent' },
+];
 
-function toNumberDraft(config: OrgConfig): NumberDraft {
-  return {
-    autoBudgetUsdPerJob: config.chat.autoBudgetUsdPerJob === null ? '' : String(config.chat.autoBudgetUsdPerJob),
-  };
-}
-
-// Account rows: identity + sign-out (locks the app); engine credentials are machine-scoped and survive it.
-function AccountRows() {
+function AccountGroup() {
   const [auth, setAuth] = useState<AuthState | null>(null);
-  const [busy, setBusy] = useState(false);
+  const [state, setState] = useState<RowState>(IDLE);
   useEffect(() => {
     desk.authState().then(setAuth).catch(() => undefined);
     const bridge = (window as unknown as { desk?: { onAuth?: (cb: (s: AuthState) => void) => () => void } }).desk;
@@ -32,142 +25,121 @@ function AccountRows() {
     return () => off?.();
   }, []);
   if (auth === null || auth.status !== 'signed-in') return null;
+  const signOut = (): void => {
+    setState({ phase: 'working', sentence: 'Signing out…' });
+    void desk.signOut().catch((err: unknown) => setState({ phase: 'failed', sentence: 'Could not sign out.', detail: errorText(err) }));
+  };
   return (
-    <>
-      <div className={styles.groupH}>Account</div>
-      <div className={styles.row}>
-        <div className={styles.rowText}>
-          <div className={styles.rowTitle}>{auth.displayName ?? auth.email ?? 'Signed in'}</div>
-          <div className={styles.rowDesc}>
-            {auth.email ?? ''} · Signing out locks the app until your password is entered again. Everything stays on this computer.
-          </div>
-        </div>
-        <div className={styles.rowCtl}>
-          <button
-            type="button"
-            className={styles.rowBtn}
-            disabled={busy}
-            onClick={() => {
-              setBusy(true);
-              void desk.signOut().finally(() => setBusy(false));
-            }}
-          >
-            sign out
-          </button>
-        </div>
-      </div>
-    </>
+    <Group title="Account">
+      <Row label="Name">
+        <span className={kit.value}>{auth.displayName ?? 'Not set'}</span>
+      </Row>
+      <Row label="Email">
+        <span className={kit.value}>{auth.email ?? 'Not set'}</span>
+      </Row>
+      <Row label="Sign out" hint="Locks the app until your password is entered again. Everything stays on this computer.">
+        <button type="button" className={kit.btn} disabled={state.phase === 'working'} onClick={signOut}>Sign out</button>
+      </Row>
+      <StatusLine state={state} />
+    </Group>
   );
 }
 
 export function GeneralSection({ orgId, role }: { orgId: string; role: OrgRole }) {
   const configQuery = useQuery('settings:config', () => desk.getOrgConfig(orgId), [orgId]);
   const [config, setConfig] = useState<OrgConfig | undefined>(undefined);
-  const [draft, setDraft] = useState<NumberDraft | undefined>(undefined);
-  const [error, setError] = useState<{ field: ConfigField; message: string } | undefined>(undefined);
-  const [saved, setSaved] = useState<ConfigField | undefined>(undefined);
-  const savedTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const [cap, setCap] = useState('');
+  const [state, setState] = useState<{ field: ConfigField; row: RowState } | null>(null);
+  const clearTimer = useRef<number | undefined>(undefined);
+  useEffect(() => () => window.clearTimeout(clearTimer.current), []);
 
+  const capOf = (c: OrgConfig): string => (c.chat.autoBudgetUsdPerJob === null ? '' : String(c.chat.autoBudgetUsdPerJob));
   useEffect(() => {
-    if (configQuery.data) {
-      setConfig(configQuery.data);
-      setDraft(toNumberDraft(configQuery.data));
-    }
+    if (configQuery.data === undefined) return;
+    setConfig(configQuery.data);
+    setCap(capOf(configQuery.data));
   }, [configQuery.data]);
-
-  useEffect(() => () => clearTimeout(savedTimer.current), []);
 
   const canEdit = can(role, 'config');
 
-  async function commit(field: ConfigField, raw: string): Promise<void> {
-    if (!config) return;
-    setError(undefined);
+  const commit = async (field: ConfigField, raw: string): Promise<void> => {
+    if (config === undefined) return;
     const patch = fieldPatch(field, raw);
     if (patch === undefined) {
-      setDraft(toNumberDraft(config)); // unparsable — revert to the record
+      setCap(capOf(config));
+      setState({ field, row: { phase: 'failed', sentence: 'That is not an amount. The old value is back.' } });
       return;
     }
-    const result = await desk.updateOrgConfig(orgId, patch);
-    if (!result.ok) {
-      setError({ field, message: result.error });
-      setDraft(toNumberDraft(config)); // the record did not change; neither may the field
-      return;
+    setState({ field, row: { phase: 'working', sentence: 'Saving…' } });
+    try {
+      const result = await desk.updateOrgConfig(orgId, patch);
+      if (!result.ok) {
+        setCap(capOf(config));
+        setState({ field, row: { phase: 'failed', sentence: 'Could not save.', detail: result.error } });
+        return;
+      }
+      if (result.data !== undefined) {
+        setConfig(result.data);
+        setCap(capOf(result.data));
+      }
+      setState({ field, row: { phase: 'done', sentence: 'Saved.' } });
+      window.clearTimeout(clearTimer.current);
+      clearTimer.current = window.setTimeout(() => setState(null), 2000);
+    } catch (err) {
+      setState({ field, row: { phase: 'failed', sentence: 'Could not save.', detail: errorText(err) } });
     }
-    if (result.data) {
-      setConfig(result.data);
-      setDraft(toNumberDraft(result.data));
-    }
-    setSaved(field);
-    clearTimeout(savedTimer.current);
-    savedTimer.current = setTimeout(() => setSaved(undefined), 1800);
-  }
+  };
 
-  if (!config || !draft) {
-    return <div className={threadStyles.placeholder}>loading config…</div>;
-  }
-
-  function numberRow(field: NumberField, title: string, desc: string, unit?: string, placeholder?: string) {
-    if (!draft || !config) return null;
-    const recordValue = toNumberDraft(config)[field];
-    return (
-      <div className={styles.row}>
-        <div className={styles.rowText}>
-          <div className={styles.rowTitle}>{title}</div>
-          <div className={styles.rowDesc}>{desc}</div>
-          {error?.field === field ? <div className={styles.rowErr}>{error.message}</div> : null}
-        </div>
-        <div className={styles.rowCtl}>
-          {saved === field ? <span className={styles.rowSaved}>saved</span> : null}
-          <input
-            className={styles.rowNum}
-            disabled={!canEdit}
-            placeholder={placeholder}
-            value={draft[field]}
-            onChange={(e) => setDraft({ ...draft, [field]: e.target.value })}
-            onBlur={(e) => {
-              if (e.target.value.trim() !== recordValue.trim()) void commit(field, e.target.value);
-            }}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') e.currentTarget.blur();
-            }}
-          />
-          {unit ? <span className={styles.rowUnit}>{unit}</span> : null}
-        </div>
-      </div>
-    );
-  }
+  const rowState = (field: ConfigField): RowState => (state?.field === field ? state.row : IDLE);
 
   return (
     <>
-      <AccountRows />
-      <div className={styles.groupH}>Chat</div>
-      <div className={styles.row}>
-        <div className={styles.rowText}>
-          <div className={styles.rowTitle}>Default chat mode</div>
-          <div className={styles.rowDesc}>New threads start here; any thread can override its own mode.</div>
-          {error?.field === 'defaultMode' ? <div className={styles.rowErr}>{error.message}</div> : null}
-        </div>
-        <div className={styles.rowCtl}>
-          {saved === 'defaultMode' ? <span className={styles.rowSaved}>saved</span> : null}
-          <select
-            className={styles.rowSelect}
-            disabled={!canEdit}
-            value={config.chat.defaultMode}
-            onChange={(e) => void commit('defaultMode', e.target.value as ThreadMode)}
-          >
-            <option value="ask">ask</option>
-            <option value="auto">auto</option>
-            <option value="agent">agent</option>
-          </select>
-        </div>
-      </div>
-      {numberRow(
-        'autoBudgetUsdPerJob',
-        'Auto budget cap',
-        'Optional ceiling per auto-mode job — work that would exceed it stops honestly.',
-        '$/job',
-        'none',
-      )}
+      <AccountGroup />
+      <Group title="Chat">
+        {configQuery.error !== undefined ? <StatusLine state={{ phase: 'failed', sentence: 'Could not read the settings.', detail: configQuery.error }} /> : null}
+        {config === undefined && configQuery.error === undefined ? <Empty>Loading…</Empty> : null}
+        {config !== undefined ? (
+          <>
+            <Row
+              label="New chats start in"
+              htmlFor="settings-mode"
+              hint="Ask waits for your Yes on every card. Auto and Agent answer routine cards themselves and record each answer. Any chat can change its own mode."
+            >
+              <select
+                id="settings-mode"
+                className={kit.select}
+                disabled={!canEdit}
+                value={config.chat.defaultMode}
+                onChange={(e) => void commit('defaultMode', e.target.value)}
+              >
+                {MODES.map((m) => <option key={m.id} value={m.id}>{m.label}</option>)}
+              </select>
+            </Row>
+            <StatusLine state={rowState('defaultMode')} />
+            <Row
+              label="Spending cap per job"
+              htmlFor="settings-cap"
+              hint="Shown beside the chat while a job runs in Auto, as spent of this amount. It does not stop the job. Leave it empty for none."
+            >
+              <div className={kit.amount}>
+                <span className={kit.unit}>$</span>
+                <input
+                  id="settings-cap"
+                  className={`${kit.input} ${kit.inputShort}`}
+                  inputMode="decimal"
+                  placeholder="None"
+                  disabled={!canEdit}
+                  value={cap}
+                  onChange={(e) => setCap(e.target.value)}
+                  onBlur={(e) => { if (e.target.value.trim() !== capOf(config).trim()) void commit('autoBudgetUsdPerJob', e.target.value); }}
+                  onKeyDown={(e) => { if (e.key === 'Enter') e.currentTarget.blur(); }}
+                />
+              </div>
+            </Row>
+            <StatusLine state={rowState('autoBudgetUsdPerJob')} />
+          </>
+        ) : null}
+      </Group>
     </>
   );
 }

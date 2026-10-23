@@ -3,7 +3,7 @@ import styles from './selection.module.css';
 
 // THE ONE SELECTION CHROME (Phase 12, row 12.16): the outline, the four corners, the size badge - the same
 // marks on a card, a screen frame, and an element inside one; the guides, the hover and the ghost beside it.
-// Constant screen size through --sk (the caller's zoom divisor); gold, the interaction hue, alone.
+// Constant screen size through --sk (the caller's zoom divisor); the interaction hue alone.
 
 export type SelRect = Rect;
 
