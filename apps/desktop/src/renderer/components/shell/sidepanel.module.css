@@ -1,0 +1,1449 @@
+/* The side panel (user-directed 2026-07-20, the Codex reference): right pane + its own tab
+ * strip. Shell furniture — follows the sidebar's contrast law (rest --t1, hover frame only,
+ * active text --t0) and the radius scale. Tokens only. */
+
+.panel {
+  grid-area: panel;
+  position: relative; /* anchors the drag handle */
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0; /* never lets mounted-but-hidden content inflate the shell grid */
+  border-left: 1px solid var(--border);
+  background: var(--bg);
+  overflow: hidden;
+  transition: border-left-color 200ms ease-out;
+}
+
+/* Same collapse grammar as the left sidebar (user-directed 2026-07-20): children stay pinned
+   to the OPEN track's width — --panelW when the user has dragged a size, else the default
+   max() that mirrors the grid track — so the closing edge clips content, text never rewraps. */
+.panel > * {
+  width: var(--panelW, max(340px, 42vw));
+  min-width: var(--panelW, max(340px, 42vw));
+}
+
+/* The resize handle (user-directed 2026-07-20): a 6px grab strip on the panel's left edge —
+   drag to trade width with the chat (floors both sides), double-click resets. */
+.dragHandle {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 6px;
+  min-width: 6px; /* escapes the .panel > * width pin */
+  cursor: col-resize;
+  z-index: 30;
+}
+
+.dragHandle:hover,
+.dragHandleActive {
+  background: rgba(236, 236, 236, 0.08);
+}
+
+/* While dragging: a full-window transparent veil so the pointer never drops into the
+   webview/iframe (guest surfaces would otherwise swallow the move events). */
+.resizeVeil {
+  position: fixed;
+  inset: 0;
+  width: auto;
+  min-width: 0; /* escapes the .panel > * width pin */
+  z-index: 100;
+  cursor: col-resize;
+}
+
+.panelShut {
+  border-left-color: transparent;
+}
+
+/* D11 (the one-dashboard spec, 2026-08-14): the LEFT slot - the SAME panel
+   species mounted on the 'side' grid track (ADDITIVE ONLY: the right and
+   bottom slots are byte-untouched). Geometry mirrors: the border and the
+   drag handle move to the RIGHT edge; the overlay slides in from the LEFT. */
+.panelLeft {
+  grid-area: side;
+  border-left: 0;
+  border-right: 1px solid var(--border);
+  transition: border-right-color 200ms ease-out;
+}
+
+.panelLeft > * {
+  width: var(--leftW, 300px);
+  min-width: var(--leftW, 300px);
+}
+
+.panelLeft .dragHandle {
+  left: auto;
+  right: 0;
+  /* The .panelLeft > * width pin must never swallow the handle (the cursor
+     would lie across the whole pane) - the strip stays its 6px. */
+  width: 6px;
+  min-width: 6px;
+}
+
+.panelLeft .resizeVeil {
+  width: auto;
+  min-width: 0;
+}
+
+.panelLeft.panelShut {
+  border-left: 0;
+  border-right-color: transparent;
+}
+
+.panelLeft.panelOverlay {
+  right: auto;
+  left: 0;
+  width: 300px;
+  min-width: 300px;
+  border-left: 0;
+  border-right: 1px solid var(--border);
+  box-shadow: 8px 0 24px rgba(0, 0, 0, 0.35);
+  animation: panelInLeft 200ms ease-out;
+}
+
+@keyframes panelInLeft {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+/* Narrow-window overlay (mirrors the left sidebar exactly): fixed panel sliding in from the
+   RIGHT over the shared blurred scrim; the one sanctioned shadow case (an overlay). Children
+   stay width-pinned — at narrow widths max(340px, 42vw) = 340px = the overlay's own width. */
+.panelOverlay {
+  position: fixed;
+  top: 35px;
+  bottom: 0;
+  right: 0;
+  width: 340px;
+  min-width: 340px;
+  z-index: 60;
+  border-left: 1px solid var(--border);
+  box-shadow: -8px 0 24px rgba(0, 0, 0, 0.35);
+  animation: panelIn 200ms ease-out;
+}
+
+@keyframes panelIn {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panelOverlay {
+    animation: none;
+  }
+}
+
+.strip {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: var(--barH); /* border-aligns with the thread header at any size */
+  padding: 0 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* The scrolling tabs region (user-directed 2026-07-20): overflowing tabs stay reachable —
+   wheel scrolls sideways, the active tab auto-scrolls into view, the + never moves. The
+   scrollbar itself is hidden (the strip is one row tall; wheel + drag are the controls). */
+.tabsScroll {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.tabsScroll::-webkit-scrollbar {
+  display: none;
+}
+
+.tabDragging {
+  opacity: 0.45;
+}
+
+/* Fixed-size tabs (user-directed 2026-07-20): every tab is the same width; a clipped label
+   marquees on hover with the thread-row physics. */
+.tab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 160px;
+  flex: none;
+  padding: 4px 6px 4px 10px;
+  border-radius: var(--r1);
+  color: var(--t1);
+  font-size: 12.5px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.tab:hover {
+  background: var(--panel);
+}
+
+.tabActive {
+  background: var(--panel2);
+  color: var(--t0);
+}
+
+.tabLabel {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Same marquee grammar as the sidebar thread rows: 500ms hover delay, LINEAR constant
+   velocity via --marquee-ms (measured on mouseenter), fitting labels never move
+   (min-width: 100%), base state carries no transition so hover-out snaps. */
+.tabLabelInner {
+  display: inline-block;
+  position: relative;
+  left: 0;
+  transform: translateX(0);
+  min-width: 100%;
+  width: max-content;
+}
+
+.tab:hover .tabLabelInner {
+  left: 100%;
+  transform: translateX(-100%);
+  transition: left var(--marquee-ms, 0ms) linear, transform var(--marquee-ms, 0ms) linear;
+  transition-delay: 500ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tab:hover .tabLabelInner {
+    transition: none;
+  }
+}
+
+.tabClose {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--t2);
+  cursor: pointer;
+  padding: 0;
+}
+
+.tabClose:hover {
+  background: var(--border2);
+  color: var(--t0);
+}
+
+.addWrap {
+  position: relative;
+}
+
+.stripBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border: 0;
+  border-radius: var(--r1);
+  background: transparent;
+  color: var(--t1);
+  cursor: pointer;
+  padding: 0;
+}
+
+.stripBtn:hover {
+  background: var(--panel);
+}
+
+.addMenu {
+  position: absolute;
+  top: 30px;
+  right: 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 6px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--r2);
+  white-space: nowrap;
+}
+
+.addItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border: 0;
+  border-radius: var(--r1);
+  background: transparent;
+  color: var(--t1);
+  font: 13px var(--sans);
+  text-align: left;
+  cursor: pointer;
+}
+
+.addItem:hover {
+  background: var(--panel2);
+}
+
+.body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.bodyHidden {
+  display: none;
+}
+
+/* The LAUNCHER (the Codex picker): an empty pane offers its surfaces as quiet rows —
+   CENTERED, capped at 320px so a wide pane never stretches them into banners. */
+.launcher {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  justify-content: center;
+  align-items: center;
+  padding: 0 24px;
+}
+
+.launchItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  max-width: 320px;
+  padding: 11px 16px;
+  border: 0;
+  border-radius: var(--r2);
+  background: var(--panel);
+  color: var(--t1);
+  font: 13.5px var(--sans);
+  text-align: left;
+  cursor: pointer;
+}
+
+/* PROJECT FOCUS (2026-08-01): `.launchSub` (the project chooser's indented sub-rows)
+   died with the chooser — the ⚙ row opens the focused project directly. */
+
+.launchItem:hover {
+  background: var(--panel2);
+  color: var(--t0);
+}
+
+
+
+.freshChat {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0 12px;
+}
+
+.freshHint {
+  font-size: 13px;
+  color: var(--t3);
+  margin-bottom: 18px;
+}
+
+/* ---- the browser tab ---- */
+
+.browser {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Tier 31 (FR-340, LAW 1): the ONE owner of "who has the wheel" — amber while the agent
+   drives, brighter when it is the user's turn. Carries revoke ("Take the wheel") + resume. */
+.driveStrip {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 10px;
+  border-bottom: 1px solid var(--amber);
+  color: var(--amber);
+  font: 11.5px var(--mono);
+}
+
+.driveStripUser {
+  color: var(--t0);
+  border-bottom-color: var(--border2);
+}
+
+.driveText {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.driveBtn,
+.driveBtnStop {
+  flex: none;
+  border: 1px solid var(--border2);
+  border-radius: var(--r1);
+  background: transparent;
+  color: var(--t1);
+  font: 11px var(--sans);
+  padding: 3px 10px;
+  cursor: pointer;
+}
+
+.driveBtn:hover,
+.driveBtnStop:hover {
+  background: var(--panel2);
+  color: var(--t0);
+}
+
+.urlRow {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.urlInput {
+  flex: 1;
+  min-width: 0;
+  background: var(--panel2);
+  border: 0;
+  border-radius: 999px;
+  padding: 5px 12px;
+  color: var(--t1);
+  font-size: 12px;
+  font-family: var(--sans);
+}
+
+.urlInput:focus,
+.urlInput:focus-visible {
+  outline: none;
+}
+
+.webview {
+  flex: 1;
+  min-height: 0;
+  background: #fff;
+}
+
+.browserEmpty {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  color: var(--t3);
+}
+
+/* Tier 35 (FR-363, D-139): the glass pane — read-only file viewer, mono 400 only. */
+.filePane {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+.fileHead {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--border);
+}
+.fileCrumbs {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--t2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.fileBody {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  margin: 0;
+  padding: 10px 12px;
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 400; /* bold mono banned — the type ladder */
+  line-height: 1.55;
+  color: var(--t1);
+  white-space: pre;
+  transition: background-color 400ms ease-out;
+}
+.fileFlash {
+  background-color: var(--panel); /* the landing flash — luminance, never hue */
+}
+.fileEmpty {
+  padding: 16px;
+  color: var(--t3);
+  font-size: 12px;
+}
+
+/* Tier 38 (FR-386, D-154): the inspector — the glass-pane idiom for scene nodes.
+   Monochrome, mono values, luminance-only emphasis (no new hues — D-19/D-126). */
+/* THE PANEL STANDARD re-dressed in SOFT SURFACES (user-asked 2026-08-05; CLAUDE.md
+   THE DESIGN SYSTEM + the two Framer references — reference, our own take): the pane
+   is a --surface; depth carries structure (wells sink, raised fills press); rows
+   breathe at ~36-40px; body type 13px; the 2px --live ring is the one focus. The
+   bordered 11px dress died here. */
+.inspector {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 8px 0 16px;
+  background: var(--surface);
+}
+.inspectorHead {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 8px 12px 10px;
+  border-bottom: 1px solid var(--hairline);
+}
+.inspectorScene {
+  font-size: var(--fs-body);
+  color: var(--t1);
+  font-weight: 600;
+}
+/* Correction #8: the subject's NAME is UI text — Inter; only literal values keep mono. */
+.inspectorNode {
+  font-size: var(--fs-small);
+  font-weight: 500;
+  color: var(--t2);
+}
+.inspectorMeta {
+  font-size: var(--fs-caption);
+  color: var(--t3);
+}
+.inspectorSection {
+  padding: 6px 12px 4px;
+}
+/* Correction #8: section headers speak display words — Inter. */
+.inspectorRef {
+  font-size: var(--fs-small);
+  font-weight: 500;
+  color: var(--t2);
+  padding: 6px 0 4px;
+}
+.inspectorRow,
+.inspectorRowStatic {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 36px;
+  padding: 2px 0;
+  background: none;
+  border: 0;
+  text-align: left;
+  font: inherit;
+}
+.inspectorRow {
+  cursor: pointer;
+}
+.inspectorRow:hover .inspectorKey {
+  color: var(--t1);
+}
+.inspectorKey {
+  flex: 0 0 auto;
+  min-width: 92px;
+  font-size: var(--fs-body);
+  color: var(--t2);
+}
+.inspectorVal,
+.inspectorValSet {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--mono);
+  font-size: var(--fs-small);
+  font-weight: 400;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.inspectorVal {
+  color: var(--t3); /* definition default — quieter by luminance */
+}
+.inspectorValSet {
+  color: var(--t1); /* set on this node */
+}
+.inspectorWhy {
+  padding: 0 0 6px 102px;
+  font-size: var(--fs-caption);
+  color: var(--t3);
+}
+
+/* E3 (M-EX3): the ONE quiet Motion… fold — the unset motion words wait behind it
+   (the theme rows' moreLink grammar, this pane's own class). */
+.inspectorMotionMore {
+  background: none;
+  border: none;
+  color: var(--t3);
+  font-size: 11px;
+  cursor: pointer;
+  padding: 2px 0 6px;
+}
+
+.inspectorMotionMore:hover {
+  color: var(--t1);
+}
+
+/* Tier 38 (FR-388): inspector edit affordances — same quiet chrome as the rest. */
+.inspectorTools {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.inspectorNotice {
+  padding: 6px 12px;
+  font-size: var(--fs-caption);
+  color: var(--t2);
+  border-bottom: 1px solid var(--hairline);
+}
+/* The verbatim value editor — a sunken well; mono because the value is data. */
+.inspectorEdit {
+  flex: 1;
+  min-width: 0;
+  height: 30px;
+  background: var(--well);
+  border: none;
+  border-radius: var(--r1);
+  color: var(--t1);
+  font-family: var(--mono);
+  font-size: var(--fs-small);
+  padding: 0 10px;
+}
+.inspectorEdit:focus-visible {
+  outline: 2px solid var(--live);
+  outline-offset: -1px;
+}
+/* Enum dropdowns — the sunken well, "pick here". */
+.inspectorSelect {
+  height: 32px;
+  max-width: 170px;
+  background: var(--well);
+  border: none;
+  border-radius: var(--r1);
+  color: var(--t1);
+  font-size: var(--fs-body);
+  padding: 0 8px 0 10px;
+}
+.inspectorSelect:focus-visible {
+  outline: 2px solid var(--live);
+  outline-offset: -1px;
+}
+
+/* ---- THE NOTES DETAIL (speed arc D-x2/FR-x7, 2026-07-29) ------------------------ */
+
+.notesWrap {
+  height: 100%;
+  overflow-y: auto;
+  padding: 40px 14px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.notesEmpty {
+  font: 12px var(--sans);
+  color: var(--t3);
+  padding: 18px 4px;
+}
+
+.notesList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.noteCard {
+  border: 1px solid var(--border);
+  border-radius: var(--r1);
+  background: var(--panel);
+  padding: 8px 10px;
+}
+
+.noteBody {
+  font: 12.5px var(--sans);
+  line-height: 1.45;
+  color: var(--t1);
+  white-space: pre-wrap;
+}
+
+.noteMeta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 5px;
+  font: 10.5px var(--mono);
+  color: var(--t3);
+}
+
+.noteActsInline {
+  margin-left: auto;
+  display: flex;
+  gap: 6px;
+}
+
+.noteActs {
+  display: flex;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.noteBtn {
+  border: 1px solid var(--border);
+  border-radius: var(--r1);
+  background: var(--panel);
+  color: var(--t2);
+  font: 10.5px var(--sans);
+  padding: 2px 8px;
+  cursor: pointer;
+}
+
+.noteBtn:hover:not(:disabled) {
+  background: var(--panel2);
+  color: var(--t0);
+}
+
+.noteBtn:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+/* THE DELETION DOORS (2026-08-02): the armed-delete button died — delete is SELECT +
+   Delete key (no button, ever); the selected card wears the quiet ring. */
+.noteCardSelected {
+  outline: 1px solid var(--border2);
+  outline-offset: -1px;
+}
+
+.noteHistoryBtn {
+  border: none;
+  background: none;
+  color: var(--t3);
+  font: 10.5px var(--sans);
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
+}
+
+.noteHistory {
+  margin-top: 7px;
+  border-top: 1px solid var(--border2, var(--border));
+  padding-top: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.noteHistoryItem {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.noteHistoryBody {
+  font: 11.5px var(--sans);
+  color: var(--t3);
+  text-decoration: line-through;
+}
+
+.noteHistoryMeta {
+  font: 10px var(--mono);
+  color: var(--t3);
+}
+
+.noteAdd {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-start;
+}
+
+.noteInput {
+  width: 100%;
+  resize: vertical;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r1);
+  color: var(--t1);
+  font: 12px var(--sans);
+  line-height: 1.4;
+  padding: 6px 8px;
+}
+
+.noteErr {
+  font: 11px var(--sans);
+  color: var(--t2);
+  border: 1px solid var(--border);
+  border-left: 2px solid var(--t2);
+  border-radius: var(--r1);
+  padding: 5px 8px;
+}
+
+/* ---- THE RE-HOUSING R2 — the node browser (§1.6) --------------------------------- */
+
+.nodeBrowser {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--s3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s2);
+}
+
+.nodeBrowserHead {
+  font: 500 13px var(--sans);
+  color: var(--t1);
+  padding-bottom: var(--s1);
+}
+
+.nodeBrowserSearch {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r1);
+  color: var(--t1);
+  font: 12px var(--sans);
+  padding: 5px 8px;
+}
+
+.nodeBrowserCat {
+  font: 600 10px var(--sans);
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--t3);
+  padding: var(--s2) 0 3px;
+}
+
+.nodeBrowserRow {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+  padding: 5px 7px;
+  background: transparent;
+  border: 0;
+  border-radius: var(--r1);
+  color: var(--t1);
+  font: 12px var(--sans);
+  text-align: left;
+  cursor: pointer;
+}
+
+.nodeBrowserRow:hover { background: var(--panel2); }
+
+.nodeBrowserLabel {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.nodeBrowserDetail {
+  margin-left: auto;
+  color: var(--t3);
+  font-size: 10.5px;
+  white-space: nowrap;
+}
+
+.nodeBrowserPlus {
+  flex: none;
+  width: 12px;
+  text-align: center;
+  color: var(--t3);
+}
+
+.nodeBrowserQuiet {
+  font: 11px var(--sans);
+  color: var(--t3);
+  padding: 3px 0;
+}
+
+/* ---- R2 — the ContractForm (one generic Inspector body) -------------------------- */
+
+.contractLine {
+  padding: 2px 8px;
+}
+
+.contractText {
+  font: 12px var(--sans);
+  color: var(--t2);
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+/* G3a (M4): when-clause / gated-param / follows sub-rows under a "can do" line. */
+.contractSub {
+  font: 12px var(--sans);
+  color: var(--t3);
+  line-height: 1.45;
+  padding-left: 14px;
+  overflow-wrap: anywhere;
+}
+
+.contractMono {
+  font: 11px var(--mono);
+  color: var(--t2);
+  overflow-wrap: anywhere;
+}
+
+/* Re-dressed 2026-08-05 (soft surfaces): a verb is a RAISED pill — press here. */
+.contractVerb {
+  display: inline-flex;
+  align-items: center;
+  height: 30px;
+  margin: 2px var(--s2) 2px 0;
+  padding: 0 12px;
+  background: var(--raised);
+  border: none;
+  border-radius: var(--r1);
+  color: var(--t1);
+  font: var(--fs-body) var(--sans);
+  cursor: pointer;
+}
+
+.contractVerb:hover { background: var(--float); } /* hover = one surface step */
+.contractVerb:focus-visible { outline: 2px solid var(--live); outline-offset: -1px; }
+
+/* ---- R2 — the bench chrome (+ Add · entered descents · the quiet line) ----------- */
+
+.benchBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s2);
+}
+
+/* R3 fix: the crumb is an absolute overlay at top-left — the add menu keeps to the
+   right end or the two controls overlap (found driving the screens canvas). */
+.benchAdd { position: relative; margin-left: auto; }
+
+.benchAddBtn {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--r1);
+  color: var(--t1);
+  font: 12px var(--sans);
+  padding: 4px 10px;
+  cursor: pointer;
+}
+
+.benchAddBtn:hover { border-color: var(--border2); }
+
+.benchAddMenu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 4px);
+  z-index: 10;
+  min-width: 130px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--r1);
+  padding: 4px;
+  display: flex;
+  flex-direction: column;
+}
+
+.benchAddRow {
+  background: transparent;
+  border: 0;
+  border-radius: var(--r1);
+  color: var(--t1);
+  font: 12px var(--sans);
+  text-align: left;
+  padding: 5px 8px;
+  cursor: pointer;
+}
+
+.benchAddRow:hover { background: var(--panel2); }
+
+/* THE LIVE MAP (2026-07-31): + Add over empty root ground = the birth flow — the
+   What-to-build question, framed, floating quiet over the map. */
+.benchBirth {
+  position: absolute;
+  top: 44px;
+  right: 12px;
+  z-index: 20;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--r1);
+}
+
+.benchEntered {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.benchQuiet {
+  font: 11px var(--sans);
+  color: var(--t3);
+  padding: 4px 8px;
+}
+
+/* FIX 4 (2026-08-05, the silent-nothing class): the canvas mount's quiet line —
+   ANCHORED to the bench corner (the benchConfirm spot's grammar), so a refusal
+   renders wherever the camera looks. Quiet tone, never error chrome. */
+.benchQuietFloat {
+  position: absolute;
+  left: 12px;
+  top: 44px;
+  z-index: 20;
+  max-width: 340px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--r1, 10px);
+  padding: 6px 10px;
+  font: 12px var(--sans);
+  color: var(--t2);
+}
+
+/* THE DELETION DOORS (2026-08-02): the ONE confirm — Tables only. A small anchored
+   popover in the bench (the benchQuiet spot's grammar), never a modal. Tokens only. */
+.benchConfirm {
+  position: absolute;
+  left: 12px;
+  top: 44px;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--panel);
+  border: 1px solid var(--border2);
+  border-radius: var(--r1, 10px);
+  padding: 6px 10px;
+  font: 12px var(--sans);
+  color: var(--t2);
+  box-shadow: var(--shadow2, 0 4px 14px rgba(0, 0, 0, 0.12));
+}
+
+.benchConfirmDelete {
+  background: var(--panel2);
+  border: 1px solid var(--border2);
+  border-radius: var(--r1, 10px);
+  color: var(--t1);
+  font-size: 12px;
+  padding: 2px 10px;
+  cursor: pointer;
+}
+
+.benchConfirmDismiss {
+  background: none;
+  border: none;
+  color: var(--t3);
+  font-size: 12px;
+  cursor: pointer;
+  padding: 2px 4px;
+}
+
+/* B4 (spec ㊲) re-dressed 2026-08-05 (user-asked; the Framer references + THE DESIGN
+   SYSTEM): THE PANEL STANDARD's section + row-form chrome in the SOFT-SURFACES
+   material — collapsed plain-word headers with the + on the right, the fixed row
+   vocabulary as sunken wells / raised segments, ghost Add rows as quiet wells.
+   Depth by surface, borders gone; the 2px --live ring is the one focus; monochrome
+   text (tool chrome never wears expression). */
+
+.sectionHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  background: none;
+  border: none;
+  border-top: 1px solid var(--hairline);
+  color: var(--t1);
+  font-size: var(--fs-body);
+  font-weight: 600;
+  padding: 12px 4px 8px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.sectionHeadStatic {
+  border-top: 1px solid var(--hairline);
+  color: var(--t1);
+  font-size: var(--fs-body);
+  font-weight: 600;
+  padding: 12px 4px 8px;
+}
+
+.sectionChev {
+  color: var(--t3);
+  font-size: 14px;
+  line-height: 1;
+}
+
+.rowWord {
+  background: none;
+  border: none;
+  color: var(--t2);
+  font-size: var(--fs-body);
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+  flex: 0 0 auto;
+  min-width: 84px;
+}
+
+.rowWord:hover {
+  color: var(--t1);
+}
+
+.rowWordStatic {
+  color: var(--t2);
+  font-size: var(--fs-body);
+  flex: 0 0 auto;
+  min-width: 84px;
+}
+
+.rowControl {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+  justify-content: flex-end;
+}
+
+.rowClear {
+  background: none;
+  border: none;
+  color: var(--t3);
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 2px;
+}
+
+.rowClear:hover {
+  color: var(--t1);
+}
+
+/* The sunken wells — "type here": no border, the surface step IS the affordance. */
+.rowNum {
+  width: 64px;
+  height: 32px;
+  background: var(--well);
+  border: none;
+  border-radius: var(--r1);
+  color: var(--t1);
+  font-size: var(--fs-body);
+  padding: 0 10px;
+}
+
+.rowText {
+  flex: 1;
+  min-width: 0;
+  max-width: 170px;
+  height: 32px;
+  background: var(--well);
+  border: none;
+  border-radius: var(--r1);
+  color: var(--t1);
+  font-size: var(--fs-body);
+  padding: 0 10px;
+}
+
+.rowNum:focus-visible,
+.rowText:focus-visible {
+  outline: 2px solid var(--live);
+  outline-offset: -1px;
+}
+
+.rowText::placeholder {
+  color: var(--t3);
+}
+
+.rowSlider {
+  flex: 1;
+  min-width: 60px;
+  max-width: 110px;
+  accent-color: var(--t1);
+}
+
+/* The segmented two-state: a sunken track; the ACTIVE segment is the raised fill
+   ("press here" — the material speaks the state, never a border). */
+.rowSeg {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  height: 32px;
+  background: var(--well);
+  border: none;
+  border-radius: var(--r1);
+  padding: 2px;
+}
+
+.rowSegBtn,
+.rowSegOn {
+  height: 28px;
+  border: none;
+  border-radius: calc(var(--r1) - 2px);
+  font-size: var(--fs-body);
+  padding: 0 12px;
+  cursor: pointer;
+  transition: color 120ms ease-out, background 120ms ease-out;
+}
+
+.rowSegBtn {
+  background: transparent;
+  color: var(--t2);
+}
+
+.rowSegBtn:hover {
+  color: var(--t1);
+  background: color-mix(in srgb, var(--raised) 55%, transparent);
+}
+
+.rowSegOn {
+  background: var(--raised);
+  color: var(--t0);
+}
+
+.rowSegBtn:focus-visible,
+.rowSegOn:focus-visible {
+  outline: 2px solid var(--live);
+  outline-offset: -1px;
+}
+
+.rowSwatch {
+  width: 18px;
+  height: 18px;
+  border-radius: 6px;
+  border: 1px solid var(--hairline); /* the legit hairline: a swatch matching the well */
+  flex: 0 0 auto;
+  /* [66]: the swatch is a BUTTON now - the picker's door (honest cursor). */
+  padding: 0;
+  cursor: pointer;
+}
+
+.rowSwatch:focus-visible {
+  outline: 2px solid var(--live);
+  outline-offset: 1px;
+}
+
+/* The ghost "Add…" row — a quiet well the unset aspect waits behind (add-to-set). */
+.addGhost {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 32px;
+  background: var(--well);
+  border: none;
+  border-radius: var(--r1);
+  color: var(--t3);
+  font-size: var(--fs-body);
+  padding: 0 10px;
+  margin: 4px 0 6px;
+  cursor: pointer;
+  text-align: left;
+  transition: color 120ms ease-out;
+}
+
+.addGhost:hover {
+  color: var(--t1);
+}
+
+.addGhost:focus-visible {
+  outline: 2px solid var(--live);
+  outline-offset: -1px;
+}
+
+.addChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 4px 0 8px;
+}
+
+/* Word chips — raised pills (capsule: the single-line signature). */
+.addChip {
+  height: 26px;
+  background: var(--raised);
+  border: none;
+  border-radius: 999px;
+  color: var(--t1);
+  font-size: var(--fs-small);
+  padding: 0 12px;
+  cursor: pointer;
+  transition: background 120ms ease-out;
+}
+
+.addChip:hover {
+  background: var(--float);
+  color: var(--t0);
+}
+
+.addChip:focus-visible {
+  outline: 2px solid var(--live);
+  outline-offset: -1px;
+}
+
+/* ㊿ (user-ruled 2026-08-05): THE LAYERS TREE — the editing page's hierarchy in the
+   soft-surfaces material: quiet rows, selection as a --well fill + --live text edge,
+   drag zones as one hairline-class line / a well ring; display words only. */
+.layers {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 6px 8px 14px;
+  background: var(--surface);
+}
+
+/* The page head rows (project-wide layers, 2026-08-14): every page owns its
+   block; a closed page's head is a door (click opens it in the center). */
+.layersHead {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--fs-body);
+  font-weight: 600;
+  color: var(--t2);
+  padding: 6px 4px;
+  margin-top: 2px;
+  cursor: pointer;
+  border-radius: var(--r1);
+}
+
+.layersHead:hover {
+  background: var(--raised);
+}
+
+.layersHeadLive {
+  color: var(--t0);
+  cursor: default;
+}
+
+.layersHeadLive:hover {
+  background: transparent;
+}
+
+.layersRow {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 28px;
+  padding-right: 6px;
+  border-radius: var(--r1);
+  color: var(--t2);
+  font-size: var(--fs-body);
+  cursor: default;
+  user-select: none;
+  transition: background 120ms ease-out, color 120ms ease-out;
+}
+
+.layersRow:hover {
+  color: var(--t1);
+}
+
+.layersRowSelected {
+  background: var(--well);
+  color: var(--t0);
+}
+
+.layersRowDragging { opacity: 0.5; }
+
+/* The drop zones: a 2px --live line before/after; a --live ring for drop-into. */
+.layersRowBefore::before,
+.layersRowAfter::after {
+  content: '';
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--live);
+}
+
+.layersRowBefore::before { top: -1px; }
+.layersRowAfter::after { bottom: -1px; }
+
+.layersRowInto {
+  outline: 2px solid var(--live);
+  outline-offset: -2px;
+}
+
+.layersChev {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  background: none;
+  border: none;
+  color: var(--t3);
+  padding: 0;
+  cursor: pointer;
+}
+
+.layersChev:hover { color: var(--t1); }
+
+.layersChevGap { flex: none; width: 16px; }
+
+.layersIcon {
+  flex: none;
+  color: var(--t3);
+}
+
+.layersRowSelected .layersIcon { color: var(--t1); }
+
+.layersWord {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.layersRename {
+  flex: 1;
+  min-width: 0;
+  height: 24px;
+  background: var(--well);
+  border: none;
+  border-radius: calc(var(--r1) - 2px);
+  color: var(--t1);
+  font-size: var(--fs-body);
+  padding: 0 6px;
+}
+
+.layersRename:focus-visible {
+  outline: 2px solid var(--live);
+  outline-offset: -1px;
+}
+
+.layersQuiet {
+  padding: 8px 4px 0;
+  font-size: var(--fs-caption);
+  color: var(--t3);
+}

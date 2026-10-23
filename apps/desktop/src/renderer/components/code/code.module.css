@@ -1,0 +1,126 @@
+/* THE EDITOR ARC Phase E (D-e11, FR-e14): THE CODE TAB — rail + bar + the CM6 host.
+   Tokens only, MONOCHROME; the editor's own theme rides the same vars (cmSetup). */
+
+.code {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+}
+
+.rail {
+  flex: none;
+  width: 220px;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--s3);
+  background: var(--side);
+  border-right: 1px solid var(--border);
+}
+
+.railTitle {
+  font-family: var(--sans);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--t3);
+  padding: var(--s2) var(--s2) var(--s1);
+}
+
+.railRow {
+  border: 0;
+  background: transparent;
+  text-align: left;
+  font: 12px var(--mono);
+  color: var(--t2);
+  padding: 4px var(--s2);
+  border-radius: var(--r1);
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.railRow:hover { background: var(--panel); color: var(--t1); }
+.railRowOn { background: var(--panel2); color: var(--t0); }
+
+.railInput {
+  margin: var(--s1) var(--s2);
+  border: 1px solid var(--border);
+  border-radius: var(--r1);
+  background: var(--panel);
+  color: var(--t0);
+  font: 11.5px var(--mono);
+  padding: 4px 8px;
+  min-width: 0;
+}
+
+.main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.bar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: var(--s3);
+  padding: var(--s2) var(--s3);
+  border-bottom: 1px solid var(--border);
+}
+
+.crumbBtn {
+  border: 0;
+  background: transparent;
+  color: var(--t2);
+  font-size: var(--fs-caption);
+  cursor: pointer;
+}
+
+.crumbBtn:hover { color: var(--t0); }
+
+.subject {
+  min-width: 0;
+  flex: 1;
+  font: 11.5px var(--mono);
+  color: var(--t2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.barTools {
+  display: flex;
+  gap: var(--s2);
+}
+
+.barBtn {
+  border: 1px solid var(--border);
+  border-radius: var(--r1);
+  background: var(--panel);
+  color: var(--t1);
+  font-size: var(--fs-caption);
+  padding: 3px 10px;
+  cursor: pointer;
+}
+
+.barBtn:hover:not(:disabled) { border-color: var(--border2); color: var(--t0); }
+.barBtn:disabled { opacity: 0.5; cursor: default; }
+
+.note {
+  flex: none;
+  padding: var(--s1) var(--s3);
+  color: var(--t3);
+  font-size: var(--fs-caption);
+}
+
+.editorHost {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}

@@ -1,0 +1,104 @@
+/* The onboarding gate: the app's only surface until it opens. One centered
+   surface card on the ground; inputs are sunken wells, the one verb is gold. */
+
+.wrap {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--ground);
+  -webkit-app-region: drag;
+}
+
+.card {
+  width: min(420px, calc(100vw - 32px));
+  display: flex;
+  flex-direction: column;
+  gap: var(--s4);
+  padding: var(--s6);
+  border-radius: var(--r3);
+  background: var(--surface);
+  -webkit-app-region: no-drag;
+}
+
+.brand {
+  font: 600 var(--fs-heading) var(--sans);
+  color: var(--t0);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s3);
+}
+
+.title {
+  font: 600 var(--fs-title) var(--sans);
+  color: var(--t1);
+}
+
+.quiet {
+  font: 400 var(--fs-small) var(--sans);
+  color: var(--t3);
+  line-height: 1.5;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s1);
+}
+
+.label {
+  font: 400 var(--fs-small) var(--sans);
+  color: var(--t2);
+}
+
+.input {
+  height: 36px;
+  padding: 0 var(--s3);
+  background: var(--well);
+  border: 0;
+  border-radius: var(--r1);
+  color: var(--t1);
+  font: 400 var(--fs-body) var(--sans);
+  outline: none;
+}
+
+.input:focus {
+  outline: 2px solid var(--live);
+  outline-offset: -2px;
+}
+
+.error {
+  font: 400 var(--fs-small) var(--sans);
+  color: var(--red);
+  line-height: 1.5;
+}
+
+.primary {
+  align-self: flex-start;
+  height: 36px;
+  padding: 0 var(--s4);
+  border: 0;
+  border-radius: 999px;
+  background: var(--live);
+  color: var(--ground);
+  font: 500 var(--fs-small) var(--sans);
+  cursor: pointer;
+}
+
+.primary:hover:not(:disabled) {
+  filter: brightness(1.08);
+}
+
+.primary:focus-visible {
+  outline: 2px solid var(--live);
+  outline-offset: 2px;
+}
+
+.primary:disabled {
+  opacity: 0.6;
+  cursor: default;
+}

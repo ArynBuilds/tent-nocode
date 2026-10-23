@@ -1,0 +1,30 @@
+{
+  "name": "@tent-nocode/kernel",
+  "version": "0.0.1",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@iconify-json/flowbite": "^1.2.7",
+    "@iconify-json/heroicons": "^1.2.3",
+    "@iconify-json/logos": "^1.2.12",
+    "@iconify-json/mage": "^1.2.4",
+    "@iconify-json/material-symbols": "^1.2.88",
+    "@iconify-json/meteor-icons": "^1.2.5",
+    "@iconify-json/nonicons": "^1.2.2",
+    "@iconify-json/ph": "^1.2.2",
+    "@iconify-json/si": "^1.2.17",
+    "@tent-nocode/core": "*",
+    "basicons": "^1.0.3",
+    "feather-icons": "^4.29.2",
+    "lucide": "^1.31.0",
+    "postgres": "^3.4.4",
+    "simple-git": "^3.27.0",
+    "zod": "^3.23.8",
+    "zod-to-json-schema": "^3.25.2"
+  },
+  "devDependencies": {
+    "@types/feather-icons": "^4.29.4"
+  }
+}

@@ -1,0 +1,92 @@
+/*
+ * Tier 52 Phase 3 (spec §1 geometry, D-198): THE BOTTOM PANEL's geometry. Docked mode is
+ * pure grid — `grid-area: bottom` fills the middle column's third row (shell.module.css),
+ * so the panel can NEVER overlap the left rail or the right panel: the grid owns the
+ * walls (the T30 never-overlap law). position:fixed is banned here except the TWO
+ * sanctioned cases the side panel already ratified: the narrow-mode overlay and the
+ * resize drag veil. Tokens only.
+ */
+
+.bottom {
+  grid-area: bottom;
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  border-top: 1px solid var(--border);
+  background: var(--bg);
+  overflow: hidden;
+  transition: border-top-color 200ms ease-out;
+}
+
+.bottomShut {
+  border-top-color: transparent;
+}
+
+/* Clip-not-reflow, rotated 90°: content keeps the OPEN track's height and anchors to the
+   BOTTOM (the window-stationary edge) — the collapsing row's top edge clips it, text never
+   rewraps mid-animation. --bottomH stays in lockstep with the .appBottom grid row. */
+.bottomInner {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: var(--bottomH, 280px);
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.bottomOverlay .bottomInner {
+  height: 100%;
+}
+
+/* Narrow-window overlay (mirrors the side panel exactly, rotated): fixed panel sliding UP
+   from the bottom over the shared blurred scrim; the one sanctioned shadow case. */
+.bottomOverlay {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: min(45vh, 420px);
+  z-index: 60;
+  border-top: 1px solid var(--border);
+  box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.35);
+  animation: bottomIn 200ms ease-out;
+}
+
+@keyframes bottomIn {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bottomOverlay {
+    animation: none;
+  }
+}
+
+/* The resize handle: a 6px grab strip on the panel's TOP edge — the side panel's divider,
+   rotated. Drag to trade height with the stage; double-click resets. */
+.dragHandleH {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  cursor: row-resize;
+  z-index: 30;
+}
+
+.dragHandleH:hover,
+.dragHandleHActive {
+  background: rgba(236, 236, 236, 0.08);
+}
+
+/* While dragging: the full-window transparent veil so the pointer never drops into a
+   webview/iframe (the side panel's exact fix, row cursor). */
+.resizeVeilH {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  cursor: row-resize;
+}

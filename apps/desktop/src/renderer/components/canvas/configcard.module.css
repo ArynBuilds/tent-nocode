@@ -1,0 +1,104 @@
+/* THE CONFIG CARD (node-side bugfix arc, ratified on the 2026-08-21 mockup):
+   one floating card per node - name row, param rows (label left, well right),
+   the strip, the verb footer. Floating chrome = --float + the one soft shadow. */
+
+.card {
+  position: fixed;
+  z-index: 60;
+  width: 288px;
+  background: var(--float);
+  border-radius: var(--r2);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .4);
+  overflow: hidden;
+  font-size: 13px;
+  color: var(--t1);
+}
+
+.head { display: flex; align-items: center; gap: 8px; padding: 11px 12px 8px 14px; }
+.headIcon { display: flex; color: var(--t1); }
+.name { font-size: 13.5px; font-weight: 600; color: var(--t0); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.close {
+  margin-left: auto; border: 0; background: none; cursor: pointer;
+  color: var(--t2); font-size: 14px; line-height: 1; padding: 3px 6px; border-radius: 7px;
+  font-family: inherit;
+}
+.close:hover { background: var(--raised); color: var(--t0); }
+
+.body { padding: 3px 14px 12px; display: flex; flex-direction: column; gap: 8px; }
+.row { display: flex; align-items: center; gap: 9px; min-height: 28px; }
+.lbl { flex: 0 0 68px; color: var(--t1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lblFree { flex: 1 1 auto; color: var(--t1); }
+
+.well {
+  flex: 1; display: flex; align-items: center; gap: 7px; height: 30px; min-width: 0;
+  background: var(--well); border: 0; border-radius: var(--r1); padding: 0 10px;
+  color: var(--t0); font-size: 13px; font-family: var(--sans); text-align: left;
+}
+.well:focus-visible, .select:focus-visible { outline: 2px solid var(--live); outline-offset: 1px; }
+.wellNum { flex: 0 0 78px; font-variant-numeric: tabular-nums; }
+.select {
+  flex: 1; height: 30px; min-width: 0;
+  background: var(--well); border: 0; border-radius: var(--r1); padding: 0 8px;
+  color: var(--t0); font-size: 13px; font-family: var(--sans);
+}
+.selectSlim { flex: 1; }
+
+.add {
+  flex: 1; height: 30px; display: flex; align-items: center; gap: 8px;
+  background: var(--well); border: 0; border-radius: var(--r1); padding: 0 6px;
+  color: var(--t2); font-size: 13px; font-family: var(--sans); cursor: pointer;
+}
+.add:hover { color: var(--t1); }
+.addChip {
+  width: 20px; height: 20px; border-radius: 6px; background: var(--raised);
+  display: flex; align-items: center; justify-content: center; flex: none; color: var(--t1);
+}
+
+.pill {
+  display: inline-flex; align-items: center; height: 24px; padding: 0 9px; flex: none;
+  background: color-mix(in srgb, var(--live) 13%, transparent); color: var(--live);
+  font-family: var(--mono); font-size: 11px; border-radius: 999px;
+  border: 0; cursor: pointer; max-width: 96px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+}
+.pillSelect {
+  height: 24px; flex: none; max-width: 104px;
+  background: color-mix(in srgb, var(--live) 13%, transparent); color: var(--live);
+  font-family: var(--mono); font-size: 11px; border-radius: 999px;
+  border: 0; padding: 0 8px;
+}
+.ruleX {
+  border: 0; background: none; color: var(--t2); cursor: pointer; padding: 2px 4px;
+  border-radius: 6px; font-size: 12px; line-height: 1; flex: none; font-family: inherit;
+}
+.ruleX:hover { color: var(--t0); background: var(--raised); }
+
+.strip { border-top: 1px solid var(--hairline); padding: 9px 14px 11px; }
+.stripHead { color: var(--t1); font-size: 12px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.sample {
+  margin-top: 8px; font-family: var(--mono); font-size: 10.5px; color: var(--t2);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+.foot { border-top: 1px solid var(--hairline); padding: 10px 14px; display: flex; align-items: center; gap: 10px; }
+.verb {
+  height: 28px; padding: 0 14px; border-radius: 999px; border: 0; cursor: pointer;
+  background: var(--raised); color: var(--t1); font-size: 13px; font-weight: 500; font-family: var(--sans);
+  transition: background 120ms ease-out;
+}
+.verb:hover { background: color-mix(in srgb, var(--raised) 82%, white 6%); }
+.verbGold { background: var(--live); color: var(--ground); }
+.verbGold:hover { background: var(--live); filter: brightness(1.06); }
+.verbGold:disabled { opacity: .45; cursor: default; }
+.verbQuiet {
+  border: 0; background: none; color: var(--t2); font-size: 13px; font-family: var(--sans);
+  cursor: pointer; padding: 4px 7px; border-radius: 7px;
+}
+.verbQuiet:hover { color: var(--t0); background: var(--raised); }
+.lastWord { margin-left: auto; font-size: 11.5px; color: var(--green); font-variant-numeric: tabular-nums; }
+
+/* The fire line - status as words, never ornament. */
+.fireLine { display: flex; align-items: center; gap: 6px; min-height: 24px; font-size: 12.5px; }
+.fireNews { color: var(--green); font-weight: 500; }
+.firePaused { color: var(--amber); font-weight: 500; }
+.fireQuiet { color: var(--t1); }

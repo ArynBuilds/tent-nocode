@@ -1,0 +1,85 @@
+# electron-builder config (Task 21; Phase 1-A rework). Produces the Tent NoCode Windows NSIS installer.
+# The renderer/preload/main are built by `electron-vite build` (npm run package runs both).
+# extraResources and the resolver inventory (src/main/resources.ts) list the same rows - edit them together.
+appId: com.tentnocode.desktop
+productName: Tent NoCode
+# Pinned explicitly: `electron` is a caret range in package.json and hoists to the monorepo root
+# node_modules, so electron-builder can't auto-detect the version from apps/desktop.
+# (electron-userland/electron-builder#3984). Keep in sync with the installed electron.
+electronVersion: 33.4.11
+
+directories:
+  output: release
+  buildResources: build
+
+# electron-vite emits the app into out/; the workspace packages (@tent-nocode/core|kernel|runner) are
+# bundled into out/main by electron-vite, so only the external native deps (postgres,
+# embedded-postgres + its platform binaries) travel as real node_modules.
+files:
+  - out/**
+  - package.json
+  - "!**/*.map"
+  # The @tent-nocode/* workspace packages are symlinked into node_modules (→ ../../packages/*, outside
+  # this app dir) AND are already bundled into out/main by electron-vite — exclude them so asar
+  # packing doesn't try to follow the symlink outside apps/desktop (app-builder "must be under" error).
+  - "!node_modules/@tent-nocode/**"
+
+# embedded-postgres chmods its binaries by their in-archive path; Electron redirects spawn out of
+# asar but not chmod, so asar stays off and the binaries ship as loose files.
+asar: false
+
+extraResources:
+  # Tier 9 (FR-153): the tab:// protocol serves the bundled fonts to caged tab documents.
+  - from: "src/renderer/fonts"
+    to: "fonts"
+    filter:
+      - "**/*.woff2"
+  # T42/T46 riders (the deadline packaging attempt, 2026-07-25): the sealed runtime's
+  # vendored closure + the ONNX runtime + the tab engines travel as resources. NOTE:
+  # the packaged-path seams (loaders resolving process.resourcesPath when
+  # app.isPackaged) are verified at the packaged first-boot smoke — shipping the bytes
+  # is the necessary half.
+  - from: "resources/pyodide"
+    to: "pyodide"
+  - from: "resources/onnx"
+    to: "onnx"
+  - from: "resources/engines"
+    to: "engines"
+  # Phase 1-A (FR-489): the two rows whose absence left the sealed executor DEAD and the
+  # window icon defaulted in the 2026-07-25 packaged build.
+  - from: "../../packages/runner/src/ops/opsWorker.cjs"
+    to: "opsWorker.cjs"
+  - from: "resources/icon.png"
+    to: "icon.png"
+  # The local server migrates both databases at every boot.
+  - from: "../../packages/room-server/migrations"
+    to: "rooms-migrations"
+  - from: "../../packages/kernel/migrations"
+    to: "workspace-migrations"
+
+win:
+  target:
+    - nsis
+  icon: build/icon.ico
+
+# The .tproject association registers at install (per-user HKCU).
+fileAssociations:
+  - ext: tproject
+    name: Tent NoCode project
+    description: Tent NoCode project
+    icon: build/tproject.ico
+
+nsis:
+  # D10.1 THE ZERO-QUESTION INSTALLER (the Roblox trick, ours): per-user +
+  # one-click = no UAC, no wizard, nothing to ask. THE DEATH: the directory
+  # chooser died with its config line (the wizard is GENERATED from these
+  # lines and dies by their flip alone).
+  oneClick: true
+  perMachine: false
+  # The versioned artifact name.
+  artifactName: Tent NoCode-Setup-${version}.${ext}
+  # Phase 1-B (FR-491, D-216.2): DATA SURVIVES EVERYTHING — explicit, never implied.
+  # The uninstaller is data-blind by law; userData outlives every uninstall/reinstall.
+  deleteAppDataOnUninstall: false
+  # The uninstall honesty sentence.
+  include: build/installer.nsh

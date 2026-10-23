@@ -1,0 +1,28 @@
+export { EMBEDDING_DIM } from './ids.js';
+export type { OrgId, AgentId, JobId, RunId } from './ids.js';
+export * from './genome.js';
+export * from './execution.js';
+export * from './models.js';
+export * from './graph.js';
+export * from './orchestration.js';
+export * from './releaseEngine.js';
+export * from './workspace.js';
+export * from './workspaceWire.js';
+export * from './tabs.js';
+export * from './scene.js';
+// THE CONTRACT: the five primitives, the shared groups, the instance model, the element class.
+export * from './primitives.js';
+export * from './sceneContracts.js';
+export * from './flows.js';
+export * from './datasetQuery.js';
+export * from './arrayDescriptor.js';
+export * from './arrayStats.js';
+export * from './expr.js';
+export * from './exprFixtures.js';
+export * from './sceneFold.js';
+export * from './sceneSeed.js';
+export * from './lsgPackage.js';
+export * from './sceneOrder.js';
+export * from './wiring.js';
+export * from './nodeContract.js';
+export * from './importFormats.js';

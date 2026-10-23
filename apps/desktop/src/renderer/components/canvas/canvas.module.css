@@ -1,0 +1,895 @@
+/* THE EDITOR ARC Phase B (D-e3, FR-e4): THE ONE CANVAS — the obs* grammar moved here
+   whole (values byte-identical; names de-scoped from the Observatory since the engine now
+   serves every depth: Observatory, editor, entered nodes). Tokens only, MONOCHROME. */
+
+.wrap {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.empty {
+  padding: 16px;
+  color: var(--t3);
+  font-size: 12px;
+}
+
+.scroll {
+  position: relative; /* the chrome overlay's coordinate box (screen px) */
+  flex: 1;
+  min-height: 0;
+  /* 2026-07-28 (user-ruled: ENTIRELY FREE movement): the camera is a transform, not a
+     scroll — overflow hides the finite canvas; pan is unbounded in every direction. */
+  overflow: hidden;
+  /* THE CURSOR NEVER LIES (user amendment 2026-07-31): the DEFAULT ARROW at rest —
+     a hand would promise left-drag panning that doesn't exist (pan is middle-drag). */
+  cursor: default;
+  /* THE WORLD-LOCKED GRID (user-ruled 2026-08-18 on the reference screenshots):
+     CLEARLY VISIBLE dots that ride the camera — the engine sets the phase
+     (background-position = the camera offset), the adaptive spacing, and the
+     dot radius (--dotr) per zoom. The color derives from --t3 so BOTH themes
+     carry it (the token flips in lockstep — never a hardcoded gray again). */
+  background-image: radial-gradient(circle, color-mix(in srgb, var(--t3) 42%, transparent) var(--dotr, 1.3px), transparent var(--dotr, 1.3px));
+  background-size: 18px 18px;
+}
+
+/* `grabbing` while a gesture runs = chrome.module.css .scrollGrabbing (one concern,
+   one file — the AFFORDANCE chrome grammar lives there whole). */
+
+/* PROJECT FOCUS (2026-08-01): the cluster frame boxes died with the org-root Map —
+   one project per canvas needs no frame around itself. */
+
+/* FR-467: the breadcrumb — quiet chrome floating top-left over the entered canvas. */
+.crumb {
+  position: absolute;
+  top: 8px;
+  left: 10px;
+  z-index: 6;
+  border: 1px solid var(--border);
+  border-radius: var(--r1);
+  background: var(--panel);
+  color: var(--t1);
+  font: 11.5px var(--sans);
+  padding: 3px 10px;
+  cursor: pointer;
+}
+
+.crumb:hover {
+  background: var(--panel2);
+  color: var(--t0);
+}
+
+/* PROJECT FOCUS: the bench crumb STARTS at the project — a label, not a way up.
+   THE CURSOR NEVER LIES: no pointer, no hover shift on the still crumb. */
+.crumb.crumbStill,
+.crumb.crumbStill:hover {
+  cursor: default;
+  background: var(--panel);
+  color: var(--t1);
+}
+
+/* THE RE-HOUSING R0: the code-only anatomy drawer DIED — code opens the Code tab (one
+   home); properties open the Inspector (R2, where the anatomy CANVAS died too — the
+   ContractForm's body absorbed the read; .lineMono left with it). */
+
+.canvas {
+  position: relative;
+}
+
+.edges {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  /* THE FREE CANVAS (2026-08-18): wires reach into negative space — the svg
+     viewport never clips a path whose ends live left/above the origin. */
+  overflow: visible;
+}
+
+.edge {
+  fill: none;
+  stroke-width: 1.4;
+  opacity: 0.38;
+  pointer-events: stroke;
+  transition: opacity 150ms ease-out;
+}
+
+.edge:hover { opacity: 0.85; }
+
+.edgeLive {
+  fill: none;
+  stroke-width: 1.8;
+  opacity: 0.85;
+  pointer-events: stroke;
+  stroke-dasharray: 6 5;
+  animation: canvasFlow 0.9s linear infinite;
+}
+
+@keyframes canvasFlow {
+  to { stroke-dashoffset: -11; }
+}
+
+/* THE NODE TILE (N1/N2, user-ruled 2026-08-18 on the ratified sheet
+   references/2026-08-18-node-tile-mockup.html): ONE 112x112 body for every unit —
+   the glyph in the upper zone, the words INSIDE at the bottom. Depth by surface:
+   --raised on the ground, NO border; hover = one surface step (--float). */
+.node {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  padding: 10px 12px;
+  background: var(--raised);
+  border: none;
+  border-radius: var(--r2);
+  box-shadow: var(--lift);
+  overflow: visible;
+  transition: background 120ms ease-out;
+  /* Canvas text is chrome, never copy (user-ruled 2026-08-18): a drag or a
+     double-click must never mark a node's words — inherits to every child
+     (name · subtitle · grow rows · sockets · badges · the fold card). */
+  user-select: none;
+}
+
+.node:hover {
+  background: var(--float);
+}
+
+/* N5: liveness — the GLYPH breathes; the blink dot died into it. */
+.nodeActive .tileIcon svg {
+  animation: canvasBreathe 1.4s ease-in-out infinite;
+}
+
+@keyframes canvasBreathe {
+  0%, 100% { opacity: 0.55; }
+  50% { opacity: 1; }
+}
+
+/* ⑦: the selected card's chrome renders in the UNSCALED overlay (the one
+   SelectionChrome); the card itself carries NO selected state (one owner). */
+
+.tileIcon {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--t1);
+}
+
+.tileWords {
+  flex: none;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.tileName {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--t1);
+  line-height: 1.25;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* N2: the subtitle — the config's own words, one quiet line; absent when no real
+   fact exists (never a kind word, never a warning triangle, never red). */
+.tileSub {
+  font-family: var(--sans);
+  font-size: 11.5px;
+  color: var(--t3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* N6 LIVING FACES: the record's own truth in the icon zone — the Table's ghost
+   grid (shape only, first row a step brighter — the header's whisper) and the
+   Result's one number (tabular, the display-number law). */
+.ghostGrid {
+  width: 56px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.ghostRow {
+  display: flex;
+  gap: 3px;
+}
+
+.ghostRow:first-child .ghostCell { background: var(--series-3); }
+
+.ghostCell {
+  flex: 1;
+  height: 5px;
+  border-radius: 2px;
+  background: var(--series-5);
+}
+
+.tileValue {
+  font-size: 22px;
+  font-weight: 500;
+  color: var(--t1);
+  font-variant-numeric: tabular-nums;
+}
+
+/* N4 THE START CAP (the ratified save): the trigger's tile stays square; the
+   rounded tab docks OUTSIDE the left edge — text can never clip. Pointer-dead so
+   the drag stays the card's; it hover-steps with the tile (one body). */
+.startCap {
+  position: absolute;
+  left: -13px;
+  top: 50%;
+  margin-top: -20px;
+  width: 26px;
+  height: 40px;
+  border-radius: 20px 0 0 20px;
+  background: var(--raised);
+  transition: background 120ms ease-out;
+  pointer-events: none;
+}
+
+.node:hover .startCap { background: var(--float); }
+
+.startCap::after {
+  content: '';
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  margin-top: -3.5px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--t3);
+}
+
+/* N8 THE GHOST SOCKET: absence as the affordance — a required-but-unfed field
+   waits as a dashed pill on the tile's left edge, ITSELF the drop target for
+   exactly that field. Quiet --t3, never a warning; pointer-events stay auto so
+   elementsFromPoint finds it (pointerdown bubbles — the drag stays the card's). */
+.tileSocket {
+  position: absolute;
+  left: -7px;
+  padding: 1.5px 8px 1.5px 9px;
+  border: 1px dashed var(--t3);
+  border-radius: 999px;
+  background: var(--ground);
+  font-family: var(--sans);
+  font-size: 10.5px;
+  color: var(--t3);
+  white-space: nowrap;
+  z-index: 2;
+}
+
+/* N9's click-to-config half DIED 2026-08-18 (user-ruled: the ⋯ door already
+   carries properties one click away — a second door was dupe machinery and it
+   ate the drag). The .tileSubDoor dress left with it, grep-zero. */
+
+/* N7 SEMANTIC ZOOM: FAR collapses the tile to its glyph (words hidden — the
+   subway map); CLOSE grows the face in place — the canvas footprint stays 112,
+   the grown rows overflow below on the raised surface, z-lifted. */
+.nodeFar .tileIcon svg { width: 34px; height: 34px; }
+.nodeClose { z-index: 4; }
+
+.tileGrow {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin-top: -2px;
+  padding: 7px 12px 9px;
+  background: var(--raised);
+  border-radius: 0 0 var(--r2) var(--r2);
+  box-shadow: var(--lift);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  border-top: 1px solid var(--hairline);
+}
+
+.node:hover .tileGrow { background: var(--float); }
+
+.growRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  min-width: 0;
+}
+
+.growK {
+  font-family: var(--sans);
+  font-size: 11px;
+  color: var(--t3);
+  flex: none;
+}
+
+.growV {
+  font-family: var(--mono, monospace);
+  font-size: 10.5px;
+  color: var(--t2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* N11: the badge-as-door keeps the badge's exact dress; the cursor tells the
+   truth (two classes outrank the base badge's pointer-events: none). */
+.runBadge.runBadgeDoor {
+  border: 0;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+/* N1's UNTOUCHED clause (user-ruled: "folded app stays the same"): the folded
+   app/website group keeps the standing 196x140 preview-card dress, byte-shaped —
+   the row layout, the panel surface, the bordered card, the hover lift. */
+.nodeFold {
+  flex-direction: row;
+  align-items: center;
+  gap: 9px;
+  padding: 0 10px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  transition: border-color 130ms ease-out, box-shadow 130ms ease-out, transform 130ms ease-out;
+}
+
+.nodeFold:hover {
+  background: var(--panel);
+  border-color: var(--border2);
+  box-shadow: 0 3px 14px rgba(0, 0, 0, 0.32);
+  transform: translateY(-1px);
+}
+
+.nodeFold.nodeActive { border-color: var(--border2); }
+
+/* The folded card's title row keeps its word (the faceLiveTitle's label). */
+.nodeLabel {
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--t0);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ---- F20 THE RUN SURFACE --------------------------------------------------------- */
+
+/* The run badge — ONE corner word per step, DOCKED INSIDE the tile (N5): red = the
+   failing step of the last run, green = it ran (its out count, tabular numbers). */
+.runBadge {
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  min-width: 15px;
+  height: 15px;
+  padding: 0 4px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--sans);
+  font-size: var(--fs-caption);
+  font-variant-numeric: tabular-nums;
+  color: var(--ground);
+  pointer-events: none;
+}
+
+.runBadgeError {
+  background: var(--red);
+}
+
+.runBadgeOk {
+  background: var(--green);
+}
+
+/* F21: the pin wears the interaction hue; dirt wears the ambiguous amber. */
+.runBadgePinned {
+  background: var(--live);
+}
+
+.runBadgeDirty {
+  background: var(--amber);
+}
+
+/* The step wire's quiet item-count word at the wire midpoint (--t3, caption size). */
+.wireCount {
+  fill: var(--t3);
+  font-family: var(--sans);
+  font-size: var(--fs-caption);
+  pointer-events: none;
+  user-select: none;
+}
+
+/* The marquee (engine grammar; Phase D drives it on the editor). */
+.marquee {
+  position: absolute;
+  border: 1px solid var(--t2);
+  background: color-mix(in srgb, var(--t2) 8%, transparent);
+  pointer-events: none;
+}
+
+/* THE FOLD RULING (2026-08-19): the open-group border frame died whole —
+   unfolding is ungrouping; no group chrome renders on the canvas. */
+
+/* P2 THE CANVAS DOCUMENT'S LAYER: the loose elements' ground - pinned at the
+   world origin under the cards, pointer-dead, transparent (elements paint,
+   the void stays the void). */
+.canvasDocLayer {
+  position: absolute;
+  left: 0;
+  top: 0;
+  pointer-events: none;
+  overflow: visible;
+  z-index: 0;
+  --sk: var(--cz, 1); /* the one selection chrome's constant-px divisor */
+}
+
+/* THE SOLO MOUNTS (the cage fix): each loose element's own small frame, placed
+   at its stored world position - the mount and everything inside it fills the
+   wrapper. THE GLASS (fix round 2) stands: the host-side iframe element paints
+   the scene-ground token (--bg) by default - inside THIS layer it clears. */
+.looseMount { position: absolute; pointer-events: none; }
+.looseMount > div { width: 100%; height: 100%; background: transparent; }
+.canvasDocLayer iframe { background: transparent !important; }
+
+/* THE LOOSE HAND (fix 2026-08-19): host-side hit rects over the glass mount -
+   the iframe stays dead; select mode's clicks and drags land here. */
+.looseHit {
+  position: absolute;
+  pointer-events: auto;
+  background: transparent;
+}
+
+/* UNIVERSAL HOVER (Figma idiom, user-ruled 2026-08-19): the bare --live
+   outline, constant screen px. Screens light from their NAME alone - the body
+   belongs to the elements inside. */
+.node:not(.nodeNatural):hover { outline: calc(2px / var(--cz, 1)) solid var(--live); }
+.nodeNatural:has([data-frame-name]:hover) { outline: calc(2px / var(--cz, 1)) solid var(--live); }
+.looseHit:hover { outline: calc(2px / var(--cz, 1)) solid var(--live); }
+
+/* P2 THE CREATE MODE: the drawn thing's coming box (dashed, quiet). */
+.createGhost {
+  position: absolute;
+  border: 1px dashed var(--t2);
+  background: color-mix(in srgb, var(--t2) 6%, transparent);
+  pointer-events: none;
+}
+
+/* P2 THE MODE STRIP (the Stitch structure, our dress): the right-edge vertical
+   toolbar — floating chrome surface, constant screen size, never clipped. */
+.modeStrip {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 4px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+  z-index: 9;
+}
+
+.modeBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--t2);
+  cursor: pointer;
+}
+
+.modeBtn:hover { background: var(--panel2); color: var(--t1); }
+
+.modeBtnOn {
+  background: var(--accent);
+  color: var(--bg);
+}
+
+.modeBtnOn:hover { background: var(--accent); color: var(--bg); }
+
+@media (prefers-reduced-motion: reduce) {
+  .edgeLive { animation: none; }
+  .nodeActive .tileIcon svg { animation: none; }
+  .node { transition: none; }
+}
+
+/* Phase C (FR-e7): the in-flight wire + the quiet drop refusal. */
+.wireDrag {
+  fill: none;
+  stroke: var(--live);
+  stroke-width: 1.8;
+  stroke-dasharray: 5 4;
+  opacity: 0.9;
+  /* constant screen-px at any zoom - the aim line must always be visible */
+  vector-effect: non-scaling-stroke;
+}
+
+.dropRefusal {
+  position: absolute;
+  z-index: 8;
+  max-width: 300px;
+  padding: var(--s2) var(--s3);
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--r1);
+  color: var(--t2);
+  font-size: var(--fs-small);
+  line-height: 1.45;
+  pointer-events: none;
+}
+
+/* ---- THE AFFORDANCE LAW (2026-07-31) ---------------------------------------------- */
+/* The unscaled interaction chrome (overlay · port dots · port + · the ㊻ selection-
+   pinned action toolbar · the grabbing state) lives WHOLE in chrome.module.css —
+   one concern, one file. */
+
+/* ---- THE RE-HOUSING R2 ---------------------------------------------------------- */
+
+/* Wire kinds by line style (§1.4): solid = data · dashed = watch/trigger · dotted =
+   permission · arrowed solid = flow. The word is the signal on hover; style is texture. */
+.edgeWatch { stroke-dasharray: 6 5; }
+.edgePermission { stroke-dasharray: 1.5 4; stroke-linecap: round; }
+.edgeFlow { stroke-width: 1.7; opacity: 0.6; marker-end: url(#wireArrow); }
+
+/* Hit ≫ visual: the wide invisible hit lane — a wire is touchable, never a pixel hunt.
+   Click = SELECT (the Inspector speaks the sentence); the toolbar carries +/×. */
+.edgeHit {
+  fill: none;
+  stroke: transparent;
+  stroke-width: 24;
+  pointer-events: stroke;
+}
+
+/* SELECT-TO-FOCUS (the Unreal trick): outside the neighborhood dims, never hides. */
+.nodeDim { opacity: 0.32; }
+
+/* A wire in flight lights its LEGAL landing spots (contract-read). N1: the tile is
+   borderless — the light is an outline (the fold card and the natural frame ride
+   their own arms). */
+.nodeWireTarget { outline: 1px solid var(--t2); }
+
+/* THE LIVE-FRAME FACE (ruling 1): a real scaled SceneScreen mount — the render is the
+   face; pointer-events dead so the card keeps every gesture. */
+.faceLive {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  width: 100%;
+  padding: 5px 0;
+}
+
+.faceLiveTitle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.faceLiveFrame {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--r1);
+  background: var(--panel2);
+  pointer-events: none;
+}
+
+.faceLiveScale {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+  transform-origin: 0 0;
+}
+
+.faceLiveScale > * { width: 100%; height: 100%; }
+
+/* ---- THE FULL-FRAME RULING (2026-07-31) ------------------------------------------ */
+
+/* The natural (whole-page) frame sheds the card cage: NO panel, NO radius, NO hover
+   lift — a 1px quiet hairline (an OUTLINE, so the content box stays exactly the design
+   width) + the name label above (.frameName). ⑦: its selection outline renders in the
+   chrome overlay, SQUARE (the frame's own rendered radius IS 0). overflow visible so
+   the label above and the edge ports live; the CONTENT clips inside .frameBody. */
+.nodeNatural {
+  display: block;
+  padding: 0;
+  background: var(--bg);
+  border: none;
+  border-radius: 0;
+  overflow: visible;
+  /* Editor-only artboard chrome (user-ruled walk fix): a hairline edge + one soft shadow so the
+     surface reads against the ground at any zoom (constant screen px). Never stored, never
+     published - the composed page draws none of this. */
+  outline: calc(1px / var(--cz, 1)) solid var(--hairline);
+  box-shadow: 0 calc(4px / var(--cz, 1)) calc(20px / var(--cz, 1)) rgba(0, 0, 0, 0.3);
+}
+
+.nodeNatural:hover {
+  box-shadow: 0 calc(4px / var(--cz, 1)) calc(20px / var(--cz, 1)) rgba(0, 0, 0, 0.3);
+  transform: none;
+}
+
+.nodeNatural.nodeWireTarget { outline-color: var(--t2); }
+
+.frameNatural {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+
+/* The keyboard-reclaim target (fix 2026-08-07 ported): a surface, never a control. */
+.frameNatural:focus { outline: none; }
+
+.frameNameLive { color: var(--live); }
+
+
+/* The Figma frame-name idiom: small, quiet, above the frame - THE SCREEN'S OWN
+   HANDLE (user-ruled: body clicks belong to the elements inside). Constant
+   screen px at any zoom. */
+.frameName {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  margin-bottom: calc(6px / var(--cz, 1));
+  max-width: 100%;
+  font-family: var(--sans);
+  font-size: calc(12px / var(--cz, 1));
+  color: var(--t2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  pointer-events: auto;
+  cursor: default;
+}
+
+/* Unfocused element hit spans - hover lights the element (constant px). */
+.elHit { position: absolute; pointer-events: auto; background: transparent; }
+.elHit:hover { outline: calc(2px / var(--cz, 1) / var(--fs, 1)) solid var(--live); }
+
+/* The page itself — a live mount. THE FRESH FRAME (P1): the frame body is
+   ANCHORED, not stretched (position from the card's top-left, sized by the
+   design width + content height the face sets inline). At rest it is
+   pointer-dead — the card keeps every gesture; FOCUSED it goes pointer-live
+   and the measure shim's click lanes drive element selection. */
+/* The miniature (user-ruled 2026-08-19): the card box holds a frame-unit inner
+   scaled by --fs; chrome inside counter-divides to stay constant-px. */
+/* The inline scale(k) rides this span - origin 0 0 or the face drifts to center. */
+.frameScale { position: absolute; inset: 0; display: block; overflow: visible; transform-origin: 0 0; }
+.frameScaleInner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+  transform: scale(var(--fs, 1));
+  transform-origin: 0 0;
+}
+
+.frameBody {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+  overflow: hidden;
+}
+
+.frameBodyRest { pointer-events: none; }
+
+.frameBodyLive { pointer-events: auto; }
+
+.frameBody > * { width: 100%; height: 100%; }
+
+/* ---- THE RE-HOUSING R3 (§1.5) ---------------------------------------------------- */
+
+/* 8c-a: element PORT DOTS on a focused frame — pointer-live inside the pointer-dead
+   face (the dot is the hands; the render stays the face). G3b CONSTANT-SIZE RETROFIT:
+   these live inside the camera-scaled layer, so every dimension divides by --cz — a
+   24px SCREEN hit over a 9px SCREEN dot at any zoom (the affordance grammar: rest as a
+   mid-gray whisper, hover full-bright + soft backplate disc). */
+.elPort,
+.elPortSrc {
+  position: absolute;
+  width: calc(24px / var(--cz, 1) / var(--fs, 1));
+  height: calc(24px / var(--cz, 1) / var(--fs, 1));
+  margin: calc(-12px / var(--cz, 1) / var(--fs, 1)) 0 0 calc(-12px / var(--cz, 1) / var(--fs, 1));
+  border-radius: 50%;
+  background: transparent;
+  border: 0;
+  pointer-events: auto;
+  cursor: crosshair;
+  opacity: 0.45;
+  z-index: 3;
+  transition: opacity 120ms ease;
+}
+
+.elPort::after,
+.elPortSrc::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: calc(9px / var(--cz, 1) / var(--fs, 1));
+  height: calc(9px / var(--cz, 1) / var(--fs, 1));
+  margin: calc(-4.5px / var(--cz, 1) / var(--fs, 1)) 0 0 calc(-4.5px / var(--cz, 1) / var(--fs, 1));
+  border-radius: 50%;
+  background: var(--panel);
+  border: calc(1px / var(--cz, 1) / var(--fs, 1)) solid var(--t2);
+}
+
+/* G3a (M2): the channel SOURCE port — the element SAYS something (solid data source). */
+.elPortSrc::after { background: var(--t2); }
+
+/* E3 (D-EX10, M-EX4): THE SCROLL PORT — the screen's ONE ambient source on the frame
+   edge; the same dot grammar with its quiet word beside it (the mock's `● scroll`). */
+.elPortScreen {
+  composes: elPortSrc;
+}
+
+.elPortScreenWord {
+  position: absolute;
+  left: calc(16px / var(--cz, 1));
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: calc(11px / var(--cz, 1));
+  color: var(--t3);
+  pointer-events: none;
+  user-select: none;
+}
+
+.elPortScreen:hover .elPortScreenWord { color: var(--t1); }
+
+.elPort:hover,
+.elPortSrc:hover {
+  opacity: 1;
+}
+
+.elPort:hover::after,
+.elPortSrc:hover::after {
+  background: #ececec;
+  border-color: #ececec;
+  box-shadow: 0 0 0 calc(6px / var(--cz, 1)) color-mix(in srgb, var(--panel) 80%, transparent);
+}
+
+/* G3a (M2): landed channel wires INSIDE the frame — solid data line element→element. */
+.chanOverlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* G3b: the stroke divides by --cz — a constant 1.5px SCREEN line at any zoom; the
+   pointer rides an invisible generous twin (.chanHit, ~14 screen px — hit ≫ visual). */
+.chanWire {
+  fill: none;
+  stroke: var(--t3);
+  stroke-width: calc(1.5px / var(--cz, 1));
+  pointer-events: none;
+}
+
+.chanWireNear { stroke: #ececec; }
+
+.chanHit {
+  fill: none;
+  stroke: transparent;
+  stroke-width: calc(14px / var(--cz, 1));
+  pointer-events: stroke;
+  cursor: pointer;
+}
+
+/* ㊽ (user-ruled 2026-08-05): COMPONENT SELECTION inside a focused natural frame —
+   the invisible click layer (pointerdown passes through: the frame still drags);
+   the selected outline rides the one SelectionChrome. */
+.elHit {
+  position: absolute;
+  background: transparent;
+  pointer-events: auto;
+  cursor: default;
+  z-index: 2;
+}
+
+/* The element wire in flight — SCREEN-space overlay (the drag-shield idiom): the line
+   follows the pointer above everything while the drag runs. */
+.elWireOverlay {
+  position: fixed;
+  inset: 0;
+  /* an SVG is a replaced element — inset alone leaves it at its intrinsic 300×150 */
+  width: 100%;
+  height: 100%;
+  z-index: 60;
+  pointer-events: none;
+}
+
+.elWireOverlay path {
+  fill: none;
+  stroke: var(--t2);
+  stroke-width: 1.6;
+  stroke-dasharray: 5 4;
+}
+
+/* B5 (spec 35): THE CORNER LEGEND - bottom-right whisper chrome, constant px (the
+   unscaled wrap), collapsible to the ? chip. Quiet by law: --t3, never a tutorial. */
+.legend {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 8px 22px 8px 10px;
+  background: color-mix(in srgb, var(--panel) 72%, transparent);
+  border: 1px solid var(--border2);
+  border-radius: var(--r1);
+}
+
+.legendLine {
+  color: var(--t3);
+  font-size: 10.5px;
+  line-height: 14px;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.legendHide {
+  position: absolute;
+  top: 2px;
+  right: 4px;
+  background: transparent;
+  border: 0;
+  padding: 2px;
+  color: var(--t3);
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.legendHide:hover { color: var(--t1); }
+
+.legendChip {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  z-index: 5;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--panel) 72%, transparent);
+  border: 1px solid var(--border2);
+  color: var(--t3);
+  font-size: 11px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.legendChip:hover { color: var(--t1); }
+
+/* B5 (spec 33): THE EMPTY CANVAS TEACHES ONCE - one centered whisper line, derived
+   from the graph (zero state); it dissolves forever at the first citizen. */
+.emptyTeach {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  color: var(--t3);
+  font-size: 12px;
+  letter-spacing: 0.02em;
+}

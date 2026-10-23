@@ -1,0 +1,151 @@
+[
+  {
+    "id": "hi",
+    "class": "answer",
+    "ask": "hi",
+    "expectedDoors": [],
+    "maxCalls": 0,
+    "maxTokens": 50000,
+    "checks": [
+      "sequence-matches",
+      "calls-under-max",
+      "tokens-under-budget",
+      "no-invalid-twice",
+      "no-wordless-thoughts",
+      "ends-with-report"
+    ]
+  },
+  {
+    "id": "coffee-shop-v1",
+    "class": "first-surface",
+    "ask": "make me a landing page for my coffee shop",
+    "expectedDoors": [
+      "brief",
+      "contract",
+      "edit"
+    ],
+    "maxCalls": 4,
+    "maxTokens": 140000,
+    "checks": [
+      "sequence-matches",
+      "calls-under-max",
+      "tokens-under-budget",
+      "no-invalid-twice",
+      "no-wordless-thoughts",
+      "ends-with-report"
+    ]
+  },
+  {
+    "id": "gold-button",
+    "class": "change",
+    "ask": "make the button gold",
+    "expectedDoors": [
+      "edit"
+    ],
+    "maxCalls": 2,
+    "maxTokens": 40000,
+    "checks": [
+      "sequence-matches",
+      "calls-under-max",
+      "tokens-under-budget",
+      "no-invalid-twice",
+      "no-wordless-thoughts",
+      "ends-with-report"
+    ]
+  },
+  {
+    "id": "lint-fix",
+    "class": "change",
+    "ask": "fix the small text",
+    "expectedDoors": [
+      "edit"
+    ],
+    "maxCalls": 2,
+    "maxTokens": 40000,
+    "checks": [
+      "sequence-matches",
+      "calls-under-max",
+      "tokens-under-budget",
+      "no-invalid-twice",
+      "no-wordless-thoughts",
+      "ends-with-report"
+    ]
+  },
+  {
+    "id": "chart-shows-nothing",
+    "class": "answer",
+    "ask": "the chart shows nothing",
+    "expectedDoors": [
+      "record",
+      "read"
+    ],
+    "maxCalls": 3,
+    "maxTokens": 40000,
+    "checks": [
+      "sequence-matches",
+      "calls-under-max",
+      "tokens-under-budget",
+      "no-invalid-twice",
+      "no-wordless-thoughts",
+      "ends-with-report"
+    ]
+  },
+  {
+    "id": "tarot-plan",
+    "class": "plan",
+    "ask": "build me a tarot reading app: users pick a spread, draw cards, save their readings, and get a daily card by email",
+    "expectedDoors": [
+      "contract",
+      "edit"
+    ],
+    "maxCalls": 3,
+    "maxTokens": 50000,
+    "checks": [
+      "sequence-matches",
+      "calls-under-max",
+      "tokens-under-budget",
+      "no-invalid-twice",
+      "no-wordless-thoughts",
+      "ends-with-report"
+    ],
+    "card": "approve"
+  },
+  {
+    "id": "declined-card",
+    "class": "card",
+    "ask": "publish this app",
+    "expectedDoors": [
+      "edit"
+    ],
+    "maxCalls": 2,
+    "maxTokens": 25000,
+    "checks": [
+      "sequence-matches",
+      "calls-under-max",
+      "tokens-under-budget",
+      "no-invalid-twice",
+      "no-wordless-thoughts",
+      "ends-with-report"
+    ],
+    "card": "decline"
+  },
+  {
+    "id": "ask-once-repeat",
+    "class": "card",
+    "ask": "dispatch a run to write the FAQ copy for every screen",
+    "expectedDoors": [
+      "edit"
+    ],
+    "maxCalls": 2,
+    "maxTokens": 25000,
+    "checks": [
+      "sequence-matches",
+      "calls-under-max",
+      "tokens-under-budget",
+      "no-invalid-twice",
+      "no-wordless-thoughts",
+      "ends-with-report"
+    ],
+    "card": "approve"
+  }
+]

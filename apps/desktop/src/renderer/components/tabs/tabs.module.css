@@ -1,0 +1,162 @@
+/* Tier 9 (FR-157): the scene host (chrome-free since 2026-07-19 — the tab IS the screen)
+ * + the sidebar Tabs group. Tokens only. P3 (the editor-in-the-map arc): the
+ * center route's pencil + lock-row dresses died with it (the lock lives in the
+ * screen's Properties now). */
+
+.screen {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-width: 0;
+}
+
+.frame {
+  flex: 1;
+  width: 100%;
+  border: none;
+  background: var(--bg);
+}
+
+/* Track 6b (2026-08-16): the flow effects' ONE quiet viewport-anchored
+   sentence (the room feeder's fxSay, panel-toned for the frame area). */
+.fxNotice {
+  position: absolute;
+  left: 50%;
+  bottom: 24px;
+  transform: translateX(-50%);
+  max-width: 80%;
+  background: var(--panel2);
+  color: var(--t1);
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-size: var(--fs-body, 13px);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, .25);
+  z-index: 7;
+  pointer-events: none;
+}
+
+/* D-e9 (FR-e12): THE QUIET WARM-UP — panel tone, one --t3 line; the retry affordance is
+   a quiet HOVER control (invisible at rest), never a red state, never error chrome. */
+.warmup {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s2);
+  background: var(--panel);
+  color: var(--t3);
+  font-size: var(--fs-small);
+}
+
+.warmupNow {
+  font: inherit;
+  font-size: var(--fs-caption);
+  color: var(--t3);
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 140ms ease;
+}
+
+.warmup:hover .warmupNow {
+  opacity: 1;
+}
+
+.warmupNow:hover {
+  color: var(--t1);
+}
+
+/* Sidebar Tabs group (rendered by Sidebar between the thread list and the subnav). */
+
+.group {
+  margin: 4px 0;
+  padding-top: 6px;
+  border-top: 1px solid var(--border);
+}
+
+.groupLabel {
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--t3);
+  padding: 2px 10px 4px;
+}
+
+/* Sidebar contrast law (2026-07-20, same grammar as threads/subnav): rest = ONE bright tone,
+   hover = frame only, click = TEXT steps to max contrast — the frame untouched. */
+.tabRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 5px 10px;
+  font: inherit;
+  font-size: 13px;
+  color: var(--t1);
+  background: none;
+  border: none;
+  border-radius: var(--r1);
+  cursor: pointer;
+  text-align: left;
+}
+
+.tabRow:hover {
+  background: var(--panel);
+}
+
+.tabRowActive {
+  background: var(--panel2);
+  color: var(--t0);
+}
+
+.tabRowBuilding {
+  font-size: 11px;
+  color: var(--t3);
+  margin-left: auto;
+}
+
+/* Tier 48 (FR-444): the quiet imported-origin note — same muted voice as the
+   building state; the tooltip carries the exporting org. */
+.tabRowOrigin {
+  font-size: 11px;
+  color: var(--t3);
+  margin-left: auto;
+}
+
+/* Tier 46 (FR-425): the "open focused" hover affordance — the open-in-side idiom on
+   scene-backed tab rows; visible on row hover only, rest = invisible. */
+.tabRowWrap {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+}
+.tabRowWrap > .tabRow {
+  flex: 1;
+  min-width: 0;
+}
+.tabRowFocus {
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--t1);
+  cursor: pointer;
+}
+.tabRowWrap:hover .tabRowFocus {
+  display: inline-flex;
+}
+.tabRowFocus:hover {
+  background: var(--panel2);
+  color: var(--t0);
+}

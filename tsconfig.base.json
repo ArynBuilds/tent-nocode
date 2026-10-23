@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "@tent-nocode/core": ["./packages/core/src/index.ts"],
+      "@tent-nocode/kernel": ["./packages/kernel/src/index.ts"]
+    }
+  }
+}

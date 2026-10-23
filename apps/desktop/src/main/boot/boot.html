@@ -1,0 +1,92 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<!-- Phase 1-C (FR-492, D-217.1): the boot/failure surface — static, monochrome, no
+     renderer build involvement. Buttons speak to main via app-boot:// navigation
+     (will-navigate interception in bootWindow.ts); no preload, no IPC surface. -->
+<style>
+  :root { color-scheme: dark; }
+  html, body { margin: 0; height: 100%; }
+  body {
+    background: #171717; color: #f4f4f2;
+    font-family: Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+    display: flex; align-items: center; justify-content: center;
+    -webkit-user-select: none; user-select: none; cursor: default;
+    -webkit-app-region: drag;
+  }
+  .wrap { text-align: center; padding: 0 32px; max-width: 460px; }
+  .mark {
+    width: 44px; height: 44px; margin: 0 auto 18px; border-radius: 11px;
+    background: #f4f4f2; position: relative;
+  }
+  .mark::after {
+    content: ''; position: absolute; inset: 11px;
+    border-radius: 50%; border: 3.5px solid #2b2b2b; border-top-color: transparent;
+    animation: spin 1.2s linear infinite;
+  }
+  .failed .mark::after { animation: none; border-color: #2b2b2b; }
+  .sentence { font-size: 14px; line-height: 1.5; color: #d6d6d3; }
+  .actions { margin-top: 20px; display: none; gap: 10px; justify-content: center; -webkit-app-region: no-drag; }
+  .failed .actions { display: flex; }
+  button {
+    font: inherit; font-size: 12.5px; padding: 6px 14px; border-radius: 7px;
+    border: 1px solid #3a3a3a; background: #232323; color: #f4f4f2; cursor: pointer;
+  }
+  button.primary { background: #f4f4f2; color: #171717; border-color: #f4f4f2; }
+  button:hover { filter: brightness(1.08); }
+  .details-toggle {
+    margin-top: 14px; display: none; font-size: 11.5px; color: #8a8a87;
+    text-decoration: underline; cursor: pointer; -webkit-app-region: no-drag;
+  }
+  .failed .details-toggle { display: inline-block; }
+  pre {
+    display: none; margin: 12px 0 0; padding: 10px 12px; border-radius: 7px;
+    background: #1f1f1f; border: 1px solid #2e2e2e; color: #a8a8a5;
+    font-family: "JetBrains Mono", Consolas, monospace; font-size: 10.5px;
+    text-align: left; white-space: pre-wrap; word-break: break-word;
+    max-height: 130px; overflow-y: auto; -webkit-app-region: no-drag;
+    -webkit-user-select: text; user-select: text;
+  }
+  .show-details pre { display: block; }
+</style>
+</head>
+<body>
+  <div class="wrap" id="wrap">
+    <div class="mark"></div>
+    <div class="sentence" id="sentence">Getting things ready…</div>
+    <div class="actions">
+      <button class="primary" id="primary"></button>
+      <button id="quit">Quit</button>
+    </div>
+    <span class="details-toggle" id="toggle">Show details</span>
+    <pre id="detail"></pre>
+  </div>
+  <script>
+    var state = { action: 'try-again' };
+    function setStage(sentence) {
+      document.getElementById('wrap').classList.remove('failed', 'show-details');
+      document.getElementById('sentence').textContent = sentence;
+    }
+    function setFailure(f) {
+      state.action = f.action;
+      var wrap = document.getElementById('wrap');
+      wrap.classList.add('failed');
+      document.getElementById('sentence').textContent = f.sentence;
+      document.getElementById('primary').textContent = 'Try again';
+      document.getElementById('detail').textContent = f.detail + '\n\nlog: ' + f.logPath;
+    }
+    document.getElementById('toggle').addEventListener('click', function () {
+      var wrap = document.getElementById('wrap');
+      var on = wrap.classList.toggle('show-details');
+      this.textContent = on ? 'Hide details' : 'Show details';
+    });
+    document.getElementById('primary').addEventListener('click', function () {
+      location.href = 'app-boot://' + state.action;
+    });
+    document.getElementById('quit').addEventListener('click', function () {
+      location.href = 'app-boot://quit';
+    });
+  </script>
+</body>
+</html>

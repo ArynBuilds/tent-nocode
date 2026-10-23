@@ -1,0 +1,207 @@
+import type { IntegrationDefInput as IntegrationDef } from '../catalog.js';
+
+// Spotify def: reads top tracks and playlists on the listener's own account.
+// Both reads answer a top-level items array, so each pull also feeds the other mirror by matching column names.
+// Nested objects (album, artists, owner) cannot fill columns; picks project the first element's values instead.
+export const spotify: IntegrationDef = {
+  name: 'spotify',
+  version: 1,
+  displayName: 'Spotify',
+  blurb: 'Bring your top tracks and playlists into your app through your own Spotify account.',
+  category: 'media',
+  surfaces: 'both',
+  scope: 'both',
+  availability: 'upcoming',
+  hosts: ['https://api.spotify.com'],
+  auth: {
+    kind: 'oauth',
+    authUrl: 'https://accounts.spotify.com/authorize',
+    tokenUrl: 'https://accounts.spotify.com/api/token',
+    scopes: ['user-top-read', 'playlist-read-private'],
+    clientEnv: 'SPOTIFY',
+    tokenHelp: 'Click Sign in to Spotify and approve read access to your top tracks and playlists - there is no key to paste.',
+  },
+  endpoints: [
+    {
+      id: 'top-tracks',
+      displayName: 'See your top tracks',
+      method: 'GET',
+      path: '/v1/me/top/tracks',
+      class: 'read',
+      params: {
+        time_range: {
+          type: 'string',
+          choices: ['short_term', 'medium_term', 'long_term'],
+          help: 'The last 4 weeks, the last 6 months, or about a year of listening.',
+        },
+        limit: { type: 'number', help: 'How many tracks, up to 50.' },
+        offset: { type: 'number', help: 'Where the page starts, from 0.' },
+      },
+      picks: [
+        { field: 'track_id', from: 'items.0.id' },
+        { field: 'track_name', from: 'items.0.name' },
+        { field: 'artist', from: 'items.0.artists.0.name' },
+        { field: 'album', from: 'items.0.album.name' },
+        { field: 'popularity', from: 'items.0.popularity' },
+        { field: 'total', from: 'total' },
+      ],
+    },
+    {
+      id: 'my-playlists',
+      displayName: 'See your playlists',
+      method: 'GET',
+      path: '/v1/me/playlists',
+      class: 'read',
+      params: {
+        limit: { type: 'number', help: 'How many playlists, up to 50.' },
+        offset: { type: 'number', help: 'Where the page starts, from 0.' },
+      },
+      picks: [
+        { field: 'playlist_id', from: 'items.0.id' },
+        { field: 'playlist_name', from: 'items.0.name' },
+        { field: 'track_count', from: 'items.0.tracks.total' },
+        { field: 'total', from: 'total' },
+      ],
+    },
+  ],
+  inside: {
+    // Both mirrors pull once per app; each fan-out lands one row per items element.
+    tables: [
+      {
+        name: 'top-tracks',
+        displayName: 'Top tracks',
+        rowSchema: {
+          id: 'string',
+          name: 'string',
+          popularity: 'number',
+          'duration-ms': 'number',
+          explicit: 'boolean',
+        },
+        grain: 'app',
+        fromArray: 'items',
+      },
+      {
+        name: 'playlists',
+        displayName: 'Playlists',
+        rowSchema: {
+          id: 'string',
+          name: 'string',
+          description: 'string',
+          public: 'boolean',
+          collaborative: 'boolean',
+          'snapshot-id': 'string',
+        },
+        grain: 'app',
+        fromArray: 'items',
+      },
+    ],
+    watchers: [],
+  },
+  settings: [
+    // These names match the endpoint params and fill them when unset.
+    {
+      id: 'time_range',
+      label: 'Listening window',
+      kind: 'enum',
+      choices: ['short_term', 'medium_term', 'long_term'],
+      help: 'Top tracks from the last 4 weeks, the last 6 months, or about a year.',
+    },
+    { id: 'limit', label: 'How many', kind: 'number', help: 'How many rows each pull brings back, up to 50.' },
+  ],
+  // Playlists read fires every 60 minutes per active connection.
+  sync: { endpoint: 'my-playlists', everyMinutes: 60 },
+  fixtures: [
+    {
+      endpoint: 'top-tracks',
+      params: { time_range: 'medium_term', limit: 2 },
+      status: 200,
+      response: {
+        href: 'https://api.spotify.com/v1/me/top/tracks?offset=0&limit=2&time_range=medium_term',
+        limit: 2,
+        next: null,
+        offset: 0,
+        previous: null,
+        total: 50,
+        items: [
+          {
+            id: '11dFghVXANMlKmJXsNCbNl',
+            name: 'Cut To The Feeling',
+            popularity: 63,
+            duration_ms: 207959,
+            explicit: false,
+            disc_number: 1,
+            track_number: 1,
+            type: 'track',
+            uri: 'spotify:track:11dFghVXANMlKmJXsNCbNl',
+            album: {
+              id: '0tGPJ0bkWOUmH7MEOR77qc',
+              name: 'Cut To The Feeling',
+              release_date: '2017-05-26',
+              album_type: 'single',
+              total_tracks: 1,
+            },
+            artists: [{ id: '6sFIWsNpZYqfjUpaCgueju', name: 'Carly Rae Jepsen', type: 'artist' }],
+          },
+          {
+            id: '7ouMYWpwJ422jRcDASZB7P',
+            name: 'Knights of Cydonia',
+            popularity: 71,
+            duration_ms: 366213,
+            explicit: false,
+            disc_number: 1,
+            track_number: 11,
+            type: 'track',
+            uri: 'spotify:track:7ouMYWpwJ422jRcDASZB7P',
+            album: {
+              id: '0lw68yx3MhKflWFqCsGkIs',
+              name: 'Black Holes and Revelations',
+              release_date: '2006-07-03',
+              album_type: 'album',
+              total_tracks: 12,
+            },
+            artists: [{ id: '12Chz98pHFMPJEknJQMWvI', name: 'Muse', type: 'artist' }],
+          },
+        ],
+      },
+    },
+    {
+      endpoint: 'my-playlists',
+      params: { limit: 2 },
+      status: 200,
+      response: {
+        href: 'https://api.spotify.com/v1/me/playlists?offset=0&limit=2',
+        limit: 2,
+        next: null,
+        offset: 0,
+        previous: null,
+        total: 4,
+        items: [
+          {
+            id: '3cEYpjA9oz9GiPac4AsH4n',
+            name: 'Spotify Web API Testing playlist',
+            description: 'A playlist for testing purposes',
+            public: true,
+            collaborative: false,
+            snapshot_id: 'ZmQ0NTBjNzQ',
+            type: 'playlist',
+            uri: 'spotify:playlist:3cEYpjA9oz9GiPac4AsH4n',
+            owner: { id: 'jmperezperez', display_name: 'JMPerez', type: 'user' },
+            tracks: { href: 'https://api.spotify.com/v1/playlists/3cEYpjA9oz9GiPac4AsH4n/tracks', total: 5 },
+          },
+          {
+            id: '53Y8wT46QIMz5H4WQ8O22c',
+            name: 'Weekly picks',
+            description: '',
+            public: false,
+            collaborative: false,
+            snapshot_id: 'M2E1ZDFiOTg',
+            type: 'playlist',
+            uri: 'spotify:playlist:53Y8wT46QIMz5H4WQ8O22c',
+            owner: { id: 'jmperezperez', display_name: 'JMPerez', type: 'user' },
+            tracks: { href: 'https://api.spotify.com/v1/playlists/53Y8wT46QIMz5H4WQ8O22c/tracks', total: 32 },
+          },
+        ],
+      },
+    },
+  ],
+};

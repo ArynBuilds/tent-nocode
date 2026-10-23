@@ -1,0 +1,43 @@
+{
+  "name": "@tent-nocode/desktop",
+  "private": true,
+  "version": "0.1.20",
+  "description": "Tent NoCode — the app-building engine as a self-contained Windows desktop app",
+  "author": "Arin Gorgulu",
+  "type": "module",
+  "main": "./out/main/index.js",
+  "scripts": {
+    "dev": "electron-vite dev",
+    "build": "electron-vite build",
+    "start": "electron-vite preview",
+    "typecheck": "tsc -p tsconfig.main.json --noEmit && tsc -p tsconfig.preload.json --noEmit && tsc -p tsconfig.renderer.json --noEmit",
+    "package": "electron-vite build && electron-builder"
+  },
+  "dependencies": {
+    "@codemirror/lang-javascript": "^6.2.5",
+    "@codemirror/lang-python": "^6.2.1",
+    "@tldraw/state": "^5.3.2",
+    "codemirror": "^6.0.2",
+    "postgres": "^3.4",
+    "@tent-nocode/server": "*",
+    "@tent-nocode/room-server": "*",
+    "embedded-postgres": "17.10.0-beta.17"
+  },
+  "devDependencies": {
+    "@tent-nocode/core": "*",
+    "@tent-nocode/kernel": "*",
+    "@tent-nocode/runner": "*",
+    "@tent-nocode/tentkit": "*",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@vitejs/plugin-react": "^4",
+    "electron": "^33",
+    "electron-builder": "^25",
+    "electron-vite": "^2",
+    "lucide-react": "^0.510",
+    "react": "^19",
+    "react-dom": "^19",
+    "typescript": "^5.6",
+    "playwright": "^1.61.1"
+  }
+}

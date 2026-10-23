@@ -1,0 +1,29 @@
+{
+  "onnxruntimeWebVersion": "1.27.0",
+  "npmTarballSha256": "b59c9819434a7519f334f77e8d4bf22b69808d531a57724cabc4bb2c0704c835",
+  "vendoredAt": "2026-07-24",
+  "license": "MIT (declared in the package's package.json; notice in THIRD-PARTY-NOTICES.md beside this manifest)",
+  "note": "Tier 46 (FR-423, D-174): the sealed inference runtime — the wasm execution path ONLY (ort.js CJS entry + the simd-threaded loader/wasm pairs it dynamic-imports at numThreads=1; ort.js's wasm backend resolves the .jsep pair — live find 2026-07-24). File-served forever (file:// wasmPaths; model bytes passed to InferenceSession.create — never a fetch). package.json ({type:commonjs}) is OURS: apps/desktop is type:module, which would load ort.js as ESM and skip its CJS export (the empty-namespace live find). A new version = a RE-VENDOR with fresh hashes, never an in-place edit.",
+  "files": {
+    "ort.js": {
+      "sha256": "776927f869d17d5ff9d6faa37d574978c895269471b39d048c58aaf3f4cfc88f",
+      "bytes": 2614203
+    },
+    "ort-wasm-simd-threaded.mjs": {
+      "sha256": "0a1e718d99c41b22c21f2520ff4f9e883a6b5533856e398d21816ee8eb8185d3",
+      "bytes": 24180
+    },
+    "ort-wasm-simd-threaded.wasm": {
+      "sha256": "d1ab1b94b16a65b29d710d0b587b29e7bed336827577623913479b8afe8113e6",
+      "bytes": 13479978
+    },
+    "ort-wasm-simd-threaded.jsep.mjs": {
+      "sha256": "3ee381d20a80f51a788a1c4a5872f6f1d047538dd4342f4af00062de5f9ea4c6",
+      "bytes": 46614
+    },
+    "ort-wasm-simd-threaded.jsep.wasm": {
+      "sha256": "78feeeb3d08f6bcee94d938ed322f69073bb8076b5f9d34697a574ffba8deb48",
+      "bytes": 26827543
+    }
+  }
+}

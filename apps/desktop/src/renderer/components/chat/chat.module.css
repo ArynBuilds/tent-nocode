@@ -1,0 +1,596 @@
+/*
+ * Conversation route (Task 11, Tier 6 FR-121/122/128/130): the merged user/desk bubble timeline,
+ * the proposal card, and inline job summary cards. Deliberately its own module (not shared with
+ * `thread/thread.module.css`, the shared card/kv/chip styles several sections reuse) — same
+ * D-19 graphite/status-hue tokens, just a distinct flow (bubbles, not a single job's linear feed).
+ */
+
+.conv {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+  position: relative; /* anchors the floating composer capsule — THEME-INDEPENDENT.
+    (Fix ledger 2026-07-28 wave 1.3: the light-mode commit 6052a1d captured this line into
+    the light block, so dark mode's .composerFloat escaped to the viewport.) */
+}
+
+/* LIGHT MODE (user-ruled 2026-07-28): the chat reads on FULL WHITE everywhere the
+   conversation renders (main route, side panel, console). */
+:global([data-theme='light']) .conv {
+  background: #ffffff;
+}
+
+/* The composer floats over the document (user-directed 2026-07-20): the feed scrolls beneath
+   the capsule. The band is an INVISIBLE frame — solid --bg so it vanishes against the thread
+   surface, but opaque so scrolling text never bleeds through the meta row (user-directed,
+   the tokens-overlap fix). */
+.composerFloat {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--bg);
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: var(--barH); /* border-aligns with the side panel's tab strip at any size */
+  flex: none;
+  padding: 0 24px;
+  border-bottom: 1px solid var(--border);
+}
+
+.head h2 {
+  font-size: 14.5px;
+  font-weight: 650;
+  margin: 0;
+}
+
+.headMeta {
+  font: 11.5px var(--mono);
+  color: var(--t3);
+}
+
+/* ---- mode selector (Task 13, FR-126/127) --------------------------------- */
+
+.modeCtl {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* In-pill mode control (the Cursor model-slot position): quiet text button + a custom
+   popover in the panel add-menu grammar (2026-07-20 — the native select popup was OS chrome). */
+.modeWrap {
+  position: relative;
+  display: inline-flex;
+}
+
+.modeBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font: 11px var(--mono);
+  color: var(--t2);
+  background: transparent;
+  border: none;
+  outline: none;
+  padding: 2px 4px;
+  cursor: pointer;
+}
+
+.modeBtn:hover {
+  color: var(--t1);
+}
+
+.modeBtn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.modeMenu {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  right: 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 6px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--r2);
+  white-space: nowrap;
+}
+
+.modeItem {
+  display: flex;
+  align-items: center;
+  padding: 6px 18px 6px 12px;
+  border: 0;
+  border-radius: var(--r1);
+  background: transparent;
+  color: var(--t1);
+  font: 13px var(--sans);
+  text-align: left;
+  cursor: pointer;
+}
+
+.modeItem:hover {
+  background: var(--panel2);
+}
+
+.modeItemActive {
+  color: var(--t0);
+  font-weight: 600;
+}
+
+.scroll {
+  flex: 1;
+  overflow: auto;
+  /* Bottom clearance for the floating capsule + meta row — the last message scrolls above it. */
+  padding: 20px 24px 120px;
+}
+
+/* Fix ledger 2026-07-28 wave 1.6: no floating composer in this view (the console panel —
+   the external capsule lives OUTSIDE the region), so no capsule clearance: the 120px was
+   dead air pushing the live edge below the fold. */
+.scrollNoComposer {
+  padding-bottom: 24px;
+}
+
+.placeholder {
+  font: 11.5px var(--mono);
+  color: var(--t3);
+  padding: 8px 0;
+}
+
+/* ---- bubbles ------------------------------------------------------------ */
+
+.row {
+  display: flex;
+  margin-bottom: 14px;
+}
+
+.rowUser {
+  justify-content: flex-end;
+}
+
+.rowDesk {
+  justify-content: flex-start;
+}
+
+.bubble {
+  max-width: 72%;
+  padding: 10px 14px;
+  border-radius: var(--r2);
+  font-size: 13.5px;
+  line-height: 1.55;
+  white-space: pre-wrap;
+}
+
+.bubbleUser {
+  background: var(--accent);
+  color: var(--bg);
+  border-bottom-right-radius: 3px;
+}
+
+.bubbleDesk {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  color: var(--t1);
+  border-bottom-left-radius: 3px;
+}
+
+.bubbleFail {
+  border-color: #f8514966;
+  color: var(--red);
+}
+
+.bubbleMeta {
+  font: 10px var(--mono);
+  color: var(--t3);
+  margin-top: 6px;
+}
+
+/* The wordless pulse dot died with the legacy bubbles — liveness now shimmers on the
+ * feed's worded status line (feed.module.css .shimmer). */
+
+.rawToggle {
+  border: none;
+  background: transparent;
+  color: var(--t3);
+  font: 10px var(--sans);
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+  margin-top: 6px;
+  display: inline-block;
+}
+
+.rawBox {
+  margin-top: 6px;
+  padding: 8px 10px;
+  background: #0a0a0a;
+  border: 1px solid var(--border);
+  border-radius: var(--r1);
+  font: 11px/1.6 var(--mono);
+  color: #a8a8a8;
+  white-space: pre-wrap;
+}
+
+/* ---- THE ONE CARD (AI-surface rebuild Phase 3): the single card moment.
+   A soft surface on the ground - depth by surface, no borders; the one hue
+   spent on Approve alone; status as words. Two sizes by container width
+   (the pill-chat face and the full-screen face) via the wrap's query. ---- */
+
+.cardWrap {
+  container-type: inline-size;
+  max-width: 560px;
+  margin: 0 0 14px;
+}
+
+.card {
+  background: var(--surface);
+  border-radius: var(--r2);
+  padding: var(--s4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s2);
+}
+
+.cardTitle {
+  font: 600 13px var(--sans);
+  color: var(--t1);
+}
+
+.cardRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--s3);
+}
+.cardRowLabel { font: 400 12px var(--sans); color: var(--t2); flex: none; }
+.cardRowValue {
+  font: 400 12.5px var(--sans); color: var(--t1);
+  text-align: right; min-width: 0; overflow-wrap: anywhere;
+}
+
+.cardLands { font: 400 12.5px/1.5 var(--sans); color: var(--t2); }
+.cardQuiet { font: 400 11.5px/1.5 var(--sans); color: var(--t3); }
+
+/* The mint face: the real rendered candidate frame. */
+.cardPreview {
+  display: block;
+  max-width: 100%;
+  border-radius: var(--r1);
+}
+
+/* The app_plan citizen grid - rendered inside the card, never a new surface. */
+.planGrid { display: flex; flex-direction: column; gap: var(--s3); }
+.planSection { display: flex; flex-direction: column; gap: var(--s1); }
+.planLabel { font: 400 12px var(--sans); color: var(--t2); }
+.planRow { display: flex; flex-direction: column; gap: 1px; padding: 2px 0; }
+.planHead { display: flex; align-items: baseline; gap: var(--s2); justify-content: space-between; }
+.planName { font: 500 12.5px var(--sans); color: var(--t1); min-width: 0; }
+.planTag { font: 400 11.5px var(--sans); color: var(--t3); flex: none; text-align: right; }
+.planQuiet { font: 400 11.5px/1.45 var(--sans); color: var(--t3); }
+
+/* The connect face - the only inputs on any card; the key rides into the vault. */
+.cardField { display: flex; flex-direction: column; gap: var(--s2); }
+.cardInput {
+  background: var(--well);
+  border: none;
+  border-radius: var(--r1);
+  height: 32px;
+  padding: 0 12px;
+  color: var(--t1);
+  font: 400 12.5px var(--sans);
+}
+.cardInput::placeholder { color: var(--t3); }
+.cardInput:focus { outline: 2px solid var(--live); outline-offset: -2px; }
+.cardBtnQuiet {
+  align-self: flex-start;
+  border: none;
+  cursor: pointer;
+  background: var(--raised);
+  color: var(--t1);
+  font: 500 12px var(--sans);
+  border-radius: 999px;
+  padding: 7px 14px;
+  transition: background 120ms ease-out;
+}
+.cardBtnQuiet:hover { background: var(--float); }
+.cardBtnQuiet:disabled { opacity: 0.5; cursor: default; }
+
+.cardBtns {
+  display: flex;
+  gap: var(--s2);
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: var(--s1);
+}
+
+.pBtnPrimary {
+  border: none;
+  cursor: pointer;
+  background: var(--live);
+  color: var(--ground);
+  font: 600 12.5px var(--sans);
+  border-radius: 999px;
+  padding: 8px 18px;
+}
+
+.pBtnGhost {
+  border: none;
+  cursor: pointer;
+  background: var(--raised);
+  color: var(--t1);
+  font: 500 12.5px var(--sans);
+  border-radius: 999px;
+  padding: 8px 18px;
+  transition: background 120ms ease-out;
+}
+.pBtnGhost:hover { background: var(--float); }
+
+/* Numbered keyboard hints - 1/Enter answers the newest card's primary, 2 its ghost. */
+.pBtnPrimary::after {
+  content: '1';
+  margin-left: 8px;
+  font: 10px var(--mono);
+  opacity: 0.6;
+  border: 1px solid rgba(0, 0, 0, 0.35);
+  border-radius: 4px;
+  padding: 0 4px;
+}
+.pBtnGhost::after {
+  content: '2';
+  margin-left: 8px;
+  font: 10px var(--mono);
+  opacity: 0.6;
+  border: 1px solid var(--hairline);
+  border-radius: 4px;
+  padding: 0 4px;
+}
+.pBtnPrimary:disabled,
+.pBtnGhost:disabled { opacity: 0.5; cursor: default; }
+
+/* Ask-once memory line beside the buttons. */
+.cardMemory { font: 400 11.5px var(--sans); color: var(--t3); margin-left: auto; }
+
+/* The compact pill-chat size: rows stack, padding tightens. */
+@container (max-width: 460px) {
+  .card { padding: var(--s3); }
+  .cardRow { flex-direction: column; align-items: flex-start; gap: 2px; }
+  .cardRowValue { text-align: left; }
+  .planHead { flex-wrap: wrap; justify-content: flex-start; }
+  .planTag { text-align: left; }
+  .cardMemory { margin-left: 0; flex-basis: 100%; }
+}
+
+.errorText {
+  color: var(--red);
+  font-size: 11.5px;
+  margin-top: 8px;
+  font-family: var(--mono);
+}
+
+/* Answered gates (user-ratified 2026-07-15): ONE quiet full-text line — no chip chrome,
+   no accent border. Visible forever (D-24 floor 3), quiet like every settled fact. */
+.answeredLine {
+  font: 12px var(--mono);
+  color: var(--t3);
+  margin: 8px 0;
+}
+
+/* Auto-approved chip (D-24 floor 3): visible, never a silent stand-in for a user name. */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  border-radius: var(--r1);
+  padding: 1px 7px;
+  font: 10.5px var(--mono);
+  font-weight: 600;
+}
+
+/* ---- inline job cards ----------------------------------------------------- */
+
+.jobCard {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  max-width: 72%;
+  margin: 0 0 14px 0;
+  padding: 9px 13px;
+  border: 1px solid var(--border);
+  border-radius: var(--r2);
+  background: var(--panel2);
+  font: 12px var(--mono);
+  color: var(--t2);
+  cursor: pointer;
+  text-align: left;
+}
+
+.jobCardOpen {
+  border-color: rgba(236, 236, 236, 0.5);
+}
+
+.jobId {
+  color: var(--t3);
+}
+
+.jobPrompt {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--sans);
+  color: var(--t1);
+}
+
+.jobExpand {
+  max-width: 100%;
+  border: 1px solid var(--border);
+  border-radius: var(--r2);
+  margin: -6px 0 14px 0;
+  overflow: hidden;
+}
+
+/* ---- composer (pill restyle, user-directed 2026-07-20 — the Cursor input idiom:
+   one rounded pill, naked input, quiet in-pill mode slot, circular send; the meta
+   row rides BELOW the pill. LAW 4: same chrome, same one home, new coat.) ------- */
+
+/* Width-locked to the feed's text column (user-directed 2026-07-20): the feed is a centered
+   760px box with 4px inner padding inside the scroll's 24px gutters → content = min(752px,
+   window − 56px). 808 = 760 + 2×24; 28 = 24 + 4. Change these together with feed.module.css. */
+.composerDock {
+  width: 100%;
+  max-width: 808px;
+  margin: 0 auto;
+  padding: 10px 28px 6px;
+}
+
+.composer {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  background: var(--panel2); /* reverted 2026-07-20: only the MESSAGE pills wear --side */
+  border: 1px solid var(--border);
+  border-radius: 999px; /* full capsule, per the reference */
+  padding: 6px 6px 6px 18px;
+  transition: border-color 180ms ease-out;
+}
+
+.composer:focus-within {
+  border-color: var(--border2);
+}
+
+.cbox {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  padding: 8px 0;
+  color: var(--t1);
+  font-size: 13px;
+  font-family: var(--sans);
+}
+
+.cbox::placeholder {
+  color: var(--t3);
+}
+
+.send {
+  flex: none;
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border: none;
+  border-radius: 50%;
+  font-size: 15px;
+  line-height: 1;
+  background: var(--accent);
+  color: var(--bg);
+  cursor: pointer;
+  transition: opacity 150ms ease-out;
+}
+
+.send:disabled {
+  background: var(--panel);
+  color: var(--t3);
+  border: 1px solid var(--border);
+  cursor: default;
+}
+
+.composerNote {
+  border-top: 1px solid var(--border);
+  padding: 13px 24px;
+  font: 11.5px var(--mono);
+  color: var(--t3);
+}
+
+.pDetails {
+  margin: 2px 0 6px;
+}
+.pDetailsSummary {
+  cursor: pointer;
+  color: var(--text-tertiary, #6e6e6e);
+  font-size: 12px;
+  user-select: none;
+}
+.jobRow { display: flex; align-items: stretch; gap: 6px; }
+.jobRow > button:first-child { flex: 1; }
+.jobCancel {
+  flex: none; padding: 0 10px; font-size: 12px; cursor: pointer;
+  background: transparent; border: 1px solid var(--border, #333);
+  border-radius: var(--r1); color: var(--text-secondary, #9a9a9a);
+}
+.jobCancel:hover { color: var(--status-red, #e5534b); border-color: var(--status-red, #e5534b); }
+
+/* The composer meta row's quiet clear button (selection chips). */
+.schedToggle {
+  background: none; border: none; padding: 0; cursor: pointer;
+  font-size: 11px; color: var(--accent, #ececec); text-decoration: underline;
+}
+
+/* FR-190 + FR-200 (Tier 12): the thread status strip — quiet one-line truth above the composer. */
+.statusStrip {
+  display: flex; gap: 14px; align-items: baseline;
+  padding: 3px 14px; font-size: 12px;
+  color: var(--text-tertiary, #6e6e6e); user-select: none;
+}
+.statusTokens { font-family: var(--font-mono, 'JetBrains Mono', monospace); font-size: 11px; }
+
+/* FR-232 (Tier 15): the living checklist — the mission pinned above the composer.
+   Tier 52 (FR-466, D-203): CC-TASK-SHAPED — compact one-line rows, a state glyph per row
+   (breathing ● in flight, amber ⚠ blocked, struck ✕ dropped), quiet "n of m" header.
+   A restyle only; the data and the LAW 5 floor are untouched. */
+.intentBlock {
+  margin: 0 14px 4px; padding: 6px 10px;
+  border: 1px solid var(--border, #2a2a2a); border-radius: var(--r1);
+  font-size: 12px; line-height: 1.5;
+}
+.intentSettled { opacity: 0.55; }
+.intentHead {
+  display: flex; gap: 12px; align-items: baseline;
+  color: var(--text-tertiary, #6e6e6e); margin-bottom: 2px;
+}
+.intentMeta { font-family: var(--font-mono, 'JetBrains Mono', monospace); font-size: 11px; }
+.intentHide {
+  margin-left: auto; width: 18px; height: 18px; padding: 0;
+  border: 1px solid var(--border, #2a2a2a); border-radius: var(--r1, 4px);
+  background: transparent; color: var(--text-tertiary, #6e6e6e);
+  font: 11px var(--font-mono, 'JetBrains Mono', monospace); line-height: 1; cursor: pointer;
+}
+.intentHide:hover { color: var(--text-primary, #ddd); }
+/* One line per part: the row never wraps — text and note ellipsize instead. */
+.intentPart { display: flex; gap: 8px; align-items: baseline; padding: 1px 0; min-width: 0; white-space: nowrap; }
+.intentPartText { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.intentGlyph { font-family: var(--font-mono, 'JetBrains Mono', monospace); width: 14px; flex: none; }
+.intentGlyphDone { color: var(--text-tertiary, #6e6e6e); }
+.intentGlyphBlocked { color: var(--status-amber, #d4a72c); }
+.intentGlyphLive { animation: intentBreathe 2s ease-in-out infinite; }
+@keyframes intentBreathe { 0%, 100% { opacity: 0.35; } 50% { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .intentGlyphLive { animation: none; } }
+.intentDropped { text-decoration: line-through; opacity: 0.6; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.intentNote { color: var(--text-tertiary, #6e6e6e); font-size: 11px; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.intentParked { margin-top: 4px; color: var(--status-amber, #d4a72c); }
+
+/* FR-240 (D-68): the composer meta row — quiet thread chrome BELOW the pill (the Cursor
+   bottom-row idiom; the mode control moved into the pill itself, 2026-07-20). Same column
+   lock as .composerDock, nudged 6px inward so the tiny text sits inside the pill's edge. */
+.metaRow {
+  display: flex; gap: 14px; align-items: center;
+  width: 100%; max-width: 808px; margin: 0 auto;
+  padding: 2px 34px 10px; font-size: 11px;
+  color: var(--text-tertiary, #6e6e6e); user-select: none;
+}
+.metaQuiet { font-size: 11px; }

@@ -1,0 +1,640 @@
+/*
+ * Shared card/kv/chip styles — mirrors the mockup's `.chat`/`.pcard`/`.task`/`.chip`/
+ * `.gatebtns`/`.evline` classes (docs/superpowers/specs/2026-07-04-desk-mockup.html screens 2/3).
+ * The legacy thread-view components that started this module are deleted (Tier 25 A1); the
+ * classes live on, reused by the settings/agents/knowledge/system sections that import this file.
+ */
+
+.thread {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+}
+
+.chead {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding: 13px 24px;
+  border-bottom: 1px solid var(--border);
+}
+
+.chead h2 {
+  font-size: 14.5px;
+  font-weight: 650;
+  margin: 0;
+}
+
+.chm {
+  font: 11.5px var(--mono);
+  color: var(--t3);
+}
+
+.scroll {
+  flex: 1;
+  overflow: auto;
+  padding: 20px 24px 8px;
+}
+
+.placeholder {
+  font: 11.5px var(--mono);
+  color: var(--t3);
+  padding: 8px 0;
+}
+
+/* ---- prompt message ---------------------------------------------------- */
+
+.msg {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 18px;
+  max-width: 760px;
+}
+
+.msgWho {
+  width: 24px;
+  height: 24px;
+  border-radius: var(--r1);
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+  background: #2e2e2e;
+  border: 1px solid var(--border2);
+}
+
+.msgBody {
+  flex: 1;
+  min-width: 0;
+}
+
+.msgName {
+  font-size: 11px;
+  color: var(--t3);
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+
+.msgTime {
+  font-weight: 400;
+  font-family: var(--mono);
+  font-size: 10.5px;
+}
+
+.msgText {
+  font-size: 13.5px;
+  line-height: 1.55;
+  white-space: pre-wrap;
+}
+
+/* ---- gate cards (plan / capability) ------------------------------------ */
+
+.pcard {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--r2);
+  padding: 13px 15px;
+  margin-top: 8px;
+  max-width: 760px;
+}
+
+.bh {
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--t3);
+  font-weight: 600;
+  margin-bottom: 8px;
+  display: flex;
+  gap: 8px;
+}
+
+.bhRight {
+  margin-left: auto;
+  font: 10px var(--mono);
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 400;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--border2);
+  border-radius: var(--r1);
+  padding: 2px 8px;
+  font-size: 11.5px;
+  color: var(--t1);
+  margin: 0 5px 5px 0;
+  background: var(--panel2);
+}
+
+.chipDashed {
+  border-style: dashed;
+}
+
+.chipUntrusted {
+  color: var(--amber);
+}
+
+/* Auto-approved chip (D-24 floor 3): a mode-driven answer's `resolvedBy === 'mode:agentic'`
+ * renders this INSTEAD of a resolved user name — visible, never a hidden/implicit approval. */
+.chipAgentic {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  border-radius: var(--r1);
+  padding: 1px 7px;
+  font: 10.5px var(--mono);
+  font-weight: 600;
+}
+
+.cf {
+  font: 9px var(--mono);
+  color: var(--t3);
+}
+
+.bfoot {
+  font: 10.5px var(--mono);
+  color: var(--t3);
+  margin-top: 4px;
+}
+
+.task {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 0;
+  border-bottom: 1px solid #1d1d1d;
+  font-size: 12.5px;
+}
+
+.task:last-child {
+  border-bottom: 0;
+}
+
+.taskNo {
+  font: 10.5px var(--mono);
+  color: var(--t3);
+  width: 14px;
+}
+
+.taskCap {
+  margin-left: auto;
+  font: 11px var(--mono);
+  color: var(--t2);
+}
+
+.taskDep {
+  font: 10px var(--mono);
+  color: var(--t3);
+}
+
+.resolved {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 11px;
+  font-size: 12px;
+  color: var(--t3);
+}
+
+.resolvedOk {
+  color: var(--green);
+  font-weight: 600;
+}
+
+.resolvedFail {
+  color: var(--red);
+  font-weight: 600;
+}
+
+.gatebtns {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.btn {
+  border-radius: var(--r1);
+  padding: 7px 16px;
+  font-weight: 600;
+  font-size: 12.5px;
+  border: 1px solid transparent;
+  font-family: var(--sans);
+  cursor: pointer;
+}
+
+.btnPrimary {
+  background: var(--accent);
+  color: var(--bg);
+}
+
+.btnGhost {
+  background: transparent;
+  border-color: var(--border2);
+  color: var(--t2);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.notein {
+  flex: 1;
+  min-width: 120px;
+  border: 1px solid var(--border);
+  border-radius: var(--r1);
+  background: var(--panel2);
+  padding: 7px 10px;
+  color: var(--t1);
+  font-size: 12px;
+  font-family: var(--sans);
+}
+
+.notein::placeholder {
+  color: var(--t3);
+}
+
+.errorText {
+  color: var(--red);
+  font-size: 11.5px;
+  margin-top: 8px;
+  font-family: var(--mono);
+}
+
+.kv {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--t2);
+  padding: 4px 0;
+  border-bottom: 1px solid #1f1f1f;
+  gap: 10px;
+}
+
+.kv:last-child {
+  border-bottom: 0;
+}
+
+.kvB {
+  color: var(--t1);
+  font-weight: 500;
+  font-family: var(--mono);
+  font-size: 11.5px;
+  text-align: right;
+}
+
+.kvWarn {
+  color: var(--amber);
+}
+
+.evline {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 18px 0;
+  font: 11.5px var(--mono);
+  color: var(--t3);
+  max-width: 724px;
+}
+
+.busline {
+  margin: 0 0 6px 24px;
+  font: 11px var(--mono);
+  color: var(--t3);
+}
+
+/* ---- DAG rows + tail box (Task 13) ------------------------------------- */
+
+.runline {
+  margin: 0 0 14px 24px;
+  max-width: 724px;
+}
+
+.dagRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--r1);
+  margin-bottom: 6px;
+  background: var(--panel);
+  font-size: 12.5px;
+}
+
+.dagRowNo {
+  font: 10.5px var(--mono);
+  color: var(--t3);
+}
+
+.dagRowStatus {
+  margin-left: auto;
+  font: 10.5px var(--mono);
+  color: var(--t3);
+  white-space: nowrap;
+}
+
+.dagRowDone {
+  border-color: #2ea04344;
+}
+
+.dagRowDone .dagRowStatus {
+  color: var(--green);
+}
+
+.dagRowAct {
+  border-color: rgba(236, 236, 236, 0.5);
+}
+
+.dagRowAct .dagRowStatus {
+  color: var(--accent);
+}
+
+.dagRowFail {
+  border-color: #f8514966;
+}
+
+.dagRowFail .dagRowStatus {
+  color: var(--red);
+}
+
+.dagRowCancel {
+  border: 1px solid var(--border2);
+  border-radius: var(--r1);
+  font: 10.5px var(--sans);
+  color: var(--t3);
+  padding: 2px 8px;
+  margin-left: 10px;
+  background: transparent;
+  cursor: pointer;
+}
+
+.dagRowCancel:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.runbox {
+  background: #0a0a0a;
+  border: 1px solid var(--border);
+  border-radius: var(--r2);
+  overflow: hidden;
+  margin: 2px 0 8px 24px;
+}
+
+.runboxHead {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 6px 12px;
+  border-bottom: 1px solid var(--border);
+  font: 10.5px var(--mono);
+  color: var(--t2);
+}
+
+.runboxPre {
+  padding: 8px 14px;
+  font: 11.5px/1.65 var(--mono);
+  color: #a8a8a8;
+  overflow: auto;
+  white-space: pre-wrap;
+  margin: 0;
+}
+
+/* ---- running-thread status strip (Task 13) ----------------------------- */
+
+.lockstrip {
+  border-top: 1px solid var(--border);
+  padding: 13px 24px;
+  font: 11.5px var(--mono);
+  color: var(--t3);
+  display: flex;
+  gap: 14px;
+  align-items: center;
+}
+
+.lockstripBtn {
+  margin-left: auto;
+  border: 1px solid var(--border2);
+  border-radius: var(--r1);
+  padding: 4px 12px;
+  font-size: 11.5px;
+  color: var(--t2);
+  font-family: var(--sans);
+  background: transparent;
+  cursor: pointer;
+}
+
+.lockstripBtn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* ---- terminal card (Task 14) -------------------------------------------- */
+
+.statDone {
+  color: var(--green);
+  font-weight: 600;
+}
+
+.statPart {
+  color: var(--amber);
+  font-weight: 600;
+}
+
+.statPlain {
+  color: var(--t2);
+  font-weight: 600;
+}
+
+.statsLine {
+  font: 11px var(--mono);
+  color: var(--t3);
+  margin-bottom: 8px;
+}
+
+.termSummary {
+  font-size: 13px;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  margin-bottom: 4px;
+}
+
+.expandBtn {
+  margin-left: auto;
+  border: none;
+  background: transparent;
+  color: var(--t3);
+  font: 10px var(--sans);
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.vrow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font: 11.5px var(--mono);
+  color: var(--t3);
+  margin: 8px 0;
+}
+
+.vbtn {
+  border: 1px solid var(--border2);
+  border-radius: var(--r1);
+  background: transparent;
+  color: var(--t2);
+  font: 11px var(--sans);
+  padding: 3px 9px;
+  cursor: pointer;
+}
+
+.vbtn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* ---- why panel (Task 14) ------------------------------------------------- */
+
+.whyWrap {
+  margin-top: 8px;
+}
+
+.whybtn {
+  border: none;
+  background: transparent;
+  color: var(--t3);
+  font: 11.5px var(--mono);
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
+}
+
+.kpanel {
+  background: #0a0a0a;
+  border: 1px solid var(--border);
+  border-radius: var(--r2);
+  padding: 10px 12px;
+  margin-top: 8px;
+}
+
+.kpre {
+  font: 11.5px/1.75 var(--mono);
+  color: #b8b8b8;
+  white-space: pre-wrap;
+  padding: 4px 2px;
+  margin: 0;
+}
+
+.knodes {
+  margin-top: 6px;
+  border-top: 1px solid var(--border);
+  padding-top: 6px;
+}
+
+/* ---- follow-up composer (Task 14, extended Task 15) ---------------------- */
+
+.composer {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  border-top: 1px solid var(--border);
+  padding: 13px 24px;
+}
+
+.cbox {
+  flex: 1;
+  border: 1px solid var(--border);
+  border-radius: var(--r1);
+  background: var(--panel2);
+  padding: 8px 12px;
+  color: var(--t1);
+  font-size: 12.5px;
+  font-family: var(--sans);
+}
+
+.cbox::placeholder {
+  color: var(--t3);
+}
+
+.send {
+  border: 1px solid var(--border2);
+  border-radius: var(--r1);
+  padding: 7px 16px;
+  font-weight: 600;
+  font-size: 12.5px;
+  background: var(--accent);
+  color: var(--bg);
+  cursor: pointer;
+}
+
+.send:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.composerPlanning {
+  border-top: 1px solid var(--border);
+  padding: 13px 24px;
+  font: 11.5px var(--mono);
+  color: var(--t3);
+}
+
+/* ---- NEW-job composer (Task 15, Home's `'new'` state) -------------------- */
+
+.hcomposer {
+  width: 640px;
+  background: var(--panel);
+  border: 1px solid var(--border2);
+  border-radius: var(--r2);
+  padding: 16px;
+}
+
+.hbox {
+  width: 100%;
+  border: 0;
+  resize: none;
+  background: transparent;
+  color: var(--t1);
+  font-size: 14.5px;
+  font-family: var(--sans);
+  min-height: 52px;
+}
+
+.hbox::placeholder {
+  color: var(--t3);
+}
+
+.hcrow {
+  display: flex;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.hsend {
+  margin-left: auto;
+  border: 0;
+  background: var(--accent);
+  color: var(--bg);
+  border-radius: var(--r1);
+  padding: 6px 16px;
+  font-weight: 600;
+  font-size: 13px;
+  font-family: var(--sans);
+  cursor: pointer;
+}
+
+.hsend:disabled {
+  opacity: 0.5;
+  cursor: default;
+}

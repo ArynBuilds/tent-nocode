@@ -1,0 +1,365 @@
+/* The document flow (FR-175, D-39; restyled 2026-07-20, user-ratified against the Codex
+ * reference): typographic hierarchy, not borders. The user's texts are RIGHT-ALIGNED rounded
+ * pills — the only filled elements; consent questions keep their bordered sections; the
+ * assistant is plain quiet text on the bare surface. Generous inter-turn air. */
+
+.feed {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 16px 4px 24px;
+}
+
+.prompt {
+  background: var(--panel2); /* user-ruled 2026-07-28: sent messages wear the CHATBOX's own
+                                color (the capsule composer's --panel2) — one family */
+  border: none;
+  border-radius: 22px;
+  padding: 10px 18px;
+  margin: 30px 0 22px auto;
+  width: fit-content;
+  max-width: 72%;
+  white-space: pre-wrap;
+  line-height: 1.5;
+}
+/* LIGHT MODE (user-corrected 2026-07-28): the RELATIVE flip only — dark mode's pill is
+   lighter than its ground, so light mode's pill is DARKER than its ground; text stays
+   the theme's own. */
+:global([data-theme='light']) .prompt,
+:global([data-theme='light']) .mdCode,
+:global([data-theme='light']) .mdTable th {
+  background: #f0f0f0; /* ONE shared tone: pill + inline mentions + table headers (lightened per user, pass 3) */
+}
+
+.narration {
+  color: var(--t1);
+  line-height: 1.6;
+  margin: 14px 0;
+  white-space: pre-wrap;
+}
+/* A failed turn's reason, in place: error = mono red, the design system's one error face. */
+.narrationFailed {
+  color: var(--red);
+  font-family: var(--mono);
+  font-size: 12px;
+  line-height: 1.6;
+  margin: 14px 0;
+  white-space: pre-wrap;
+}
+/* The thinking indicator: the working word itself shimmers — a light sweep across the
+ * TEXT (background-clip). No wordless markers anywhere; the live element carries its
+ * own words, and clicking the word folds the process detail open and closed. */
+.shimmer {
+  /* One narrow band on the base tone; the 200% tile with a 100% -> -100% sweep means one band
+   * enters left and exits right per loop, and no repeat ever tiles a second band over the tail. */
+  background: linear-gradient(90deg, var(--t3) 0%, var(--t3) 45%, var(--t0) 50%, var(--t3) 55%, var(--t3) 100%);
+  background-size: 200% 100%;
+  background-repeat: no-repeat;
+  background-color: var(--t3);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shimmer 2s linear infinite;
+}
+@keyframes shimmer {
+  from { background-position: 100% 0; }
+  to { background-position: -100% 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .shimmer { animation: none; background: none; color: var(--t2); }
+}
+
+/* FR-215: the FR-190 status word lives IN the chat, at the document's live edge. */
+.liveStatus {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--t2);
+  margin: 10px 0 2px;
+  user-select: none;
+  /* Fix ledger 2026-07-28 wave 1.2: the edge word is NOT clickable — its live group-header
+   * twin is. Explicit, so the twins' cursors never drift into a false shared affordance. */
+  cursor: default;
+}
+
+.step {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--t3);
+  margin: 2px 0;
+  line-height: 1.5;
+}
+.stepTool {
+  color: var(--t2);
+}
+.stepFail {
+  color: var(--amber);
+}
+
+.chipRow {
+  margin: 4px 0;
+}
+.chip {
+  display: inline-flex;
+  gap: 6px;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--t2);
+  background: var(--panel2);
+  border: 1px solid var(--border);
+  border-radius: var(--r1);
+  padding: 3px 9px;
+  margin: 2px 6px 2px 0;
+}
+.chipWarn {
+  border-color: var(--amber);
+  color: var(--amber);
+}
+
+.machinery {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--t3);
+  margin: 6px 0;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+  display: block;
+  text-align: left;
+}
+.machinery:hover {
+  color: var(--t2);
+}
+.machineryDetail {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--t3);
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--r1);
+  padding: 8px 10px;
+  margin: 2px 0 8px;
+  white-space: pre-wrap;
+  word-break: break-all;
+  max-height: 180px;
+  overflow-y: auto;
+}
+
+/* User-ratified 2026-07-12: the border bars died — liveness is the constellation mark, and an
+   opened group is contained by a quiet inset panel, never by vertical rules. */
+.group {
+  margin: 8px 0 8px 2px;
+}
+.groupLive .groupSummary {
+  color: var(--accent);
+}
+.groupDetail {
+  background: var(--panel);
+  border-radius: var(--r1);
+  padding: 6px 10px;
+  margin-top: 4px;
+}
+.groupSummary {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--t2);
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+  display: block;
+  text-align: left;
+}
+.groupSummary:hover {
+  color: var(--t1);
+}
+/* Fix ledger 2026-07-28 wave 1.2, hover-only ratification: the LIVE header is the clickable
+ * twin of the edge status word — at rest the two stay pixel-identical (the 2026-07-12
+ * bare-verb ruling holds at rest), so the disclosure cue is hover-only: a faint caret
+ * fades in after the verb. Zero-width inline-block + overflow:visible = the space is
+ * reserved by construction, no layout shift on hover. */
+.liveCaret {
+  display: inline-block;
+  width: 0;
+  overflow: visible;
+  white-space: nowrap;
+  color: var(--t3);
+  opacity: 0;
+  transition: opacity 120ms ease;
+}
+.groupSummary:hover .liveCaret {
+  opacity: 0.5;
+}
+@media (prefers-reduced-motion: reduce) {
+  .liveCaret { transition: none; }
+}
+.working {
+  color: var(--accent);
+}
+
+.outcome {
+  margin: 20px 0;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.stopped {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--amber);
+  margin: 8px 0;
+}
+
+/* FR-198 (Tier 12): inert markdown inside narration/outcome. Quiet typographic steps, D-19. */
+.mdPara { margin: 0 0 8px; white-space: pre-wrap; }
+.mdPara:last-child { margin-bottom: 0; }
+.mdHeading { margin: 10px 0 6px; font-weight: 600; color: var(--t1, #e8e8e8); }
+h3.mdHeading { font-size: 15px; }
+h4.mdHeading { font-size: 14px; }
+h5.mdHeading { font-size: 13px; }
+.mdCode {
+  font-family: var(--mono, 'JetBrains Mono', monospace); font-size: 12px;
+  background: var(--panel2, #1a1a1a); padding: 1px 5px; border-radius: 4px;
+}
+.mdPre {
+  font-family: var(--mono, 'JetBrains Mono', monospace); font-size: 12px;
+  background: var(--panel2, #1a1a1a); border: 1px solid var(--border, #2a2a2a);
+  border-radius: var(--r1); padding: 8px 10px; margin: 6px 0; overflow-x: auto;
+  white-space: pre;
+}
+.mdList { margin: 4px 0 8px; padding-left: 22px; }
+.mdList li { margin: 2px 0; }
+
+/* Pipe tables (2026-07-20, the investor-table specimen): quiet real tables — headers in the
+   UI face, data cells mono (FR-55), the wrap owns horizontal scroll so the page never does. */
+.mdTableWrap {
+  overflow-x: auto;
+  margin: 10px 0 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--r1);
+}
+.mdTable {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 12.5px;
+}
+.mdTable th {
+  text-align: left;
+  font-weight: 600;
+  color: var(--t2);
+  padding: 7px 12px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+}
+.mdTable td {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--t1);
+  padding: 6px 12px;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+.mdTable tr:last-child td { border-bottom: none; }
+
+/* FR-192 (Tier 12): actionable outcome chips — delivered files open in the file manager, tabs navigate. */
+.chipAction { cursor: pointer; background: none; }
+.chipAction:hover:not(:disabled) { border-color: var(--accent, #ececec); color: var(--t1, #e8e8e8); }
+.chipAction:disabled { cursor: default; opacity: 0.7; }
+
+/* FR-238 (Tier 16): a settled mission's collapsed record in the document. */
+.missionCard { margin: 4px 0; opacity: 0.85; }
+.missionParts { padding: 2px 0 2px 18px; }
+.missionNote { color: var(--t3, #6e6e6e); font-size: 11px; }
+
+/* FR-239 (D-67): the turn container — the reply owns what it caused, nested and quiet. */
+.turn { margin: 2px 0; }
+.turnChildren {
+  margin: 2px 0 6px 10px; padding-left: 12px;
+}
+
+/* ── Tier 35 §9 (D-139) THE WINDOW ─────────────────────────────────────────────────────────
+   The type ladder (spec §9, ruled with the user): three weights total — 400 everywhere, 500
+   spent exactly where the news is (pill role names, settled headlines), 600 never used here
+   (inline report emphasis only, via Markdown strong). LUMINANCE-FIRST, WEIGHT-SECOND. */
+
+/* FR-359/362: the turn shell header — quiet chrome (Codex grammar: never bold). */
+.turnHeader {
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--t3);
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+  display: block;
+  text-align: left;
+  margin: 10px 0 0;
+}
+.turnHeader:hover { color: var(--t2); }
+
+/* FR-360: member pills — the worker capsules at their dispatch point. */
+.pillWrap { margin: 8px 0; }
+.pillRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--sans);
+  font-size: 12px;
+  color: var(--t2);
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 999px; /* single-line capsule — the sanctioned capsule class */
+  padding: 3px 10px;
+  cursor: pointer;
+}
+.pill:hover { border-color: var(--border2); color: var(--t1); }
+.pillLive { color: var(--t1); }
+.pillRole { font-weight: 500; } /* the name is the news (FR-358) */
+.pillState { font-weight: 400; color: var(--t2); }
+.pillWord {
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--t3);
+}
+
+/* FR-361: the vertical timeline — thin connector, muted past-tense lines, quiet terminal. */
+.timeline {
+  position: relative;
+  background: var(--panel);
+  border-radius: var(--r2);
+  padding: 8px 12px 8px 22px;
+  margin-top: 6px;
+}
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 12px;
+  top: 10px;
+  bottom: 10px;
+  width: 1px;
+  background: var(--border);
+}
+.timeline .step { position: relative; }
+.timeline .step::before {
+  content: '';
+  position: absolute;
+  left: -13px;
+  top: 7px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--border2);
+}
+.timelineEnd { color: var(--t2); margin-top: 6px; }
+
+/* Tier 35 §9 micro-fork RATIFIED (2026-07-21, the Cursor reference): diff magnitude carries
+   the status hues — +N green, −N red — never color-only (the glyphs are the shape). */
+.statPlus { color: var(--green); }
+.statMinus { color: var(--red); }

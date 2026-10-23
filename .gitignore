@@ -1,0 +1,13 @@
+node_modules/
+dist/
+.env
+workspaces/
+apps/desktop/out/
+apps/desktop/dist/
+apps/desktop/.vite/
+apps/desktop/release/
+# The tentkit build is generated (npm run build:tentkit).
+apps/desktop/resources/engines/tentkit-*.js
+apps/desktop/resources/engines/tentkit.json
+*.log
+.logs/

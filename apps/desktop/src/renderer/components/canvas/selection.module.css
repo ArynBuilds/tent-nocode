@@ -1,0 +1,92 @@
+/* THE ONE SELECTION CHROME (one-hand P1): outline + corners + badge + hover,
+   one dress for cards, screens, loose and in-page elements. Constant screen px
+   at any zoom: every dimension divides by --sk (the caller stamps it: 1 in
+   screen space, the camera zoom in world space, camera x miniature in frame
+   space). Gold is the one hue (--live); corners are white Figma squares. */
+
+.outline {
+  position: absolute;
+  outline: calc(1px / var(--sk, 1)) solid var(--live);
+  pointer-events: auto;
+  cursor: default;
+}
+
+.hover {
+  position: absolute;
+  outline: calc(2px / var(--sk, 1)) solid var(--live);
+  pointer-events: none;
+}
+
+.corner {
+  position: absolute;
+  width: calc(16px / var(--sk, 1));
+  height: calc(16px / var(--sk, 1));
+  margin: calc(-8px / var(--sk, 1)) 0 0 calc(-8px / var(--sk, 1));
+  background: transparent;
+  border: 0;
+  pointer-events: auto;
+}
+
+.corner::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: calc(8px / var(--sk, 1));
+  height: calc(8px / var(--sk, 1));
+  margin: calc(-4px / var(--sk, 1)) 0 0 calc(-4px / var(--sk, 1));
+  background: #ffffff;
+  border: calc(1px / var(--sk, 1)) solid var(--live);
+  border-radius: calc(1px / var(--sk, 1));
+}
+
+.badge {
+  position: absolute;
+  transform: translateX(-50%) scale(calc(1 / var(--sk, 1)));
+  transform-origin: 50% 0;
+  margin-top: calc(8px / var(--sk, 1));
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: var(--live);
+  color: var(--ground);
+  font-family: var(--sans);
+  font-size: 11px;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* The extra selection (shift-click set): one luminance step under the primary. */
+.extra {
+  position: absolute;
+  outline: calc(1px / var(--sk, 1)) solid var(--t2);
+  pointer-events: none;
+}
+
+/* The drag ghost - every selection move/resize preview wears this one dress. */
+.ghost {
+  position: absolute;
+  border: calc(1px / var(--sk, 1)) dashed var(--t2);
+  background: color-mix(in srgb, var(--t2) 6%, transparent);
+  pointer-events: none;
+}
+
+/* The snap guides - hairlines at the snapped x/y, full drag surface. */
+.guideV {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: calc(1px / var(--sk, 1));
+  background: var(--t2);
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.guideH {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: calc(1px / var(--sk, 1));
+  background: var(--t2);
+  opacity: 0.7;
+  pointer-events: none;
+}

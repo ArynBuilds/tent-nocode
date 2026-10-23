@@ -1,0 +1,290 @@
+/*
+ * D-19 palette tokens (ramp rebased 2026-07-20, user-ratified against the Codex/ChatGPT
+ * reference image: lighter graphite main surface, DARKER sidebar — the --side token — and
+ * a raised bubble tone). One blue accent, small status hues (green/amber/red).
+ * Confidence grammar (law, applies wherever content renders): solid border =
+ * record-backed, dashed = INFERRED/LLM-derived, dotted+amber = AMBIGUOUS.
+ * No signal may be color-only.
+ */
+:root {
+  /* Swapped 2026-07-20 (user-directed): the DARKER tone is the main/thread surface,
+     the lighter one is the sidebar. */
+  --bg: #171717;
+  --side: #212121;
+  --panel: #2a2a2a;
+  --panel2: #303030;
+  --border: #3a3a3a;
+  --border2: #4a4a4a;
+  --t0: #ffffff; /* max contrast — active/selected text only (2026-07-20) */
+  --t1: #ececec;
+  --t2: #a0a0a0;
+  --t3: #7a7a7a;
+  /* Monochrome ratified 2026-07-20 (user-directed): the blue accent retired — the accent IS
+     bright white now; green/amber/red remain the only hues, carrying STATUS meaning alone. */
+  --accent: #ececec;
+  --green: #3fb950;
+  --amber: #d29922;
+  --red: #f85149;
+  /* THE DESIGN SYSTEM — SOFT SURFACES (CLAUDE.md, ruled 2026-08-05): depth comes from
+     SURFACES — inputs are sunken wells, buttons raised pills; ONE hue spent on
+     interaction alone. Landed here additively (first wearer: the Properties panel);
+     the app-wide surface migration is its own on-pixel ratification pass. */
+  --ground: #141414;
+  --surface: #1d1d1d;
+  --well: #242424;    /* SUNKEN interactive fill: inputs, dropdowns, segmented tracks */
+  --raised: #2e2e2e;  /* RAISED interactive fill: buttons, active segment, hover step */
+  --float: #363636;   /* floating chrome: menus, popovers, toolbars */
+  --lift: none;       /* raised-surface shadow: dark separates by surface alone */
+  --hairline: rgba(255, 255, 255, 0.06); /* the rare last-resort separator */
+  --live: #F5C518;    /* THE INTERACTION HUE (gold, user-ruled 2026-08-19): selected/active/focused/pressed */
+  --mono: 'JetBrains Mono', ui-monospace, monospace;
+  /* Geist ratified 2026-08-11 (the type bake-off): Tent NoCode CHROME wears Geist;
+     scenes keep their own faces (the serving font stack is untouched by law). */
+  --sans: 'Geist', 'Inter', system-ui, sans-serif;
+  /* Radius scale (ratified 2026-07-20): rounded, tiered, capsule reserved.
+     r1 = chips/rows/small buttons · r2 = cards/panels/popovers · r3 = modals/overlays.
+     Single-line pills (composer, tags, send) use 999px; avatars/knobs use 50%. */
+  --r1: 10px;
+  --r2: 14px;
+  --r3: 18px;
+  /* Shared header-bar height (2026-07-20): the thread header and the side-panel tab strip
+     carry the SAME fixed height so their bottom borders align at every window size. */
+  --barH: 44px;
+  /* Tier 40 (FR-399, D-159) — THE SCENE LADDERS (DESIGN.md lockstep; served to scenes
+     via TAB_TOKENS_CSS — keep the two files in lockstep). Type ladder: */
+  --fs-caption: 11px; /* axis ticks, chart labels, units, provenance */
+  --fs-small: 12px;   /* table headers, captions, notes */
+  --fs-body: 13px;    /* cells, controls, nav */
+  --fs-title: 14px;   /* panel titles — weight 500 is where the news is */
+  --fs-heading: 16px; /* scene section headings — weight 500 */
+  --fs-metric: 26px;  /* stat values — Inter 500 tabular-nums (mono stays record-verbatim, 400 only) */
+  --fs-hero: 40px;    /* the LONE hero metric (a panel's only child) — promoted 2026-07-28 from a
+                         v6 inline fallback (the design-system pass paying the small D-159 debt) */
+  /* Spacing scale (the 4px grid — core-set gaps/pads quantize to it): */
+  --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px; --s5: 24px; --s6: 32px;
+  /* Chart tokens (D-159): */
+  --chart-grid: #2c2c2c; /* hairline gridlines (fainter, v5 polish pass) */
+  color-scheme: dark;
+  --chart-axis: #4a4a4a; /* axis lines (border2) */
+  /* Series ramp — THE HUED EXEMPTION EXERCISED 2026-07-26 (user-directed, the 2026-07-22
+     ruling's recorded future ratification): DATA SERIES ONLY — chrome stays MONOCHROME,
+     status hues (green/amber/red) untouched. Final ratification is the user's ON PIXELS.
+     Dash patterns still join from series 4 — never color-only (D-19 law).
+     Mono ramp for instant revert: #ececec #b0b0b0 #858585 #616161 #474747 #383838 */
+  --series-1: #d97757;
+  --series-2: #8caec9;
+  --series-3: #c9a84c;
+  --series-4: #86b39c;
+  --series-5: #a98fc0;
+  --series-6: #97999e;
+}
+
+/* LIGHT MODE (user-ruled 2026-07-28, v1 values — iterate ON PIXELS like every palette
+   ruling; the same monochrome law inverted: luminance flips, status hues re-anchored for
+   white, series ramp unchanged. Keep in LOCKSTEP with TAB_TOKENS_CSS. */
+:root[data-theme='light'] {
+  --bg: #f0f0f0; /* the GROUND — lightened to match the chat chip tone (user-ruled pass 4) */
+  --side: #f6f6f6;
+  --panel: #fdfdfd;
+  --panel2: #ffffff;
+  --border: #d8d8d8;
+  --border2: #c0c0c0;
+  --t0: #000000;
+  --t1: #1f1f1f;
+  --t2: #5f5f5f;
+  --t3: #8c8c8c;
+  --accent: #1f1f1f;
+  --green: #1a7f37;
+  --amber: #9a6700;
+  --red: #cf222e;
+  /* SOFT SURFACES mirrored (CLAUDE.md light-mode table): raised/float turn white +
+     soft shadow; --live re-anchored for contrast on light wells. */
+  --ground: #f0f0f0;
+  --surface: #f7f7f7;
+  --well: #e9e9e9;
+  --raised: #ffffff;
+  --float: #ffffff;
+  --lift: 0 0 0 1px rgba(0, 0, 0, 0.06), 0 2px 8px rgba(0, 0, 0, 0.1); /* white-on-white needs the soft shadow (walk #29) */
+  --hairline: rgba(0, 0, 0, 0.07);
+  --live: #F5C518; /* the ONE gold on both themes (user-ruled, lighter tried and reverted) */
+  --chart-grid: #e6e6e6;
+  --chart-axis: #c2c2c2;
+  color-scheme: light;
+}
+
+/* Offline-first fonts: bundled .woff2 files, no network fetch. */
+@font-face {
+  font-family: 'Geist';
+  src: url('./fonts/Geist-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Geist';
+  src: url('./fonts/Geist-Medium.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Geist';
+  src: url('./fonts/Geist-SemiBold.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('./fonts/Inter-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('./fonts/Inter-Medium.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('./fonts/Inter-SemiBold.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('./fonts/Inter-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('./fonts/JetBrainsMono-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('./fonts/JetBrainsMono-Medium.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('./fonts/JetBrainsMono-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* FR-197 (Tier 12): deliberate focus — keyboard navigation gets a quiet accent ring,
+ * pointer clicks get silence. Kills the stray blue UA outline on click/Esc (live find
+ * 2026-07-10) without sacrificing keyboard accessibility. */
+:focus {
+  outline: none;
+}
+:focus-visible {
+  outline: 1px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  /* The shell NEVER page-scrolls (2026-07-20, the panel-cycle scrollbar specimen): only
+     interior panes own scrolling — a window-level scrollbar is a layout bug by definition. */
+  overflow: hidden;
+}
+
+body {
+  background: var(--bg);
+  color: var(--t1);
+  font-family: var(--sans);
+}
+
+.desk-boot {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+}
+
+.desk-boot__label {
+  color: var(--t2);
+  font-family: var(--mono);
+  font-size: 0.9rem;
+  letter-spacing: 0.02em;
+}
+
+/*
+ * Scrollbars, Cursor/VS Code style (global — Chromium renderer, so ::-webkit-* covers every
+ * scroll surface in the app): a 10px invisible rail whose thumb is a slim rounded pill
+ * (the transparent border + padding-box clip leaves ~6px visible), transparent track, no
+ * buttons, no corner block. Barely-there at rest, darkens under the pointer — never the OS
+ * gutter chrome that was clashing with the graphite panels.
+ */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track,
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background-color: rgba(154, 154, 154, 0.22);
+  border-radius: 5px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  min-height: 32px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(154, 154, 154, 0.42);
+}
+::-webkit-scrollbar-thumb:active {
+  background-color: rgba(154, 154, 154, 0.55);
+}
+::-webkit-scrollbar-button {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+/* THE DRAG-NEVER-SELECTS-TEXT SWEEP (user-ruled 2026-07-30, THE RE-HOUSING R1):
+   dragging chrome, canvases, or the lens never lights native text selection. Text
+   selects ONLY where text IS the content — prose, table cells, code, inputs. */
+body {
+  user-select: none;
+}
+p, li, h1, h2, h3, h4, blockquote, td, th, pre, code,
+input, textarea, [contenteditable='true'], .cm-content {
+  user-select: text;
+}
+/* Where selection remains, it speaks the monochrome ramp — never browser blue. */
+::selection {
+  background: color-mix(in srgb, var(--t1) 22%, transparent);
+}

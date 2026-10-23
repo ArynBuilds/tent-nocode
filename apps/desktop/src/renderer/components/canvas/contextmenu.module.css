@@ -1,0 +1,80 @@
+/* B5 ㉙+㊵: THE ONE right-click menu — constant-px chrome, monochrome, the overlay
+   shadow class (menus are overlays — the one legal shadow). */
+
+.menu {
+  position: fixed;
+  z-index: 40;
+  min-width: 184px;
+  max-width: 224px;
+  background: var(--panel2);
+  border: 1px solid var(--border2);
+  border-radius: var(--r1);
+  padding: 4px;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.35);
+}
+
+.search {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 4px;
+  background: var(--panel);
+  border: 1px solid var(--border2);
+  border-radius: var(--r1);
+  padding: 5px 6px;
+  color: var(--t1);
+  font-size: 12px;
+  font-family: var(--sans);
+  outline: none;
+}
+
+.rows {
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.divider {
+  height: 1px;
+  margin: 4px 2px;
+  background: var(--border2);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: 0;
+  border-radius: var(--r1);
+  padding: 5px 6px;
+  color: var(--t1);
+  font-size: 12px;
+  font-family: var(--sans);
+  cursor: pointer;
+}
+
+.row:hover {
+  background: var(--panel);
+}
+
+.icon {
+  width: 12px;
+  flex: 0 0 12px;
+  color: var(--t2);
+}
+
+.label {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ㊵: the inline shortcut — the menu teaches, quietly. */
+.shortcut {
+  color: var(--t3);
+  font-size: 10px;
+  font-family: var(--mono);
+}

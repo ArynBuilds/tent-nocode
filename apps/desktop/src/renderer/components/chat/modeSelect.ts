@@ -1,0 +1,6 @@
+import type { ThreadMode } from '@tent-nocode/core';
+
+/** Labels a thread's mode; null means inherit the org default and says so. */
+export function modeLabel(threadMode: ThreadMode | null, orgDefault: ThreadMode): string {
+  return threadMode ?? `default (${orgDefault})`;
+}

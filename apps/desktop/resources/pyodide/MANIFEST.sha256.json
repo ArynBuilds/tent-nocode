@@ -1,0 +1,127 @@
+{
+  "pyodideVersion": "314.0.2",
+  "python": "3.14.0",
+  "vendoredAt": "2026-07-23",
+  "files": {
+    "contourpy-1.3.3-cp314-cp314-pyemscripten_2026_0_wasm32.whl": {
+      "sha256": "8af5f4338988b30a65f5c81c0a3f335353546809538e81d35b572ed4595f80b6",
+      "bytes": 117562
+    },
+    "cycler-0.12.1-py3-none-any.whl": {
+      "sha256": "3569bab200be7f85520bf64a3ff334b016e19441ba89b588d2625c3b89da09c7",
+      "bytes": 8321
+    },
+    "decorator-5.2.1-py3-none-any.whl": {
+      "sha256": "791060972d212b89d6b64c646d940bd647d26d4e5ab3c8e1e8adbae4f1309f8b",
+      "bytes": 9167
+    },
+    "fonttools-4.62.1-py3-none-any.whl": {
+      "sha256": "6d8caa09c191f26c47403499d6cff62f3fb9685b978baa047bf791862bcb298a",
+      "bytes": 1152647
+    },
+    "imageio-2.37.3-py3-none-any.whl": {
+      "sha256": "d4a85837a12593eb71a75bb4a3c6a40eea38298d08f205598df20734d2ae4eed",
+      "bytes": 317646
+    },
+    "kiwisolver-1.5.0-cp314-cp314-pyemscripten_2026_0_wasm32.whl": {
+      "sha256": "7591db9cc1181815eeefb2e7c5b5622a18a3fa334788e1b49eb3e8ad7f90186f",
+      "bytes": 36615
+    },
+    "lazy_loader-0.5-py3-none-any.whl": {
+      "sha256": "7c11bbbabb45eb8cf9b9674d4d9defc24ae63e0f66baa2ea538deedb5bceec41",
+      "bytes": 8044
+    },
+    "matplotlib-3.10.8-cp314-cp314-pyemscripten_2026_0_wasm32.whl": {
+      "sha256": "2867b2003ee66d0d2478423f783ec035d432c6560ae86d0e58d096ff98cab6a8",
+      "bytes": 6972262
+    },
+    "networkx-3.6.1-py3-none-any.whl": {
+      "sha256": "de0354124c06f1b24dbad90defacf49764ab04dd616a13b685493670e199755c",
+      "bytes": 1084840
+    },
+    "numpy-2.4.3-cp314-cp314-pyemscripten_2026_0_wasm32.whl": {
+      "sha256": "0cad9c1b91f0082e4f959bc0e0bf5835a2efbba6ab3b1e9d1fe6e7e564cca98e",
+      "bytes": 2916023
+    },
+    "package.json": {
+      "sha256": "3364fa3f11b85fa4dda78d984e6493ecb2affcec93a809c7bc678dd669e9734e",
+      "bytes": 2999
+    },
+    "packaging-26.1-py3-none-any.whl": {
+      "sha256": "2719239437268bcea22845651a242f2c252e2ed984645161dd203546f2a52219",
+      "bytes": 95846
+    },
+    "pandas-3.0.2-cp314-cp314-pyemscripten_2026_0_wasm32.whl": {
+      "sha256": "51475a2026084c3b600566658fffc95efc5a71593472ab8a561d92a504a15a3e",
+      "bytes": 4183474
+    },
+    "pillow-12.2.0-cp314-cp314-pyemscripten_2026_0_wasm32.whl": {
+      "sha256": "a50d83a8a76d646768e99e93ed5bf365d0b83563fd8b597e77562e75c8f575a9",
+      "bytes": 1037798
+    },
+    "pyodide-lock.json": {
+      "sha256": "c963d22858f6bcb8f41586a2142f03905ab370c88ea22a86a2736e95fac2a8f3",
+      "bytes": 113804
+    },
+    "pyodide.asm.mjs": {
+      "sha256": "c7eccdfeb7a8419d61f910f0685b45cd5610b7ff5bbe844c3c1050ee6623b641",
+      "bytes": 1250259
+    },
+    "pyodide.asm.wasm": {
+      "sha256": "f7a8a169e513791e18fa0790fb69d6f2656b779e9012ba57e03e973f0df0b39f",
+      "bytes": 9609998
+    },
+    "pyodide.js": {
+      "sha256": "95fc4de60f515e3f5c4a9acd86849068f8e5cc0818652c0963e43de08b9b2f30",
+      "bytes": 18861
+    },
+    "pyodide.js.map": {
+      "sha256": "027ec5cfee7d9e5a98e6b293f474e99597925cf060c05dd27579a84959655ce3",
+      "bytes": 84996
+    },
+    "pyodide.mjs": {
+      "sha256": "955d2088bbb7fc79a73c4802aca2370c1d95bfdfaffa4121e0faebda2b0ea3f9",
+      "bytes": 17880
+    },
+    "pyodide.mjs.map": {
+      "sha256": "1da3cb7143464b8a647a1587ae6ca10b5589a9d5790ec269cbd88e71ef4ba3ee",
+      "bytes": 84618
+    },
+    "pyparsing-3.3.2-py3-none-any.whl": {
+      "sha256": "101eece4e324f842bf46e6f821fe5bc62d79b9ebfa3b399b6aff0e0ab0ee400f",
+      "bytes": 122781
+    },
+    "python_dateutil-2.9.0.post0-py2.py3-none-any.whl": {
+      "sha256": "e0dad39eec43965d30ef0dbe870617bd5a7ca795c65fda722a7ab2bbd2b747e3",
+      "bytes": 229892
+    },
+    "python_stdlib.zip": {
+      "sha256": "101a9c94ca6304c1478c89b7b595136b9a51b4289bdc5b467d86db553efee9b3",
+      "bytes": 2552456
+    },
+    "pytz-2026.1.post1-py2.py3-none-any.whl": {
+      "sha256": "b746aea4d621b01e8c9c5e8e3a6498daecec99f5bffa429beaf3cd6483b14f61",
+      "bytes": 510489
+    },
+    "pywavelets-1.9.0-cp314-cp314-pyemscripten_2026_0_wasm32.whl": {
+      "sha256": "87d48ef7c6fb86674c6a41d1b24b24f8fa200815ce4e226dc34f263644df4cf2",
+      "bytes": 916029
+    },
+    "scikit_image-0.25.2-cp314-cp314-pyemscripten_2026_0_wasm32.whl": {
+      "sha256": "ebde167f651748b29adc37d70b4ace2fe5066541c2c00e1b8a1dc99acd92c586",
+      "bytes": 9412199
+    },
+    "scipy-1.18.0-cp314-cp314-pyemscripten_2026_0_wasm32.whl": {
+      "sha256": "4ef1569eac793bec84a92fa2eaf24eafb4529ff10c5ed87d1e335063f26142f3",
+      "bytes": 14009071
+    },
+    "setuptools-82.0.1-py3-none-any.whl": {
+      "sha256": "43e06cea3e40c5a8594b20341557153e446eec6997e031762c290e0b94639457",
+      "bytes": 756856
+    },
+    "six-1.17.0-py2.py3-none-any.whl": {
+      "sha256": "c6681057bd87fdec57e811b8e4007bad38deea284052817fa400d542c6423e2d",
+      "bytes": 11050
+    }
+  }
+}

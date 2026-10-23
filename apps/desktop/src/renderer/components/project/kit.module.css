@@ -1,0 +1,339 @@
+/* The project screen's building blocks on soft surfaces: groups are surface panels,
+   inputs are wells, verbs are raised pills, the gold is spent on focus and the one primary verb. */
+
+/* ---- section head ---- */
+
+.head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s1);
+}
+
+.title {
+  margin: 0;
+  font: 600 var(--fs-heading) var(--sans);
+  color: var(--t1);
+}
+
+.description {
+  margin: 0;
+  max-width: 60ch;
+  font: 400 var(--fs-body) / 1.5 var(--sans);
+  color: var(--t2);
+}
+
+/* ---- group + row ---- */
+
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s2);
+}
+
+.groupTitle {
+  margin: 0;
+  padding: 0 var(--s1);
+  font: 600 var(--fs-small) var(--sans);
+  color: var(--t1);
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  padding: var(--s1) var(--s4);
+  background: var(--surface);
+  border-radius: var(--r2);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--s4);
+  min-height: 56px;
+  padding: var(--s3) 0;
+}
+
+.rowStack {
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--s2);
+}
+
+.rowText {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.label {
+  font: 400 var(--fs-body) var(--sans);
+  color: var(--t2);
+}
+
+.hint {
+  font: 400 var(--fs-small) / 1.45 var(--sans);
+  color: var(--t3);
+}
+
+.hint code {
+  font: 400 var(--fs-small) var(--mono);
+  color: var(--t2);
+}
+
+.itemName {
+  font: 400 var(--fs-small) var(--mono);
+  color: var(--t1);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.control {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+  min-width: 0;
+  max-width: 100%;
+}
+
+.rowStack .control {
+  flex-wrap: wrap;
+}
+
+.control > .copyValue {
+  flex: 1;
+}
+
+.value {
+  font: 400 var(--fs-body) var(--sans);
+  color: var(--t1);
+}
+
+.empty {
+  padding: var(--s3) 0;
+  font: 400 var(--fs-small) / 1.45 var(--sans);
+  color: var(--t3);
+}
+
+/* ---- controls: wells to type into, pills to press ---- */
+
+.input,
+.select {
+  height: 36px;
+  min-width: 0;
+  padding: 0 var(--s3);
+  background: var(--well);
+  border: 0;
+  border-radius: var(--r1);
+  color: var(--t1);
+  font: 400 var(--fs-body) var(--sans);
+  outline: none;
+}
+
+.input {
+  flex: 1;
+}
+
+.input::placeholder {
+  color: var(--t3);
+}
+
+.mono {
+  font-family: var(--mono);
+  font-size: var(--fs-small);
+}
+
+.select {
+  padding-right: var(--s2);
+  cursor: pointer;
+}
+
+.input:focus-visible,
+.select:focus-visible {
+  outline: 2px solid var(--live);
+  outline-offset: -2px;
+}
+
+.input:disabled,
+.select:disabled {
+  opacity: 0.6;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s2);
+  flex: none;
+  height: 32px;
+  padding: 0 var(--s4);
+  background: var(--raised);
+  box-shadow: var(--lift);
+  border: 0;
+  border-radius: 999px;
+  color: var(--t1);
+  font: 500 var(--fs-small) var(--sans);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 120ms ease-out;
+}
+
+.btn:hover:not(:disabled) {
+  background: var(--float);
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--live);
+  outline-offset: 2px;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.btnPrimary {
+  background: var(--live);
+  color: var(--ground);
+  box-shadow: none;
+}
+
+.btnPrimary:hover:not(:disabled) {
+  background: var(--live);
+  filter: brightness(1.06);
+}
+
+.btnQuiet {
+  background: transparent;
+  box-shadow: none;
+  color: var(--t2);
+  padding: 0 var(--s3);
+}
+
+.btnQuiet:hover:not(:disabled) {
+  background: var(--raised);
+  color: var(--t1);
+}
+
+/* The confirming verb of a destructive pair: inverted, so it never reads as the resting verb. */
+.btnStrong {
+  background: var(--t1);
+  color: var(--ground);
+  box-shadow: none;
+}
+
+.btnStrong:hover:not(:disabled) {
+  background: var(--t0);
+}
+
+/* ---- copyable values ---- */
+
+.copyValue {
+  display: flex;
+  align-items: center;
+  gap: var(--s1);
+  min-width: 0;
+  max-width: 100%;
+}
+
+.panel > .copyValue {
+  margin-bottom: var(--s3);
+}
+
+.copyText {
+  flex: 1;
+  min-width: 0;
+  padding: var(--s2) var(--s3);
+  background: var(--well);
+  border-radius: var(--r1);
+  font: 400 var(--fs-small) var(--mono);
+  color: var(--t1);
+  white-space: nowrap;
+  overflow-x: auto;
+  user-select: all;
+  scrollbar-width: none;
+}
+
+/* ---- status: words first, status hue on the words alone ---- */
+
+.status {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s2);
+  font: 400 var(--fs-small) / 1.45 var(--sans);
+  animation: statusIn 180ms cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.panel > .status {
+  padding-bottom: var(--s3);
+}
+
+.busy {
+  color: var(--t2);
+}
+
+.ok > span:first-child {
+  color: var(--green);
+}
+
+.bad > span:first-child {
+  color: var(--red);
+}
+
+.details summary {
+  width: fit-content;
+  color: var(--t3);
+  font-size: var(--fs-caption);
+  cursor: pointer;
+}
+
+.details summary:focus-visible {
+  outline: 2px solid var(--live);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.details pre {
+  margin: var(--s1) 0 0;
+  white-space: pre-wrap;
+  font: 400 var(--fs-caption) var(--mono);
+  color: var(--t2);
+}
+
+/* ---- inline confirm ---- */
+
+.confirm {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--s2);
+  animation: statusIn 150ms cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.confirmPrompt {
+  font: 500 var(--fs-small) var(--sans);
+  color: var(--t1);
+  margin-right: var(--s1);
+}
+
+@keyframes statusIn {
+  from {
+    opacity: 0;
+    transform: translateY(-2px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .status,
+  .confirm {
+    animation: none;
+  }
+}

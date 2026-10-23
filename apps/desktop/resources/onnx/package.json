@@ -1,0 +1,4 @@
+{
+  "type": "commonjs",
+  "//": "Tier 46 (FR-423): apps/desktop is type:module, which would make Node load the vendored ort.js as ESM and skip its CJS export branch (require() would return an empty namespace — the live find of 2026-07-24). This marker scopes the vendored dir back to CommonJS; it is OURS, not upstream's, and carries no code."
+}

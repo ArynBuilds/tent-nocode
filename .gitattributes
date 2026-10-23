@@ -1,0 +1,11 @@
+# Tier 26 (FR-294): engine assets are hash-pinned in the kernel registry — their bytes must be
+# identical on every checkout, so eol conversion is disabled. A converted file would serve with
+# a different sha256 and the tab:// route would refuse it (correct but mysterious).
+apps/desktop/resources/engines/* -text
+# Tier 42 (Task 0): the vendored Pyodide runtime is pinned by MANIFEST.sha256.json —
+# same law: eol conversion would silently break every hash on checkout.
+apps/desktop/resources/pyodide/* -text
+# Tier 46 (FR-423): the vendored ONNX runtime + model fixtures are pinned by
+# MANIFEST.sha256.json / in-test hashes — same law: eol conversion would break every pin.
+apps/desktop/resources/onnx/* -text
+packages/runner/test/fixtures/*.onnx -text

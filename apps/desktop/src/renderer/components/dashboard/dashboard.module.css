@@ -1,0 +1,210 @@
+/*
+ * The dashboard's projects surface: full-bleed card grid on the bare ground,
+ * one surface frame on hover, raised pill verbs. Every color is a token.
+ */
+
+/* The dashboard reads one type step bigger; the editor keeps the app ladder. */
+.scaleUp {
+  --fs-caption: 12px;
+  --fs-small: 13px;
+  --fs-body: 15px;
+  --fs-title: 17px;
+  --fs-heading: 20px;
+}
+
+.home {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  background: var(--ground);
+  padding: var(--s5) var(--s6);
+}
+
+.pageHead {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s3);
+  margin: 0 0 var(--s5);
+}
+
+.pageTitle {
+  font: 600 var(--fs-heading) var(--sans);
+  color: var(--t1);
+  margin: 0;
+}
+
+.pageMeta {
+  font: 400 var(--fs-body) var(--sans);
+  color: var(--t3);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(390px, 1fr));
+  gap: var(--s4);
+}
+
+/* At rest the card is a naked tile; hover raises one surface frame around it. */
+.card {
+  display: flex;
+  flex-direction: column;
+  background: transparent;
+  border-radius: var(--r2);
+  cursor: pointer;
+  text-align: left;
+  border: 0;
+  padding: var(--s2);
+  font-family: var(--sans);
+  transition: background 120ms ease-out;
+}
+
+.card:hover {
+  background: var(--surface);
+}
+
+.card:focus-visible {
+  outline: 2px solid var(--live);
+  outline-offset: -2px;
+}
+
+.previewEmpty {
+  aspect-ratio: 16 / 9;
+  width: 100%;
+  background: var(--well);
+  border-radius: var(--r2);
+}
+
+/* A project with no screens: the logo as a quiet placeholder, never a brand stamp. */
+.previewMark {
+  display: grid;
+  place-items: center;
+}
+
+.previewMark img {
+  filter: grayscale(1);
+  opacity: 0.14;
+  transition: opacity 120ms ease-out;
+}
+
+.card:hover .previewMark img {
+  opacity: 0.22;
+}
+
+.markOnLight {
+  display: none;
+}
+
+:global([data-theme='light']) .markOnDark {
+  display: none;
+}
+
+:global([data-theme='light']) .markOnLight {
+  display: block;
+}
+
+.cardBody {
+  padding: var(--s2) 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s1);
+  width: 100%;
+}
+
+.cardName {
+  font: 500 var(--fs-body) var(--sans);
+  color: var(--t1);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cardMeta {
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+  font: 400 var(--fs-small) var(--sans);
+  color: var(--t2);
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.cardVerbs {
+  display: flex;
+  gap: var(--s2);
+  padding: var(--s2) 0 0;
+}
+
+.verb {
+  height: 36px;
+  padding: 0 var(--s4);
+  border: 0;
+  border-radius: 999px;
+  background: var(--raised);
+  color: var(--t1);
+  font: 500 var(--fs-small) var(--sans);
+  cursor: pointer;
+  transition: background 120ms ease-out;
+}
+
+.verb:hover {
+  background: var(--float);
+}
+
+.verb:focus-visible {
+  outline: 2px solid var(--live);
+  outline-offset: -2px;
+}
+
+.verbPrimary {
+  background: var(--live);
+  color: var(--ground);
+}
+
+.verbPrimary:hover {
+  background: var(--live);
+  filter: brightness(1.08);
+}
+
+/* The plus card: the birth door. */
+.plusCard {
+  cursor: pointer;
+}
+
+.plusFrame {
+  display: grid;
+  place-items: center;
+  color: var(--t3);
+}
+
+.plusCard:hover .plusFrame {
+  color: var(--t1);
+}
+
+/* The birth screen: name + the kind cards, centered. */
+.birthWrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s4);
+  padding: var(--s5);
+}
+
+.birthName {
+  width: min(360px, 100%);
+  height: 36px;
+  padding: 0 var(--s3);
+  background: var(--well);
+  border: 0;
+  border-radius: var(--r1);
+  color: var(--t1);
+  font: 400 var(--fs-body) var(--sans);
+  outline: none;
+  text-align: center;
+}
+
+.birthName:focus {
+  outline: 2px solid var(--live);
+  outline-offset: -2px;
+}

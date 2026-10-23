@@ -1,0 +1,21 @@
+{
+  "name": "@tent-nocode/runner",
+  "version": "0.0.1",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./ops": "./src/ops/opExecutor.ts"
+  },
+  "dependencies": {
+    "@ai-sdk/anthropic": "^4.0.38",
+    "@ai-sdk/openai": "^4.0.39",
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "@tent-nocode/core": "*",
+    "@tent-nocode/kernel": "*",
+    "ai": "^7.0.61",
+    "postgres": "^3.4.4",
+    "pyodide": "^314.0.2",
+    "simple-git": "^3.27.0",
+    "zod": "^3.23.8"
+  }
+}

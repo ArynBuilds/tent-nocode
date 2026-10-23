@@ -1,0 +1,135 @@
+/* THE AFFORDANCE LAW (user, 2026-07-31) — the unscaled interaction chrome. One concern,
+   one file: everything here renders in CanvasChrome's overlay ABOVE the camera transform
+   (constant SCREEN size at any zoom; no card overflow box can clip it) or states the
+   cursor's honest word. Tokens only, MONOCHROME — luminance not hue. */
+
+/* `grabbing` ONLY while a middle-button pan or an actual card drag is IN PROGRESS
+   (THE CURSOR NEVER LIES — the engine sets this state class for the gesture's window). */
+.scrollGrabbing,
+.scrollGrabbing * {
+  cursor: grabbing !important;
+}
+
+/* The overlay itself — screen px, pointer-dead; only its controls re-enable pointers. */
+.chrome {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 5;
+}
+
+/* THE PROXIMITY REVEAL: at rest a mid-gray whisper; near the cursor — full-bright,
+   slight growth, a soft dark backplate disc (transform/opacity/shadow only, ~120ms). */
+.portDot {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  margin: -5px 0 0 -5px;
+  border-radius: 50%;
+  border: 1px solid var(--border2);
+  background: var(--panel2);
+  opacity: 0.45;
+  pointer-events: none;
+  transition: opacity 120ms ease, transform 120ms ease, box-shadow 120ms ease,
+    background 120ms ease, border-color 120ms ease;
+}
+
+.portDot.portNear {
+  opacity: 1;
+  background: #ececec;
+  border-color: #ececec;
+  transform: scale(1.2);
+  box-shadow: 0 0 0 6px color-mix(in srgb, var(--panel) 80%, transparent);
+}
+
+/* Hit ≫ visual: the invisible 24px grab circle over the 10px dot; the cursor confirms
+   the wire gesture (crosshair on port proximity). */
+.portHit {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  margin: -12px 0 0 -12px;
+  border-radius: 50%;
+  pointer-events: auto;
+  cursor: crosshair;
+}
+
+/* B3 (spec ③): the resting port-➕ chip died — creation chrome appears on INTENT
+   only; the browser door lives on the toolbar's connect button. */
+
+/* THE ACTION TOOLBAR (㊻: selection-summoned) — the one floating strip: icons only,
+   backplated, constant size, generous hits; offset above its target so it never
+   covers it. G3b: mounted INSIDE a camera-scaled layer (the in-frame channel
+   toolbar) it counter-scales by the layer's --cz — constant SCREEN size at any
+   zoom; unscaled mounts leave --cz unset (1). */
+.toolbar {
+  position: absolute;
+  z-index: 7;
+  transform-origin: 50% 100%;
+  transform: translate(-50%, -100%) scale(calc(1 / var(--cz, 1)));
+  display: flex;
+  gap: 2px;
+  padding: 3px;
+  background: color-mix(in srgb, var(--panel) 92%, transparent);
+  border: 1px solid var(--border);
+  border-radius: var(--r1);
+  pointer-events: auto;
+}
+
+.toolbarBtn {
+  width: 26px;
+  height: 26px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: var(--r1);
+  color: var(--t2);
+  padding: 0;
+  cursor: pointer;
+  transition: color 120ms ease, background 120ms ease;
+}
+
+.toolbarBtn:hover {
+  color: #ececec;
+  background: color-mix(in srgb, var(--t2) 12%, transparent);
+}
+
+/* N10 THE SENTENCE ON SELECT (the node tile, 2026-08-18): the single selection's
+   ONE plain sentence under the tile — quiet, ground-tinted, constant screen size
+   (the unscaled overlay), pointer-dead; it dissolves with the selection. */
+.selSentence {
+  position: absolute;
+  transform: translateX(-50%);
+  max-width: 380px;
+  padding: 3px 9px;
+  background: color-mix(in srgb, var(--ground) 84%, transparent);
+  border: 1px solid var(--hairline);
+  border-radius: 6px;
+  font: 11.5px var(--sans);
+  color: var(--t2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .portDot,
+  .toolbarBtn { transition: none; }
+}
+
+/* The named out-port's word - quiet at rest, bright near the cursor (the reveal). */
+.portWord {
+  position: absolute;
+  transform: translateY(-50%);
+  font-size: 10px;
+  color: var(--t3);
+  opacity: 0.55;
+  pointer-events: none;
+  white-space: nowrap;
+  transition: opacity 120ms ease, color 120ms ease;
+}
+.portWord.portNear { opacity: 1; color: var(--t1); }

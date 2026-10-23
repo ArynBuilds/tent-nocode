@@ -1,0 +1,642 @@
+/*
+ * The shell chrome (Task 8) — matches the ratified mockup's `.app`/`.side`/
+ * `.status` chrome exactly (grid, paddings, borders, fonts), sourced from
+ * docs/superpowers/specs/2026-07-04-desk-mockup.html. Screens 1-11 all
+ * render inside this frame; only the center column's content changes.
+ * Colors/fonts come from tokens.css's D-19 palette (:root vars) — nothing
+ * here hardcodes a color that isn't a status hue not yet tokenized.
+ */
+
+.app {
+  height: 100vh;
+  display: grid;
+  grid-template-columns: 240px 1fr 0;
+  grid-template-rows: 35px 1fr 0;
+  /* Tier 52 Phase 3: the third row hosts THE BOTTOM PANEL in the MIDDLE column only —
+     'side' and 'panel' span both content rows, so the bottom bar can never overlap the
+     left rail or the right panel (the grid owns the walls, the T30 never-overlap law). */
+  grid-template-areas:
+    'title title title'
+    'side main panel'
+    'side bottom panel';
+  font-size: 13px;
+  background: var(--bg);
+  overflow: hidden; /* the shell is scroll-proof; only interior panes scroll */
+  /* Sidebar collapse (user-directed 2026-07-20): a deliberate exception to the no-layout-
+     animation motion law — the grid track + sidebar padding tween together, 200ms ease-out.
+     Tier 52: the bottom row rides the same tween (rows added alongside columns). */
+  transition: grid-template-columns 200ms ease-out, grid-template-rows 200ms ease-out;
+}
+
+/* D11 (the one-dashboard spec, 2026-08-14): the EDITOR's grid - the LEFT SLOT
+   replaces the fixed sidebar track (the dashboard keeps the .app base: its
+   rail owns column 1). The left track rides --leftW exactly as the right
+   rides --panelW; absent = 0, the same tween. */
+.editorApp {
+  grid-template-columns: 0 1fr 0;
+}
+
+.editorApp.appLeft {
+  grid-template-columns: var(--leftW, 300px) 1fr 0;
+}
+
+.editorApp.appPanel {
+  grid-template-columns: 0 1fr var(--panelW, max(340px, 42%));
+}
+
+.editorApp.appLeft.appPanel {
+  grid-template-columns: var(--leftW, 300px) 1fr var(--panelW, max(340px, 42%));
+}
+
+/* The side panel column (the Codex reference): open = ~42% of the window, floored so the
+   chat column never starves. max() NOT minmax(): a minmax() track is not interpolable, so
+   the 200ms tween silently snapped (live find 2026-07-20) — max(340px, 42%) sizes the same
+   and animates. (The dashboard never opens panels; the editor grid rules above own the
+   panel combinations - .appPanel alone survives for the class assembly's sake.) */
+.appPanel {
+  grid-template-columns: 240px 1fr var(--panelW, max(340px, 42%));
+}
+
+/* Tier 52 Phase 3: the bottom panel's open track — px so the row tween interpolates
+   (the minmax() lesson from the side panel); --bottomH is the user-dragged height. */
+.appBottom {
+  grid-template-rows: 35px 1fr var(--bottomH, 280px);
+}
+
+/* Live drag (the panel resize handle): the tween must not chase the pointer. */
+.appResizing {
+  transition: none;
+}
+
+.scrim {
+  position: fixed;
+  inset: 35px 0 0 0;
+  z-index: 50;
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(2px);
+  animation: scrimIn 200ms ease-out;
+}
+
+@keyframes scrimIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scrim {
+    animation: none;
+  }
+}
+
+/* The 35px title bar (the Cursor reference height): a drag region the OS window controls
+   overlay at the same height (titleBarOverlay in main/index.ts — colors in lockstep). App-
+   shell furniture like the sidebar itself; thread chrome laws (D-68) are untouched. */
+.titlebar {
+  grid-area: title;
+  display: flex;
+  align-items: center;
+  padding: 0 0 0 8px;
+  background: var(--side);
+  border-bottom: 1px solid var(--border);
+  -webkit-app-region: drag;
+  user-select: none;
+}
+
+.titlebarSpacer {
+  flex: 1;
+}
+
+/* In-frame window controls (2026-07-20 — the OS overlay retired): Windows-idiom edge-to-edge
+   strips, full bar height, no radius; close hovers red (status hue, destructive). */
+.winControls {
+  display: flex;
+  align-self: stretch;
+  margin-left: 6px;
+}
+
+.winBtn {
+  -webkit-app-region: no-drag;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--t1);
+  cursor: pointer;
+  padding: 0;
+}
+
+.winBtn:hover {
+  background: var(--panel);
+}
+
+.winBtnClose:hover {
+  background: var(--red);
+  color: #fff;
+}
+
+.titlebarBtn {
+  -webkit-app-region: no-drag;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 27px;
+  height: 27px;
+  border: 0;
+  border-radius: var(--r1);
+  background: transparent;
+  color: var(--t1);
+  cursor: pointer;
+  padding: 0;
+}
+
+.titlebarBtn:hover {
+  background: var(--panel);
+}
+
+/* D12: the editor's top-left Publish/Export door - the one text control on
+   the bar (the ruled words; icons stay icons everywhere else). */
+.titlebarTextBtn {
+  width: auto;
+  padding: 0 10px;
+  font: 500 12px var(--sans);
+  white-space: nowrap;
+}
+
+/* ---- the dashboard frame (user-ruled 2026-08-14, the Canva separation) ----
+   The rail and the top strip are ONE seamless surround - same color, NO line
+   anywhere (the two hairlines die in dashboard mode alone); the content is a
+   FRAME set into the L, rounded at its TOP-LEFT corner only, running flush
+   into the window at the right and bottom. The editor never composes this
+   class - its surfaces stay byte-identical. */
+.dashApp {
+  background: var(--side); /* the surround shows through the frame's corner */
+  /* THE THIN RAIL (user-ruled 2026-08-17, the landing's shell mirrored):
+     the dashboard rail narrows to the landing's 54px gap - the editor's
+     grid never composes this class. */
+  grid-template-columns: 54px 1fr 0;
+}
+
+/* THE LANDING'S COLORS IN LIGHT MODE (user-ruled 2026-08-17, re-scoped the
+   same day - the theme toggle stays whole): in LIGHT mode the dashboard
+   chrome and frame wear the landing's exact palette - the surround its warm
+   near-white ground, the frame its white sheet - as scoped token overrides,
+   so every token-speaking surface inside flips coherently. DARK mode keeps
+   the standing dark dashboard untouched. Scoped to the titlebar, rail, and
+   main alone: the takeover and the settings modal (siblings in the grid)
+   keep the app theme; the editor never composes dashApp at all. */
+:global([data-theme='light']) .dashApp .titlebar,
+:global([data-theme='light']) .dashApp .sidebar,
+:global([data-theme='light']) .dashApp .main {
+  /* the shell-era names (this module + the older chrome) */
+  --side: #f2f1ef;
+  --bg: #ffffff;
+  --panel: #efeeec;
+  --panel2: #e9e8e4;
+  --border: #e2e0dd;
+  --border2: #d6d4d1;
+  --accent: #F5C518; /* the ONE gold on both themes (user-ruled 2026-08-19) */
+  /* THE DESIGN SYSTEM TOKENS (the law's palette, remapped to the landing):
+     the surround is the landing's ground, the frame content's ground is the
+     landing's white sheet; surfaces step down from it. */
+  --ground: #ffffff;
+  --surface: #f7f7f7;
+  --well: #e9e9e9;
+  /* on a pure-white ground nothing can be lighter, so raised steps DOWN -
+     the one inversion the white sheet forces */
+  --raised: #f0efec;
+  --float: #ffffff;
+  --hairline: rgba(0, 0, 0, 0.06);
+  --t0: #000000;
+  --t1: #1b1b1b;
+  --t2: #5f5d5a;
+  --t3: #8a8885;
+  --live: #F5C518;
+  --green: #1a7f37;
+  --amber: #9a6700;
+  --red: #cf222e;
+}
+
+/* The logo's two faces: the white mark in dark, the landing's #3d3c3a mark
+   in light - one img each, the theme picks. */
+:global([data-theme='light']) .dashRailLogoDark {
+  display: none;
+}
+
+.dashRailLogoLight {
+  display: none;
+}
+
+:global([data-theme='light']) .dashRailLogoLight {
+  display: block;
+}
+
+/* The window-chrome bar keeps ONE thin line under it (user-ruled - the
+   hairline, our last-resort separator; subtler than the editor's border). */
+.dashApp .titlebar {
+  border-bottom: 1px solid var(--hairline);
+}
+
+.dashApp .sidebar {
+  border-right: 0;
+  padding: 4px 0 14px;
+  align-items: center;
+}
+
+/* The 220px collapse clamp is the editor rail's; the thin rail centers its
+   icons at their own size. */
+.dashApp .sidebar > * {
+  width: auto;
+  min-width: 0;
+}
+
+/* The fixed-size tenants win back their geometry from the clamp reset
+   (the child rule above outweighs their single classes). */
+.dashApp .sidebar .dashRailIcon {
+  width: 38px;
+  min-width: 38px;
+}
+
+.dashApp .sidebar .dashAvatar {
+  width: 34px;
+  min-width: 34px;
+}
+
+/* ---- the thin rail's three tenants (logo - settings - the user circle) ---- */
+
+.dashRailLogo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 4px;
+}
+
+.dashRailIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border: 0;
+  border-radius: var(--r1);
+  background: transparent;
+  color: var(--t2);
+  cursor: pointer;
+  padding: 0;
+  margin-bottom: 6px;
+  transition: background 120ms ease-out, color 120ms ease-out;
+}
+
+.dashRailIcon:hover {
+  background: var(--panel);
+  color: var(--t1);
+}
+
+.dashRailIconActive {
+  background: var(--panel2);
+  color: var(--t0);
+}
+
+.dashAvatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #2e2e2e;
+  border: 1px solid var(--border2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  /* literal: the dark circle keeps light initials whatever the chrome wears */
+  color: #ececec;
+  flex: none;
+  margin-top: 6px;
+  user-select: none;
+}
+
+/* The main cell is the surround wrapper: a thin top gap (close to the top,
+   never stuck to it), the frame beneath. */
+.dashApp .main {
+  background: var(--side);
+  overflow: hidden;
+  padding-top: var(--s3);
+}
+
+/* The content frame: rounded at its top-left corner alone, flush right and
+   bottom; the scroll lives HERE so content clips inside the corner. */
+.dashFrame {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  border-top-left-radius: var(--r2);
+}
+
+
+/* ---- sidebar --------------------------------------------------------- */
+
+.sidebar {
+  grid-area: side;
+  background: var(--side);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  overflow: hidden;
+  min-width: 0;
+  min-height: 0;
+  transition: padding 200ms ease-out, border-right-color 200ms ease-out;
+}
+
+/* Collapse without reflow (user feedback 2026-07-20): every child keeps its rest width and is
+   CLIPPED by the closing edge — text never rewraps mid-animation (the "scaling" look, banned). */
+.sidebar > * {
+  width: 220px;
+  min-width: 220px;
+}
+
+.orgBlock {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  margin-bottom: 8px;
+}
+
+.orgLogo {
+  width: 22px;
+  height: 22px;
+  border-radius: var(--r1);
+  background: linear-gradient(135deg, #2b2b2b, #3a3a3a);
+  border: 1px solid var(--border2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  flex: none;
+}
+
+.orgName {
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.orgRole {
+  font-size: 11px;
+  color: var(--t3);
+}
+
+/* New thread rides the subnavItem grammar (the accent button died 2026-07-20, user-directed);
+   this class only adds its spacing below. */
+.newThreadRow {
+  margin-bottom: 10px;
+}
+
+.spacer {
+  flex: 1;
+}
+
+.subnav {
+  border-top: 1px solid var(--border);
+  padding-top: 8px;
+}
+
+/* Sidebar contrast law (user-directed 2026-07-20, the Codex reference): item text and icons
+   share ONE bright tone (--t1); only section labels and meta stay muted.
+   RATIFIED 2026-08-11: the rail reads one step bigger in BOTH modes - row text
+   14px, rows breathe to ~36px (raw px on purpose: ONE size, no mode scope). */
+.subnavItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  color: var(--t1);
+  font-size: 14px;
+  border-radius: var(--r1);
+  cursor: pointer;
+  border: 0;
+  background: transparent;
+  width: 100%;
+  text-align: left;
+  font-family: var(--sans);
+}
+
+.subnavItem:hover {
+  background: var(--panel);
+}
+
+.subnavItemActive {
+  color: var(--t0); /* click = text steps to max contrast; the frame stays as-is */
+  background: var(--panel2);
+}
+
+.userFooter {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 8px 2px;
+  color: var(--t1);
+  font-size: 12px;
+  overflow: hidden;
+}
+
+.userFooterEmail {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.avatar {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #2e2e2e;
+  border: 1px solid var(--border2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--t1);
+  flex: none;
+}
+
+/* ---- main (center column, screen content) ----------------------------- */
+
+.main {
+  grid-area: main;
+  overflow: auto;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  /* Grid items default to min-size:content — without these zeros, tall/wide content
+     inflates the SHELL grid past the viewport (the panel-cycle scrollbar specimen). */
+  min-width: 0;
+  min-height: 0;
+}
+
+.placeholder {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--t3);
+  font-family: var(--mono);
+  font-size: 12.5px;
+}
+
+/* ---- the ambient agent frames (Tier 33, 2026-07-20) ---------------------- */
+/* One small frame per out-of-sight running agent, bottom-right above the anomaly float;
+   LAW 1: these own ONLY liveness the feed cannot show. Gentle pulse; not interactive (v1). */
+
+.agentFrames {
+  position: fixed;
+  right: 16px;
+  bottom: 44px;
+  z-index: 39;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-end;
+}
+
+.agentFrame {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 360px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--r2);
+  padding: 6px 12px;
+  font: 11.5px var(--mono);
+  color: var(--t2);
+  animation: framePulse 2.4s ease-in-out infinite;
+}
+
+.agentFrameRole {
+  flex: none;
+  color: var(--t1);
+  font-weight: 600;
+}
+
+.agentFramesHide {
+  align-self: flex-end;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--r1);
+  background: var(--panel);
+  color: var(--t3);
+  font: 12px var(--mono);
+  line-height: 1;
+  cursor: pointer;
+}
+
+.agentFramesHide:hover {
+  color: var(--t1);
+}
+
+.agentFrameMore {
+  font: 11px var(--mono);
+  color: var(--t3);
+  padding: 2px 12px;
+}
+
+.agentFrameLine {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+@keyframes framePulse {
+  0%, 100% { opacity: 0.65; }
+  50% { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .agentFrame {
+    animation: none;
+  }
+}
+
+/* ---- the anomaly float (FR-105) ----------------------------------------- */
+/* The statusbar row died 2026-07-20 (user-directed — permanent "queue 0 · running 0" chrome
+   was exactly the trivial-state class the floors ban). The AnomalyStrip keeps its LAW-2 home
+   as a floating pill that EXISTS only while something is wrong; silence renders nothing. */
+
+.anomalyFloat {
+  position: fixed;
+  bottom: 12px;
+  right: 16px;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: var(--panel);
+  border: 1px solid var(--amber);
+  border-radius: var(--r1);
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--amber);
+}
+
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  display: inline-block;
+  background: var(--amber);
+}
+
+/* THE STAGE DIED at D11 (2026-08-14): the Map is a slot tab; the center is the
+   editing surface. */
+
+/* D-PT5 (FR-PT5): THE RENDERED-APP LAW — the own-window app's grid: titlebar over the
+   scene, which FILLS the window; the one Console (room variant) shares the 'main' cell
+   (its .wrap targets grid-area main; the pill floats viewport-fixed). No sidebar
+   track, no chat column — a project without an Assistant renders ZERO chat pixels.
+   THE NAMED AREA IS LOAD-BEARING (live find 2026-07-24): the shared .titlebar carries
+   `grid-area: title`, and a grid WITHOUT that named area auto-places it into an
+   IMPLICIT bottom row. The grid must define 'title' AND 'main' itself. */
+/* Walk #25/#36: the in-app Play surface covers the standing shell (z above the
+   floating console's 60); the shell keeps its state for the way back. */
+.focusedOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: var(--bg);
+}
+
+.focusedApp {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 35px 1fr;
+  grid-template-areas:
+    'title'
+    'main';
+  height: 100vh;
+  overflow: hidden;
+}
+.focusedScene {
+  grid-area: main;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+.focusedEmpty {
+  grid-area: main;
+  display: grid;
+  place-items: center;
+  color: var(--t3);
+  font-size: 13px;
+}
