@@ -2225,7 +2225,9 @@ export function generateProjectDialect(m: ProjectModel, opts?: ProjectLensOption
   }
   if (m.triggers.length > 0 || m.services.length > 0 || m.chains.length > 0) out.push('');
   for (const t of m.triggers) {
-    out.push(`trigger ${shortId(t.id)} = ${t.kind} ${renderValue(t.spec)} -> ${renderTriggerAction(t.action)}${t.enabled ? '' : ' off'}`);
+    // A uuid prefix can start with a digit, which the reader takes as a number: such ids ride quoted.
+    const tid = /^[A-Za-z_]/.test(shortId(t.id)) ? shortId(t.id) : JSON.stringify(shortId(t.id));
+    out.push(`trigger ${tid} = ${t.kind} ${renderValue(t.spec)} -> ${renderTriggerAction(t.action)}${t.enabled ? '' : ' off'}`);
   }
   for (const s of m.services) {
     out.push(`service ${s.integration} ${JSON.stringify(s.label)} { }   # ${s.status}`);
@@ -2472,7 +2474,9 @@ export function parseProjectDialect(code: string): ParsedProject {
         break;
       }
       case 'trigger': {
-        const id = word('the trigger id').v;
+        const idTok = c.next(true);
+        if (idTok.t !== 'word' && idTok.t !== 'str') err(idTok.line, 'expected the trigger id');
+        const id = String((idTok as { v: string }).v);
         c.expectP('=', "in 'trigger <id> = <kind> { spec } -> <action>'");
         const kind = word('the trigger kind').v;
         const spec = objectValue(`trigger '${id}' spec`, line);

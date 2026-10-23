@@ -258,7 +258,16 @@ function call(fn: string, argAsts: ExprAst[], ctx: ExprContext): ExprResult {
     if (bArg?.k !== 'str') return ERR(`${fn} names its binding as a string literal: ${fn}('sales'${fn === 'count' ? '' : ", 'field'"})`);
     const rows = ctx.bindings[bArg.v];
     if (!rows) return ERR(`unknown binding '${bArg.v}' — the scene's bindings are [${Object.keys(ctx.bindings).join(', ') || 'none'}]`);
-    if (fn === 'count') return { ok: true, value: rows.length };
+    if (fn === 'count') {
+      // count('b') counts rows, count('b','f') rows where f is set, count('b','f',v) rows where f equals v.
+      if (argAsts.length === 1) return { ok: true, value: rows.length };
+      const cField = argAsts[1];
+      if (cField?.k !== 'str' || argAsts.length > 3) return ERR("count reads count('habits'), count('habits', 'field') or count('habits', 'field', value)");
+      if (argAsts.length === 2) return { ok: true, value: rows.filter((r) => r[cField.v] !== null && r[cField.v] !== undefined).length };
+      const want = evalAst(argAsts[2]!, ctx);
+      if (!want.ok) return want;
+      return { ok: true, value: rows.filter((r) => r[cField.v] === want.value).length };
+    }
     const fArg = argAsts[1];
     if (fArg?.k !== 'str') return ERR(`${fn} names the field as a string literal`);
     const nums: number[] = [];
