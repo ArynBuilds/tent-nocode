@@ -39,7 +39,9 @@ function portInUse(port: number): Promise<boolean> {
 /** A clean pg_ctl fast stop on Windows; the library's own stop force-kills, costing WAL recovery next boot. */
 async function pgCtlStopFast(databaseDir: string): Promise<boolean> {
   try {
-    const { pg_ctl } = (await import('@embedded-postgres/windows-x64')) as { pg_ctl: string };
+    // The platform binary package exists only on Windows installs; a variable specifier keeps other platforms compiling.
+    const windowsBinaries = '@embedded-postgres/windows-x64';
+    const { pg_ctl } = (await import(windowsBinaries)) as { pg_ctl: string };
     return await new Promise<boolean>((resolve) => {
       const child = spawn(pg_ctl, ['stop', '-D', databaseDir, '-m', 'fast', '-w', '-t', '15'], { windowsHide: true });
       child.on('error', () => resolve(false));
