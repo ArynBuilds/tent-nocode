@@ -1,10 +1,10 @@
 import type postgres from 'postgres';
-import { sceneActionsSchema } from '@tent-nocode/core';
+import { sceneActionsSchema } from '@nodeloom/core';
 import {
   ROOM_LIVE_ROUTE, ROOM_SCENE_CSP, buildThemeCss, composeSceneHostPage, getSceneForServe, recordVisit, requireScene,
   type TentkitBuild,
-} from '@tent-nocode/kernel';
-import type { HostLookup } from '@tent-nocode/kernel';
+} from '@nodeloom/kernel';
+import type { HostLookup } from '@nodeloom/kernel';
 import { resolveReleaseScene } from './data.js';
 import { pillMountHtml } from './pill.js';
 import { withTenant } from './tenancy.js';
@@ -29,7 +29,7 @@ const PAGE_HEADERS = {
 
 function quietPage(sentence: string, status: number): RoomResponse {
   const html = '<!doctype html><html><head><link rel="stylesheet" href="/assets/tokens.css">'
-    + '<title>Tent NoCode</title></head>'
+    + '<title>Nodeloom</title></head>'
     + `<body><p style="padding:16px;color:var(--t2);font-size:13px;">${sentence}</p></body></html>`;
   return { status, headers: { ...PAGE_HEADERS, 'cache-control': 'no-store' }, body: html };
 }

@@ -8,8 +8,8 @@ import type { LucideIcon } from 'lucide-react';
 import {
   CONDITION_OPS, EDGE_VERB_SENTENCES, NODE_CONTRACTS, SCENE_ROOT_ID, citizenWord, conditionSchema, elementLegalTargets, elementPortRule, legalTargets,
   primitiveOfNode, sceneDocumentSchema,
-} from '@tent-nocode/core';
-import type { CitizenKind, ConditionOp, ElementClass, FlowCondition, LibraryItem, NodeContract, Pill, SceneDocument, SceneNode, VerbDoor } from '@tent-nocode/core';
+} from '@nodeloom/core';
+import type { CitizenKind, ConditionOp, ElementClass, FlowCondition, LibraryItem, NodeContract, Pill, SceneDocument, SceneNode, VerbDoor } from '@nodeloom/core';
 import { desk } from '../desk.js';
 import { subscribeLive } from '../live.js';
 import { paramWord } from '../page-edit/flowWires.js';
@@ -559,16 +559,6 @@ export class CanvasStore {
   }
   setEditing(patch: Partial<Omit<EditingRecord, 'typeName' | 'id'>>): void {
     this.update<EditingRecord>('editing', (r) => ({ ...r, ...patch }), 'remote');
-  }
-  /** The device row (Phase 14A): the editing breakpoint and the screen's design width move together.
-   *  The view switch rides the 'remote' lane; the size is a 'user' put so history's compileDiff carries it
-   *  to humanSetTargetScreen - call inside a history transaction. */
-  setDeviceBreakpoint(screenNodeId: string, bp: 'phone' | 'tablet' | null): void {
-    const screen = this.screenOf(screenNodeId);
-    if (screen === undefined) return;
-    const w = bp === 'phone' ? 390 : bp === 'tablet' ? 810 : 1440;
-    this.setEditing({ breakpoint: bp });
-    if (screen.size.w !== w) this.put([{ ...screen, size: { w, h: screen.size.h } }], 'user');
   }
   /** The effective mouse mode: Space held = hand, whatever the picked one. */
   effectiveMode(): CanvasMode {

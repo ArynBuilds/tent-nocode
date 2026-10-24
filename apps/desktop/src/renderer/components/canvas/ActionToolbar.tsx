@@ -1,6 +1,6 @@
 import { Ellipsis, Plus, SquarePlus, X } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
-import type { CitizenKind, VerbDoor } from '@tent-nocode/core';
+import type { CitizenKind, VerbDoor } from '@nodeloom/core';
 import { DOOR_ICONS, foldIcon, kindIcon, unfoldIcon } from '../../lib/canvas/store.js';
 import styles from './chrome.module.css';
 

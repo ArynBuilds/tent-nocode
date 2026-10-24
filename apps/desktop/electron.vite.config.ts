@@ -2,18 +2,18 @@ import { resolve } from 'node:path';
 import { defineConfig, externalizeDepsPlugin } from 'electron-vite';
 import react from '@vitejs/plugin-react';
 
-// `@tent-nocode/core`, `@tent-nocode/kernel`, and `@tent-nocode/runner` are
+// `@nodeloom/core`, `@nodeloom/kernel`, and `@nodeloom/runner` are
 // workspace packages whose `package.json` `exports` point straight at
 // TypeScript source (no build step) — fine for tooling that transpiles on
 // the fly (tsc, Vitest), but `externalizeDepsPlugin()`'s default behavior
 // externalizes every `dependencies` entry, including these, so the bundled
 // main process would try to `import()` a raw `.ts` file at runtime and
 // Node's ESM loader rejects it (`ERR_UNKNOWN_FILE_EXTENSION` — hit live via
-// `main/runner/daemon.ts`'s `@tent-nocode/runner` import, which predates this
+// `main/runner/daemon.ts`'s `@nodeloom/runner` import, which predates this
 // exclusion list). Excluding them here lets electron-vite bundle +
 // transpile them into `out/main/index.js` instead; true native/binary deps
 // (`postgres`) stays external (embedded-postgres died at the E2 cutover).
-const WORKSPACE_SOURCE_PACKAGES = ['@tent-nocode/core', '@tent-nocode/kernel', '@tent-nocode/runner', '@tent-nocode/room-server', '@tent-nocode/server'];
+const WORKSPACE_SOURCE_PACKAGES = ['@nodeloom/core', '@nodeloom/kernel', '@nodeloom/runner', '@nodeloom/room-server', '@nodeloom/server'];
 
 export default defineConfig({
   main: {

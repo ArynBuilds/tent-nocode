@@ -187,7 +187,7 @@ export function webhookSignatureOk(
     return (primary !== '' && sigMatches(primary, expected))
       || (secondary !== '' && sigMatches(secondary, expected));
   }
-  const raw = headers['x-tent-nocode-signature'] ?? headers['x-signature'] ?? '';
+  const raw = headers['x-nodeloom-signature'] ?? headers['x-signature'] ?? '';
   const provided = raw.startsWith('sha256=') ? raw.slice('sha256='.length) : raw;
   if (provided === '') return false;
   return sigMatches(provided, hmacHex(secret, rawBody));

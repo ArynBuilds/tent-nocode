@@ -7,7 +7,7 @@ const ACTOR = 'kernel.rooms';
 
 /** Subdomain names an app may never claim. */
 export const RESERVED_APP_SLUGS: ReadonlySet<string> = new Set([
-  'www', 'api', 'admin', 'tent-nocode', 'mail', 'login', 'auth', 'app', 'apps', 'cdn',
+  'www', 'api', 'admin', 'nodeloom', 'mail', 'login', 'auth', 'app', 'apps', 'cdn',
   'static', 'status', 'docs', 'account', 'billing', 'download', 'help', 'support',
 ]);
 

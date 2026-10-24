@@ -1,4 +1,4 @@
-import { resolveCliEngine } from '@tent-nocode/kernel';
+import { resolveCliEngine } from '@nodeloom/kernel';
 
 // Resolves the org's engine credential from the vault at spawn time, in the registry's
 // declared precedence order. Null means the CLI falls back to its own login.

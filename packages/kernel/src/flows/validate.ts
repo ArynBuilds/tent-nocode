@@ -1,5 +1,5 @@
-import { isPill } from '@tent-nocode/core';
-import type { FlowDoc } from '@tent-nocode/core';
+import { isPill } from '@nodeloom/core';
+import type { FlowDoc } from '@nodeloom/core';
 import { resolveFlowStepDef } from './registry.js';
 import type { FlowStepDef, FlowStepParamDecl } from './stepTypes.js';
 

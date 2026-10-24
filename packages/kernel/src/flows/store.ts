@@ -1,5 +1,5 @@
 import type postgres from 'postgres';
-import { flowDocSchema, flowEnvelopeSchema, mintFlowEnvelope, FLOW_DOC_VERSION, type FlowDoc, type FlowEffect, type FlowEnvelope } from '@tent-nocode/core';
+import { flowDocSchema, flowEnvelopeSchema, mintFlowEnvelope, FLOW_DOC_VERSION, type FlowDoc, type FlowEffect, type FlowEnvelope } from '@nodeloom/core';
 import { emitEvent } from '../events.js';
 import { projectArm } from '../containment.js';
 

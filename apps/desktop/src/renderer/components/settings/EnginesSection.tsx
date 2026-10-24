@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { listRegistryModels, type OrgRole } from '@tent-nocode/core';
+import { listRegistryModels, type OrgRole } from '@nodeloom/core';
 import type { EngineStatus } from '../../../shared/ipc.js';
 import { can } from '../../../shared/roles.js';
 import { useQuery } from '../../lib/data/useQuery.js';

@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { ArrowUp, CodeXml, Crosshair, LoaderCircle, Sparkles, X } from 'lucide-react';
-import type { OrgRole, ThreadMode } from '@tent-nocode/core';
+import type { OrgRole, ThreadMode } from '@nodeloom/core';
 import type { MessageRow, WorkRunView } from '../../../shared/ipc.js';
 import { can } from '../../../shared/roles.js';
 import { useLive } from '../../lib/data/useLive.js';

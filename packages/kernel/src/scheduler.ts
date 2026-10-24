@@ -1,5 +1,5 @@
 import type postgres from 'postgres';
-import type { IoContract, JobKind, RunUsage } from '@tent-nocode/core';
+import type { IoContract, JobKind, RunUsage } from '@nodeloom/core';
 import { emitEvent } from './events.js';
 import type { PermissionRule } from './consent.js';
 

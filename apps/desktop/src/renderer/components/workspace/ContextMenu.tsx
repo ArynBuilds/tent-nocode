@@ -1,4 +1,4 @@
-import type { VerbDoor } from '@tent-nocode/core';
+import type { VerbDoor } from '@nodeloom/core';
 import { createRows, hasOutPort, nodeMenu } from '../../lib/canvas/store.js';
 import type { AddKind, Placed } from '../../lib/canvas/store.js';
 import { ContextMenu } from '../canvas/ContextMenu.js';

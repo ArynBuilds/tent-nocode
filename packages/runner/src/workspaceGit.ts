@@ -12,12 +12,12 @@ export async function ensureRepo(dir: string): Promise<{ inited: boolean }> {
     return { inited: false };
   }
   await git.init();
-  await git.addConfig('user.name', 'tent-nocode');
-  await git.addConfig('user.email', 'tent-nocode@tent-nocode.local');
+  await git.addConfig('user.name', 'nodeloom');
+  await git.addConfig('user.email', 'nodeloom@nodeloom.local');
   await git.addConfig('commit.gpgsign', 'false');
   const ignorePath = join(dir, '.gitignore');
-  // .tent-nocode-* driver files stay out of checkpoint commits.
-  const lines = ['.tent-nocode-*'];
+  // .nodeloom-* driver files stay out of checkpoint commits.
+  const lines = ['.nodeloom-*'];
   if (!existsSync(ignorePath)) {
     await writeFile(ignorePath, lines.join('\n') + '\n');
   } else {
@@ -28,18 +28,18 @@ export async function ensureRepo(dir: string): Promise<{ inited: boolean }> {
   return { inited: true };
 }
 
-/** Commit the folder's entire current state as `tent-nocode: <label>`; null when nothing changed. */
+/** Commit the folder's entire current state as `nodeloom: <label>`; null when nothing changed. */
 export async function checkpoint(dir: string, label: string): Promise<{ sha: string | null }> {
   const git = simpleGit(dir);
   const status = await git.status();
   if (status.isClean()) return { sha: null };
   // Set a local identity only when absent so commits never fail on unconfigured repos.
   if (!(await git.getConfig('user.name')).value) {
-    await git.addConfig('user.name', 'tent-nocode');
-    await git.addConfig('user.email', 'tent-nocode@tent-nocode.local');
+    await git.addConfig('user.name', 'nodeloom');
+    await git.addConfig('user.email', 'nodeloom@nodeloom.local');
   }
   await git.add(['-A']);
-  const result = await git.commit(`tent-nocode: ${label}`);
+  const result = await git.commit(`nodeloom: ${label}`);
   return { sha: result.commit || null };
 }
 
@@ -77,8 +77,8 @@ export async function headSha(dir: string): Promise<string | null> {
 async function ensureIdentity(dir: string): Promise<void> {
   const git = simpleGit(dir);
   if (!(await git.getConfig('user.name')).value) {
-    await git.addConfig('user.name', 'tent-nocode');
-    await git.addConfig('user.email', 'tent-nocode@tent-nocode.local');
+    await git.addConfig('user.name', 'nodeloom');
+    await git.addConfig('user.email', 'nodeloom@nodeloom.local');
   }
 }
 
@@ -89,7 +89,7 @@ export async function worktreeAdd(realDir: string, wtDir: string, branch: string
     await ensureIdentity(realDir);
     await checkpoint(realDir, 'worktree base');
     if ((await headSha(realDir)) === null) {
-      await git.raw(['commit', '--allow-empty', '-m', 'tent-nocode: worktree base']);
+      await git.raw(['commit', '--allow-empty', '-m', 'nodeloom: worktree base']);
     }
   }
   await git.raw(['worktree', 'add', wtDir, '-b', branch]);
@@ -104,7 +104,7 @@ export async function mergeRunBranch(
   // simple-git raw() does not reliably throw on a conflicted merge; check status instead.
   let threwMessage: string | null = null;
   try {
-    await git.raw(['merge', '-m', `tent-nocode: merge ${branch}`, branch]);
+    await git.raw(['merge', '-m', `nodeloom: merge ${branch}`, branch]);
   } catch (err) {
     threwMessage = err instanceof Error ? err.message.slice(0, 500) : String(err);
   }

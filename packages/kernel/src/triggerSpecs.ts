@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { KEBAB_RE } from '@tent-nocode/core';
+import { KEBAB_RE } from '@nodeloom/core';
 
 // The trigger vocabulary: the closed kind specs and the closed action grammar.
 

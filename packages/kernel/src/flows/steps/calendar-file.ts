@@ -49,9 +49,9 @@ export const calendarFileStep: FlowStepDef = {
         const lines = [
           'BEGIN:VCALENDAR',
           'VERSION:2.0',
-          'PRODID:-//Tent NoCode//flows//EN',
+          'PRODID:-//Nodeloom//flows//EN',
           'BEGIN:VEVENT',
-          `UID:${uid}@tent-nocode`,
+          `UID:${uid}@nodeloom`,
           `DTSTAMP:${icsDate(startMs)}`,
           `DTSTART:${icsDate(startMs)}`,
           `DTEND:${icsDate(endMs)}`,

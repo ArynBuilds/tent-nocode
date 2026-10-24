@@ -1,4 +1,4 @@
-import type { WireKindName } from '@tent-nocode/core';
+import type { WireKindName } from '@nodeloom/core';
 import type { Placed } from '../../lib/canvas/store.js';
 import type { EngineEdge } from './CanvasEngine.js';
 import type { ChromeWire } from './CanvasChrome.js';

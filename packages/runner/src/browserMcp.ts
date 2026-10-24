@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-// The tent-nocode-browser MCP server: relays navigations to the host over the authed loopback
+// The nodeloom-browser MCP server: relays navigations to the host over the authed loopback
 // channel and applies the futility brake. The model can never widen the domain allowlist.
 
 export interface BrowseFutility {
@@ -110,7 +110,7 @@ export async function startBrowserMcpServer(): Promise<void> {
     },
   });
 
-  const server = new McpServer({ name: 'tent-nocode-browser', version: '0.1.0' });
+  const server = new McpServer({ name: 'nodeloom-browser', version: '0.1.0' });
   server.registerTool(
     'browse_open',
     {

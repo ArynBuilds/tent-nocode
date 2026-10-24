@@ -4,8 +4,8 @@ import type { LanguageModel } from 'ai';
 import {
   DEFAULT_MODEL_ID, MODEL_REGISTRY, listRegistryModels, resolveRegistryModel,
   type ModelEntry,
-} from '@tent-nocode/core';
-import { apiEngineForVendor } from '@tent-nocode/kernel';
+} from '@nodeloom/core';
+import { apiEngineForVendor } from '@nodeloom/kernel';
 
 // Turns a model registry row into a live vendor adapter; the apiKey is consumed in-process only.
 

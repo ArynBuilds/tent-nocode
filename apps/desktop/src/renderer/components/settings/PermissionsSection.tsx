@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { OrgRole } from '@tent-nocode/core';
+import type { OrgRole } from '@nodeloom/core';
 import type { ConsentGrantRow } from '../../../shared/ipc.js';
 import { can } from '../../../shared/roles.js';
 import { useLive } from '../../lib/data/useLive.js';

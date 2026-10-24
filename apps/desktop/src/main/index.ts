@@ -1,4 +1,5 @@
 import { app, BrowserWindow, Menu, shell } from 'electron';
+import { existsSync, renameSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createBootLog } from './boot/bootLog.js';
@@ -28,9 +29,13 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 // One resolver owns every packaged-vs-dev resource fork.
 initResources({ isPackaged: app.isPackaged, appPath: app.getAppPath() });
 
-// The app claims its name and data home first.
-app.setName('Tent NoCode');
-app.setPath('userData', join(app.getPath('appData'), 'Tent NoCode'));
+// The app claims its name and data home first; a data folder kept under the app's former name moves over once.
+const FORMER_DATA_FOLDER = 'Tent NoCode';
+app.setName('Nodeloom');
+const dataHome = join(app.getPath('appData'), 'Nodeloom');
+const formerHome = join(app.getPath('appData'), FORMER_DATA_FOLDER);
+if (!existsSync(dataHome) && existsSync(formerHome)) renameSync(formerHome, dataHome);
+app.setPath('userData', dataHome);
 
 // Privileged schemes must register before app ready.
 registerTabSchemePrivileges();

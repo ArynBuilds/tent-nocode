@@ -22,11 +22,11 @@ import postgres from 'postgres';
 import {
   createChatProject, createChatTurn, createThread, ensureDeskAgent, parseMasterKey,
   registerRunSpawner, resolveConsentCard, resolveSecretValue, setOrgConfig,
-} from '@tent-nocode/kernel';
+} from '@nodeloom/kernel';
 import {
   ApiDriver, ClaudeCodeDriver, createDirectKernelPort, executeSpawnedRun, productToolSpecs,
   type ExecutionDriver, type RunnerConfig,
-} from '@tent-nocode/runner';
+} from '@nodeloom/runner';
 
 const ROOT = resolve(import.meta.dirname, '..', '..');
 /** The harness's own actor id: every kernel door takes a uuid, never a word. */
@@ -209,7 +209,7 @@ async function drive(fixtures: Fixture[], opts: DriveOptions): Promise<number> {
   if (process.env['DATABASE_URL'] === undefined) process.env['DATABASE_URL'] = url;
   const sql = postgres(url, { max: 4, onnotice: () => {} });
   const port = createDirectKernelPort(sql);
-  const workspaceRoot = await mkdtemp(join(tmpdir(), 'tent-nocode-eval-'));
+  const workspaceRoot = await mkdtemp(join(tmpdir(), 'nodeloom-eval-'));
   try {
     let orgId = process.env['EVAL_ORG_ID'];
     if (orgId === undefined || orgId.length === 0) {

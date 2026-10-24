@@ -2,7 +2,7 @@ import { isAbsolute, join, relative } from 'node:path';
 import { existsSync, readdirSync, statSync } from 'node:fs';
 import { z } from 'zod';
 import type postgres from 'postgres';
-import { KEBAB_RE } from '@tent-nocode/core';
+import { KEBAB_RE } from '@nodeloom/core';
 import { emitEvent } from './events.js';
 import { projectArm } from './containment.js';
 import { globToRegExp } from './tabs/media.js';

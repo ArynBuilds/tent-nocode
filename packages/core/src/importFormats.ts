@@ -4,16 +4,16 @@ export interface ImportFormat {
   /** lowercase extension, no dot */
   ext: string;
   lane: 'package' | 'rows';
-  /** the plain word a surface may speak ("a Tent NoCode project", "an Excel sheet") */
+  /** the plain word a surface may speak ("a Nodeloom project", "an Excel sheet") */
   word: string;
   /** may this format arrive as a positional OS-launch argument? */
   argv: boolean;
 }
 
 export const IMPORT_FORMATS: readonly ImportFormat[] = [
-  { ext: 'tproject', lane: 'package', word: 'a Tent NoCode project', argv: true },
+  { ext: 'tproject', lane: 'package', word: 'a Nodeloom project', argv: true },
   // .lsg opens by drop only, never by OS launch.
-  { ext: 'lsg', lane: 'package', word: 'a Tent NoCode project', argv: false },
+  { ext: 'lsg', lane: 'package', word: 'a Nodeloom project', argv: false },
   { ext: 'xlsx', lane: 'rows', word: 'an Excel sheet', argv: false },
   { ext: 'csv', lane: 'rows', word: 'a CSV table', argv: false },
   { ext: 'tsv', lane: 'rows', word: 'a TSV table', argv: false },

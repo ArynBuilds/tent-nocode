@@ -1,4 +1,4 @@
-import type { AgentRow, AgentStatus, EventRow, MemberRow, OrgConfig, ThreadIntent, ThreadIntentView, ThreadUsage } from '@tent-nocode/core';
+import type { AgentRow, AgentStatus, EventRow, MemberRow, OrgConfig, ThreadIntent, ThreadIntentView, ThreadUsage } from '@nodeloom/core';
 import type postgres from 'postgres';
 import { getOrgConfig } from '../config.js';
 import { listEvents } from '../events.js';

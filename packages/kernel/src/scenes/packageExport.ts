@@ -3,7 +3,7 @@ import {
   LSG_PACKAGE_FORMAT, SCENE_SCHEMA_VERSION, instanceRefsIn, isSystemQueryTable,
   sceneActionsSchema, sceneBindingsSchema, sceneDocumentSchema,
   type LsgEntry, type LsgEntryDraft, type LsgPackage, type SceneDocument,
-} from '@tent-nocode/core';
+} from '@nodeloom/core';
 import { canonicalContentHash, packageHashOf } from './packageVerify.js';
 import { projectArm } from '../containment.js';
 import { projectThemeSchema } from '../projects.js';

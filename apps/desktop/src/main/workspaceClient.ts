@@ -1,5 +1,5 @@
-import { decodeWorkspaceWire } from '@tent-nocode/core';
-import type { LiveEvent } from '@tent-nocode/kernel';
+import { decodeWorkspaceWire } from '@nodeloom/core';
+import type { LiveEvent } from '@nodeloom/kernel';
 
 // The one door to the local server's workspace: POST /workspace/call per channel,
 // GET /workspace/live for the SSE pointer stream. Bearer token stays main-process only.

@@ -4,17 +4,17 @@ import { readFile } from 'node:fs/promises';
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from 'node:http';
 import { join } from 'node:path';
 import type postgres from 'postgres';
-import { sceneActionsSchema, sceneBindingsSchema, tablesReadBy } from '@tent-nocode/core';
+import { sceneActionsSchema, sceneBindingsSchema, tablesReadBy } from '@nodeloom/core';
 import {
   buildTokensCss, createLiveDeltas, FONT_ALLOWLIST, getSceneForServe, projectHasAssistant, readTentkitBuild, recordVisit, ROOM_LIVE_ROUTE, ROOM_SCENE_CSP,
   getSceneActionExecutionResult, getSceneActionFlowResult, serveSceneData, serveSceneProjection, serveTentkitBuild, startLiveWatcher, submitSceneAction,
   type BindingDelta, type EffectsPush, type LiveTarget, type MediaUrlMinter,
-} from '@tent-nocode/kernel';
+} from '@nodeloom/kernel';
 // ONE COMPOSER, ONE FEEDER, ONE AI DOOR: the installed single-app host renders through the SAME composition
 // the desktop's local server serves - composeServedAppPage + the room feeder + the web pill + the AI-door seam live
-// in @tent-nocode/room-server; this host owns only what is genuinely single-app (port bind, no host routing, its
+// in @nodeloom/room-server; this host owns only what is genuinely single-app (port bind, no host routing, its
 // own DB-direct data/action/media transport). The engine is the tentkit build in its resources/engines dir.
-import { AI_DOOR_PATH, PILL_CSS, PILL_JS, aiDoorSeam, composeServedAppPage } from '@tent-nocode/room-server';
+import { AI_DOOR_PATH, PILL_CSS, PILL_JS, aiDoorSeam, composeServedAppPage } from '@nodeloom/room-server';
 import { clientKey, createRateLimiter, readBodyCapped, type RateLimiter } from './visitor.js';
 
 const TOKENS_CSS = buildTokensCss('');
@@ -319,7 +319,7 @@ export function createHttpHost(deps: HttpHostDeps): HttpHost {
     if (req.method === 'GET' && path === '/') {
       const scene = await entryScene(deps.sql, deps.orgId);
       if (!scene) {
-        send(res, 200, '<!doctype html><html><head><meta charset="utf-8"><title>Tent NoCode</title><link rel="stylesheet" href="/assets/tokens.css"></head><body><p style="padding:24px;color:var(--t2);font-size:13px">No app is installed yet.</p></body></html>',
+        send(res, 200, '<!doctype html><html><head><meta charset="utf-8"><title>Nodeloom</title><link rel="stylesheet" href="/assets/tokens.css"></head><body><p style="padding:24px;color:var(--t2);font-size:13px">No app is installed yet.</p></body></html>',
           { 'content-type': 'text/html; charset=utf-8' });
         return;
       }

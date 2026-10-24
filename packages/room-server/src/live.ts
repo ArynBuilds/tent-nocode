@@ -1,5 +1,5 @@
 import type postgres from 'postgres';
-import { createLiveDeltas, type BindingDelta, type EffectsPush, type HostLookup, type LiveTarget } from '@tent-nocode/kernel';
+import { createLiveDeltas, type BindingDelta, type EffectsPush, type HostLookup, type LiveTarget } from '@nodeloom/kernel';
 import { roomLiveTarget } from './data.js';
 import { withTenant } from './tenancy.js';
 

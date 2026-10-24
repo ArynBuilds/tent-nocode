@@ -1,5 +1,5 @@
 import type postgres from 'postgres';
-import { SCENE_ROOT_ID, documentToOps, type SceneDocument, type SceneOp } from '@tent-nocode/core';
+import { SCENE_ROOT_ID, documentToOps, type SceneDocument, type SceneOp } from '@nodeloom/core';
 import { applyRevision } from './apply.js';
 import { setSceneContracts } from './actions.js';
 import { createScene, createSceneTab, deleteScene, getSceneDocument, requireScene } from './store.js';

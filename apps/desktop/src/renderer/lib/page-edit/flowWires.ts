@@ -1,5 +1,5 @@
-import { PRIMITIVES, isChannelRef, channelRefParts, primitiveOfNode, primitiveRef } from '@tent-nocode/core';
-import type { SceneNode } from '@tent-nocode/core';
+import { PRIMITIVES, isChannelRef, channelRefParts, primitiveOfNode, primitiveRef } from '@nodeloom/core';
+import type { SceneNode } from '@nodeloom/core';
 
 // The wires a screen's document carries, read over the five: a flow wire is a text with href
 // 'screen:<slug>' or a frame whose action is {goto}; a channel wire is any property holding

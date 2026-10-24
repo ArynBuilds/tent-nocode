@@ -1,5 +1,5 @@
 import type postgres from 'postgres';
-import type { ThreadMode } from '@tent-nocode/core';
+import type { ThreadMode } from '@nodeloom/core';
 import { emitEvent } from '../events.js';
 import { spawnRun } from '../scheduler.js';
 import { sanitizeLabel } from '../sanitize.js';

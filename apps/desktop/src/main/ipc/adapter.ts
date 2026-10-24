@@ -1,5 +1,5 @@
 import { ipcMain } from 'electron';
-import { workspaceRouter } from '@tent-nocode/kernel';
+import { workspaceRouter } from '@nodeloom/kernel';
 import type { MutationResult } from '../../shared/ipc.js';
 import { workspaceCall } from '../workspaceClient.js';
 import { nativeChannels } from './registry.js';

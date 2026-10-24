@@ -3,7 +3,7 @@ import { existsSync, readFileSync, statSync } from 'node:fs';
 import { isAbsolute } from 'node:path';
 import { z } from 'zod';
 import type postgres from 'postgres';
-import { KEBAB_RE } from '@tent-nocode/core';
+import { KEBAB_RE } from '@nodeloom/core';
 import { emitEvent } from '../events.js';
 import { resolveProject } from '../containment.js';
 import { createOperation, validateOperationInput } from './registry.js';

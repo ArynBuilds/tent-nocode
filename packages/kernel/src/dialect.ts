@@ -5,7 +5,7 @@ import {
   isPrimitiveName, nearestPrimitiveNames, nearestPropertyNames, channelRefParts, parseExpression, payloadSchema,
   primitiveOfNode, primitiveRef, propertiesOf, validateExpression,
   type FlowDoc, type Pill, type PrimitiveName, type SceneDocument, type SceneNode, type SceneOp,
-} from '@tent-nocode/core';
+} from '@nodeloom/core';
 import { requireScene, getSceneDocument, getSceneBindings, slugify } from './scenes/store.js';
 import { projectThemeSchema, THEME_COLOR_NAMES, type ProjectBrief, type ProjectTheme } from './projects.js';
 import { listIntegrationDefs, type IntegrationDef } from './integrations/catalog.js';
@@ -1757,7 +1757,7 @@ const tdType = (p: { type: string; enum?: string[] }): string =>
   p.type === 'enum' ? (p.enum ?? []).map((e) => JSON.stringify(e)).join(' | ')
     : p.type === 'json' ? 'object' : p.type;
 
-// The five's typedefs render from the contract itself: renderPrimitiveTypedef / renderSharedGroupsTypedef in @tent-nocode/core.
+// The five's typedefs render from the contract itself: renderPrimitiveTypedef / renderSharedGroupsTypedef in @nodeloom/core.
 
 export function renderStepTypedef(def: FlowStepDef): string {
   const lines: string[] = [];

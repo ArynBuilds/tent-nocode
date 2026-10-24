@@ -1,4 +1,4 @@
-import { threadModeSchema, type ThreadMode } from '@tent-nocode/core';
+import { threadModeSchema, type ThreadMode } from '@nodeloom/core';
 import type postgres from 'postgres';
 import { z } from 'zod';
 import { createChatTurn, createThread, type AmbientEnvelopeInput } from '../chat/chat.js';

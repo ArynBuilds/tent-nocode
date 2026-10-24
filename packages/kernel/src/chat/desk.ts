@@ -1,5 +1,5 @@
 import type postgres from 'postgres';
-import type { GenomeInput } from '@tent-nocode/core';
+import type { GenomeInput } from '@nodeloom/core';
 import { charterText } from '../charters/charter.js';
 import { ensureReservedGenome } from './reserved.js';
 

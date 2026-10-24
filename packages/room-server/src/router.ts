@@ -3,7 +3,7 @@ import { join } from 'node:path';
 import type postgres from 'postgres';
 import {
   FONT_ALLOWLIST, ROOM_LIVE_ROUTE, ROOM_SCENE_CSP, buildTokensCss, readTentkitBuild, serveTentkitBuild,
-} from '@tent-nocode/kernel';
+} from '@nodeloom/kernel';
 import { AI_DOOR_PATH, aiDoorSeam } from './aiDoor.js';
 import { roomAction, roomExecutionResult } from './actions.js';
 import { roomSceneData } from './data.js';
@@ -105,7 +105,7 @@ export function createRoomRouter(deps: {
         }
       }
 
-      // Reserved AI door: Tent NoCode never supplies inference keys.
+      // Reserved AI door: Nodeloom never supplies inference keys.
       if (req.path === AI_DOOR_PATH) {
         const seam = aiDoorSeam();
         return { status: seam.status, headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store' }, body: seam.body };

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { ChevronDown, ChevronRight } from 'lucide-react';
-import { DEFAULT_BREAKPOINTS, PRIMITIVES, primitiveOfNode, primitiveRef } from '@tent-nocode/core';
-import type { PrimitiveName } from '@tent-nocode/core';
+import { DEFAULT_BREAKPOINTS, PRIMITIVES, primitiveOfNode, primitiveRef } from '@nodeloom/core';
+import type { PrimitiveName } from '@nodeloom/core';
 import { store, useValue } from '../../lib/canvas/store.js';
 import type { ElementRecord, InspectorSelection } from '../../lib/canvas/store.js';
 import { desk } from '../../lib/desk.js';

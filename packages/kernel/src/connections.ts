@@ -37,7 +37,7 @@ export const MCP_GALLERY: readonly McpServiceSpec[] = [
     command: ['npx', '-y', '@modelcontextprotocol/server-github'],
     secretName: 'GITHUB_PERSONAL_ACCESS_TOKEN',
     secretEnv: 'GITHUB_PERSONAL_ACCESS_TOKEN',
-    tokenHelp: 'GitHub → Settings → Developer settings → Personal access tokens (fine-grained; pick the repos Tent NoCode may see)',
+    tokenHelp: 'GitHub → Settings → Developer settings → Personal access tokens (fine-grained; pick the repos Nodeloom may see)',
     defaultRules: [
       { pattern: 'mcp__ext-github__search_*', effect: 'allow' },
       { pattern: 'mcp__ext-github__get_*', effect: 'allow' },

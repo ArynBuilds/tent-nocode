@@ -1,6 +1,6 @@
 import type postgres from 'postgres';
-import { requireScene, serveSceneProjection } from '@tent-nocode/kernel';
-import type { HostLookup } from '@tent-nocode/kernel';
+import { requireScene, serveSceneProjection } from '@nodeloom/kernel';
+import type { HostLookup } from '@nodeloom/kernel';
 import { resolveReleaseScene } from './data.js';
 import { withTenant } from './tenancy.js';
 

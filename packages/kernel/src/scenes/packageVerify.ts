@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto';
 import {
   LSG_PACKAGE_FORMAT, SCENE_SCHEMA_VERSION, lsgPackageSchema, type LsgPackage,
-} from '@tent-nocode/core';
+} from '@nodeloom/core';
 
 // Canonical package hashing and stage-0 validation; lives in kernel because core must stay free of node builtins.
 

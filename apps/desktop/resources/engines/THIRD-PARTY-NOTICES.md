@@ -33,7 +33,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 
-## zod (through `@tent-nocode/core`, the contract the engine renders from)
+## zod (through `@nodeloom/core`, the contract the engine renders from)
 
 Source: the official npm package `zod`, bundled by esbuild from the repository's node_modules.
 

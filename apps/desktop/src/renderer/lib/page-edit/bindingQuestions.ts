@@ -1,4 +1,4 @@
-import type { DatasetQuery, DatasetWhere, SceneBinding } from '@tent-nocode/core';
+import type { DatasetQuery, DatasetWhere, SceneBinding } from '@nodeloom/core';
 
 // The three questions over the one query grammar: which rows (where), which fields (the picked columns),
 // what order (orderBy), plus the detail arm (rowKey). One model for the wire drop's picker and the

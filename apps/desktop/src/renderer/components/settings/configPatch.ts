@@ -1,4 +1,4 @@
-import type { ThreadMode } from '@tent-nocode/core';
+import type { ThreadMode } from '@nodeloom/core';
 import type { OrgConfigPatch } from '../../../shared/ipc.js';
 
 // Translate control values to org config patches; undefined means don't send.

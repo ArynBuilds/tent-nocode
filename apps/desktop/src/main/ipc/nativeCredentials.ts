@@ -1,4 +1,4 @@
-import { isEngineReservedSecretName, resolveApiEngine, resolveCliEngine, listedEngineIds, type SecretMeta } from '@tent-nocode/kernel';
+import { isEngineReservedSecretName, resolveApiEngine, resolveCliEngine, listedEngineIds, type SecretMeta } from '@nodeloom/kernel';
 import {
   engineStatusRead, makeApiKeyProbe, makeCredentialProbe, probeBinaryVersion,
   removeEngineCredentialFlow, saveEngineCredentialFlow, type EngineVault,

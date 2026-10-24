@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import { citizenWord } from '@tent-nocode/core';
+import { citizenWord } from '@nodeloom/core';
 import { FrameFace } from './FrameFace.js';
 import type { ScreenFrameProps } from './FrameFace.js';
 import { NodeFace, faceOf } from './NodeFace.js';

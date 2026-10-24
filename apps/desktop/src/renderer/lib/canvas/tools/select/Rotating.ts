@@ -1,4 +1,4 @@
-import { primitiveOfNode } from '@tent-nocode/core';
+import { primitiveOfNode } from '@nodeloom/core';
 import { StateNode, type PointerInfo } from '../StateNode.js';
 import type { Rect } from '../../store.js';
 

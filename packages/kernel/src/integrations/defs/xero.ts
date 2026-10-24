@@ -11,7 +11,7 @@ export const xero: IntegrationDef = {
   category: 'accounting',
   surfaces: 'both',
   scope: 'builder',
-  // Waits on the Tent NoCode Xero app registration.
+  // Waits on the Nodeloom Xero app registration.
   availability: 'upcoming',
   hosts: ['https://api.xero.com'],
   auth: {
@@ -20,7 +20,7 @@ export const xero: IntegrationDef = {
     tokenUrl: 'https://identity.xero.com/connect/token',
     scopes: ['accounting.transactions', 'accounting.contacts', 'offline_access'],
     clientEnv: 'XERO',
-    tokenHelp: 'Click Sign in to Xero and approve access - Tent NoCode holds the sign-in, you never paste a key.',
+    tokenHelp: 'Click Sign in to Xero and approve access - Nodeloom holds the sign-in, you never paste a key.',
   },
   // The accounting API answers XML by default; this asks for JSON on every call.
   headers: { accept: 'application/json' },
@@ -130,7 +130,7 @@ export const xero: IntegrationDef = {
       response: {
         Id: '900c500b-e83c-4ce2-902a-b8ba04751748',
         Status: 'OK',
-        ProviderName: 'Tent NoCode',
+        ProviderName: 'Nodeloom',
         DateTimeUTC: '/Date(1755235200000)/',
         Invoices: [
           {
@@ -179,7 +179,7 @@ export const xero: IntegrationDef = {
       response: {
         Id: 'e3626c45-77f1-4ab0-ba9b-3593c7bcd25c',
         Status: 'OK',
-        ProviderName: 'Tent NoCode',
+        ProviderName: 'Nodeloom',
         DateTimeUTC: '/Date(1755235300000)/',
         Contacts: [
           {

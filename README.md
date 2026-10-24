@@ -1,6 +1,8 @@
 <div align="center">
 
-# Tent NoCode
+<img src="docs/images/logo.svg" alt="Nodeloom logo" width="96" height="96" />
+
+# Nodeloom
 
 **Build apps and websites on one canvas, without code, on your own computer.**
 
@@ -19,9 +21,12 @@ Tables, screens, flows, triggers and 80 services are nodes you place and wire to
 
 ---
 
+> [!WARNING]
+> **Nodeloom is in early development (pre-1.0) and not yet stable.** We ship updates often, and releases may include breaking changes to features, the project file format and how data is stored. Pin a specific release for anything you depend on, and back up your data folder before you update.
+
 ![The workspace canvas](docs/images/canvas.png)
 
-Tent NoCode is a desktop app for building real apps and websites without writing code. Everything you build lives on one canvas: a table of habits, the screen that lists them, the flow that runs every morning and the service it calls are nodes wired together. Screens are edited in place at their real size.
+Nodeloom is a desktop app for building real apps and websites without writing code. Everything you build lives on one canvas: a table of habits, the screen that lists them, the flow that runs every morning and the service it calls are nodes wired together. Screens are edited in place at their real size.
 
 - **One canvas.** Tables, screens, flows (33 step types), triggers, notes and an 80-service integration shelf, placed, configured through properties and wired together.
 - **Screens from five building blocks.** Frame, text, field, chart and instance, with hover, focus and pressed states and phone and tablet layouts. Charts come in ten marks, from lines and bars to donuts, heatmaps and gauges.
@@ -71,7 +76,7 @@ It is one Electron app that starts a bundled Postgres and a small server on your
 Requirements: Windows, Node.js 20 or newer, and optionally Claude Code for the AI builder.
 
 ```sh
-git clone https://github.com/ArynBuilds/tent-nocode.git && cd tent-nocode
+git clone https://github.com/ArynBuilds/nodeloom.git && cd nodeloom
 npm install
 npm run desktop
 ```
@@ -90,7 +95,7 @@ Read [SECURITY.md](SECURITY.md) for the full model and its limits, and report vu
 
 ## Status
 
-Tent NoCode is young open-source software, extracted from a product that ran as a hosted service.
+Nodeloom is young open-source software, extracted from a product that ran as a hosted service.
 
 - The desktop app is built and tested on Windows; macOS and Linux builds are not done yet.
 - There is no test suite yet; changes are checked by the typecheck and by using the app.
@@ -110,4 +115,4 @@ npm run server -- serve  # run an installed project headless
 
 ## License
 
-[MIT](LICENSE) © 2026 Tent NoCode contributors.
+[MIT](LICENSE) © 2026 Nodeloom contributors.

@@ -1,4 +1,4 @@
-import type { FlowItem } from '@tent-nocode/core';
+import type { FlowItem } from '@nodeloom/core';
 import { SINGLE_IN, type FlowStepDef, type PureRunOutput } from '../stepTypes.js';
 
 /** Fans an array field out into one row per element; object elements spread, others land under the field name. */

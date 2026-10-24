@@ -1,9 +1,9 @@
 import { mkdir } from 'node:fs/promises';
 import { join } from 'node:path';
 import postgres from 'postgres';
-import type { DriverResult, ExecutionDriver } from '@tent-nocode/core';
-import { failStaleRuns, registerRunSpawner, resolveSecretValue, startLiveWatcher, type LiveWatcherHandle } from '@tent-nocode/kernel';
-import { ApiDriver, ClaudeCodeDriver, createDirectKernelPort, executeSpawnedRun, startHostLanes, type RunnerConfig } from '@tent-nocode/runner';
+import type { DriverResult, ExecutionDriver } from '@nodeloom/core';
+import { failStaleRuns, registerRunSpawner, resolveSecretValue, startLiveWatcher, type LiveWatcherHandle } from '@nodeloom/kernel';
+import { ApiDriver, ClaudeCodeDriver, createDirectKernelPort, executeSpawnedRun, startHostLanes, type RunnerConfig } from '@nodeloom/runner';
 
 /** THE LOOP HOST: the server IS the daemon. A spawned run executes HERE, in this
  * process, the moment the kernel spawns it (no queue, no claims, no polling);

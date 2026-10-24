@@ -11,7 +11,7 @@ import {
   rescueStalledIntents, resolveDerivedOutput, resolveOperation,
   rewriteDerivedOutputPathKeys, settleExecution,
   readProjectTheme, setWindowBridge, stampRunModel, triggerSweepDueOrgs, windowStepIfDue,
-} from '@tent-nocode/kernel';
+} from '@nodeloom/kernel';
 
 // The kernel port: the runner speaks this interface instead of holding a sql handle.
 // Verb signatures derive from the kernel functions so drift is a compile error.

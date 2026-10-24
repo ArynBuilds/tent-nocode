@@ -1,5 +1,5 @@
 import type postgres from 'postgres';
-import { modeAutoAnswers, type ThreadMode } from '@tent-nocode/core';
+import { modeAutoAnswers, type ThreadMode } from '@nodeloom/core';
 import { ACTION_REGISTRY, executeSceneRevise, type ActionSpec } from './chat/actions.js';
 import { getOrgConfig } from './config.js';
 import { emitEvent } from './events.js';
@@ -252,7 +252,7 @@ async function executeConsented(
         ...liveConnections.flatMap((c) => c.defaultRules.map((r) => ({ effect: r.effect, pattern: r.pattern }))),
         ...(panel
           ? [{ effect: 'allow' as const, pattern: 'panel:visible' },
-             { effect: 'allow' as const, pattern: 'mcp__tent-nocode-panelbrowser__acquire_browser' }]
+             { effect: 'allow' as const, pattern: 'mcp__nodeloom-panelbrowser__acquire_browser' }]
           : []),
       ]
       : WORK_RULES;

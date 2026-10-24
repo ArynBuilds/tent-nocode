@@ -1,5 +1,5 @@
 import type postgres from 'postgres';
-import { sceneActionsSchema, type ActionRule, type ActionWhen, type SceneAction } from '@tent-nocode/core';
+import { sceneActionsSchema, type ActionRule, type ActionWhen, type SceneAction } from '@nodeloom/core';
 
 // Projects a scene's declared actions into documentation shapes over the one vocabulary: the row writes,
 // start_flow, and the three effect arms (navigate, set, action).

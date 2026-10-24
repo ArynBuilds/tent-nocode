@@ -1,4 +1,4 @@
-import type { ChatTurn, ConversationView, RunStatus, ThreadMode, ThreadOverview, ThreadRow } from '@tent-nocode/core';
+import type { ChatTurn, ConversationView, RunStatus, ThreadMode, ThreadOverview, ThreadRow } from '@nodeloom/core';
 import type postgres from 'postgres';
 import { z } from 'zod';
 import { listProjects } from '../projects.js';

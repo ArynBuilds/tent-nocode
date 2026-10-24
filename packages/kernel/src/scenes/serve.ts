@@ -1,5 +1,5 @@
 import type postgres from 'postgres';
-import { expandInstanceNodes, instanceRefsIn, projectionRequestSchema, sceneBindingsSchema, type AssetBinding, type SceneBindingFeed } from '@tent-nocode/core';
+import { expandInstanceNodes, instanceRefsIn, projectionRequestSchema, sceneBindingsSchema, type AssetBinding, type SceneBindingFeed } from '@nodeloom/core';
 import { getSceneForHost } from './store.js';
 import { stampIconGlyphs } from './icons.js';
 import { libraryItemsFor } from './validate.js';

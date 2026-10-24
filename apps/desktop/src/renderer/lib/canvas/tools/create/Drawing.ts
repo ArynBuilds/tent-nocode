@@ -1,5 +1,5 @@
-import { keyBetween, primitiveOfNode, primitiveRef } from '@tent-nocode/core';
-import type { DatasetWhere, SceneNode } from '@tent-nocode/core';
+import { keyBetween, primitiveOfNode, primitiveRef } from '@nodeloom/core';
+import type { DatasetWhere, SceneNode } from '@nodeloom/core';
 import { desk } from '../../../desk.js';
 import { StateNode, type Editor, type PointerInfo } from '../StateNode.js';
 import { SCREEN_VIEW_SCALE, marqueeRect, store, type CreateArm, type ElementRecord, type Placed, type Rect } from '../../store.js';

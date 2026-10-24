@@ -1,8 +1,8 @@
-# electron-builder config (Task 21; Phase 1-A rework). Produces the Tent NoCode Windows NSIS installer.
+# electron-builder config (Task 21; Phase 1-A rework). Produces the Nodeloom Windows NSIS installer.
 # The renderer/preload/main are built by `electron-vite build` (npm run package runs both).
 # extraResources and the resolver inventory (src/main/resources.ts) list the same rows - edit them together.
-appId: com.tentnocode.desktop
-productName: Tent NoCode
+appId: com.nodeloom.desktop
+productName: Nodeloom
 # Pinned explicitly: `electron` is a caret range in package.json and hoists to the monorepo root
 # node_modules, so electron-builder can't auto-detect the version from apps/desktop.
 # (electron-userland/electron-builder#3984). Keep in sync with the installed electron.
@@ -12,17 +12,17 @@ directories:
   output: release
   buildResources: build
 
-# electron-vite emits the app into out/; the workspace packages (@tent-nocode/core|kernel|runner) are
+# electron-vite emits the app into out/; the workspace packages (@nodeloom/core|kernel|runner) are
 # bundled into out/main by electron-vite, so only the external native deps (postgres,
 # embedded-postgres + its platform binaries) travel as real node_modules.
 files:
   - out/**
   - package.json
   - "!**/*.map"
-  # The @tent-nocode/* workspace packages are symlinked into node_modules (→ ../../packages/*, outside
+  # The @nodeloom/* workspace packages are symlinked into node_modules (→ ../../packages/*, outside
   # this app dir) AND are already bundled into out/main by electron-vite — exclude them so asar
   # packing doesn't try to follow the symlink outside apps/desktop (app-builder "must be under" error).
-  - "!node_modules/@tent-nocode/**"
+  - "!node_modules/@nodeloom/**"
 
 # embedded-postgres chmods its binaries by their in-archive path; Electron redirects spawn out of
 # asar but not chmod, so asar stays off and the binaries ship as loose files.
@@ -65,8 +65,8 @@ win:
 # The .tproject association registers at install (per-user HKCU).
 fileAssociations:
   - ext: tproject
-    name: Tent NoCode project
-    description: Tent NoCode project
+    name: Nodeloom project
+    description: Nodeloom project
     icon: build/tproject.ico
 
 nsis:
@@ -77,7 +77,7 @@ nsis:
   oneClick: true
   perMachine: false
   # The versioned artifact name.
-  artifactName: Tent NoCode-Setup-${version}.${ext}
+  artifactName: Nodeloom-Setup-${version}.${ext}
   # Phase 1-B (FR-491, D-216.2): DATA SURVIVES EVERYTHING — explicit, never implied.
   # The uninstaller is data-blind by law; userData outlives every uninstall/reinstall.
   deleteAppDataOnUninstall: false

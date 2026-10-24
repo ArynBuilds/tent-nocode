@@ -1,5 +1,5 @@
 import type postgres from 'postgres';
-import { datasetQuerySchema, type DatasetQuery } from '@tent-nocode/core';
+import { datasetQuerySchema, type DatasetQuery } from '@nodeloom/core';
 import { projectArm } from '../containment.js';
 
 // The one server-side dataset query composer; every column validates against the declared rowSchema, and columns and values alike travel as bound parameters - no raw SQL in this file.

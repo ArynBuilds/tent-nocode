@@ -54,7 +54,7 @@ export function ExportSection({ item, orgId, project }: { item: ProjectNavItem; 
           : <ExportCeremony orgId={orgId} projectId={project.id} sceneSlugs={slugs} value={sel} onChange={setSel} />}
       </Group>
       <Group>
-        <Row label="Save as a file" hint="You choose where the file goes. Open it with Tent NoCode on any computer to get this project back.">
+        <Row label="Save as a file" hint="You choose where the file goes. Open it with Nodeloom on any computer to get this project back.">
           <button type="button" className={`${kit.btn} ${kit.btnPrimary}`} onClick={save} disabled={working || count === 0}>
             {working ? 'Exporting…' : `Export ${count} screen${count === 1 ? '' : 's'}`}
           </button>

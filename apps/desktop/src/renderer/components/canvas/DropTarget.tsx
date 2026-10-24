@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { ReactNode } from 'react';
-import { importFormatFor } from '@tent-nocode/core';
+import { importFormatFor } from '@nodeloom/core';
 import { desk } from '../../lib/desk.js';
 import { useOrg } from '../../lib/OrgContext.js';
 
@@ -33,7 +33,7 @@ export function DropTarget({ children, onQuiet, onComponentDrop, projectId, proj
   async function onDrop(e: React.DragEvent<HTMLDivElement>): Promise<void> {
     e.preventDefault();
     setOver(false);
-    const ref = e.dataTransfer.getData('tent-nocode/component');
+    const ref = e.dataTransfer.getData('nodeloom/component');
     if (ref !== '') {
       onComponentDrop?.(ref, canvasPointAt(e.currentTarget, e.clientX, e.clientY));
       return;

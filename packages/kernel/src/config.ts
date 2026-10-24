@@ -1,5 +1,5 @@
 import type postgres from 'postgres';
-import { orgConfigSchema, type OrgConfig } from '@tent-nocode/core';
+import { orgConfigSchema, type OrgConfig } from '@nodeloom/core';
 import { emitEvent } from './events.js';
 
 // Reads orgs.config and fills defaults via the schema; unknown keys are ignored.

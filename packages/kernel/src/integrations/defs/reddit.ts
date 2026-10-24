@@ -13,14 +13,14 @@ export const reddit: IntegrationDef = {
   availability: 'upcoming',
   hosts: ['https://oauth.reddit.com'],
   // Reddit demands a unique, descriptive User-Agent; default library agents are throttled.
-  headers: { 'user-agent': 'web:ai.tent-nocode.integration:v1.0' },
+  headers: { 'user-agent': 'web:ai.nodeloom.integration:v1.0' },
   auth: {
     kind: 'oauth',
     authUrl: 'https://www.reddit.com/api/v1/authorize',
     tokenUrl: 'https://www.reddit.com/api/v1/access_token',
     scopes: ['submit', 'read'],
     clientEnv: 'REDDIT',
-    tokenHelp: 'Click Sign in to Reddit - Tent NoCode handles the whole sign-in; there is no key to find or paste.',
+    tokenHelp: 'Click Sign in to Reddit - Nodeloom handles the whole sign-in; there is no key to find or paste.',
   },
   endpoints: [
     {
@@ -149,7 +149,7 @@ export const reddit: IntegrationDef = {
   fixtures: [
     {
       endpoint: 'submit-post',
-      params: { sr: 'test', title: 'Testing from Tent NoCode', text: 'Hello from the app.', kind: 'self', api_type: 'json' },
+      params: { sr: 'test', title: 'Testing from Nodeloom', text: 'Hello from the app.', kind: 'self', api_type: 'json' },
       status: 200,
       response: {
         json: {

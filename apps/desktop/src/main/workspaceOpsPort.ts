@@ -1,4 +1,4 @@
-import type { OpsKernelPort } from '@tent-nocode/runner';
+import type { OpsKernelPort } from '@nodeloom/runner';
 import { workspaceCall } from './workspaceClient.js';
 
 // OpsKernelPort over the workspace door: each verb rides one runner.* channel.

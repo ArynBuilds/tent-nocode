@@ -1,6 +1,6 @@
 import { Columns3, Link2, ListPlus } from 'lucide-react';
-import { elementPortRule, primitiveRef } from '@tent-nocode/core';
-import type { CitizenKind, ElementClass } from '@tent-nocode/core';
+import { elementPortRule, primitiveRef } from '@nodeloom/core';
+import type { CitizenKind, ElementClass } from '@nodeloom/core';
 import { elementToolbarFor } from '../../lib/canvas/store.js';
 import { desk } from '../../lib/desk.js';
 import { store } from '../../lib/canvas/store.js';

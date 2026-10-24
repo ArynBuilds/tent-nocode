@@ -1,7 +1,7 @@
-import type { WorkspaceClient } from '@tent-nocode/kernel';
-import type { AgentStatus, EdgeConfidence, FlowEffect, GenomeCreator, OrgConfig, OrgRole, SceneBinding, ThreadMode } from '@tent-nocode/core';
+import type { WorkspaceClient } from '@nodeloom/kernel';
+import type { AgentStatus, EdgeConfidence, FlowEffect, GenomeCreator, OrgConfig, OrgRole, SceneBinding, ThreadMode } from '@nodeloom/core';
 
-/** The contract between main and renderer: the router's inferred client (type-only from @tent-nocode/kernel) plus the
+/** The contract between main and renderer: the router's inferred client (type-only from @nodeloom/kernel) plus the
  * native set below; never import main/preload here. */
 
 import type {
@@ -13,7 +13,7 @@ import type {
   SceneProjectionResult, TabDataResult, TabRow,
   ThreadIntentView, ThreadOverview, ThreadRow, ThreadUsage, TriggerWireRow, WorkRunView,
   IntegrationImportWire, WebhookEndpointWire,
-} from '@tent-nocode/core';
+} from '@nodeloom/core';
 export type {
   ActivityRow, AgentRow, BindableOutputRow, ChatTurn, ComponentCatalogEmit,
   ComponentCatalogEntry, ComponentCatalogParam, ComponentCatalogSlot, ComponentShelfRow,
@@ -25,7 +25,7 @@ export type {
   TabDataResult, TabRow, ThreadIntent, ThreadIntentView, ThreadOverview, ThreadRow,
   ThreadUsage, TriggerWireRow, WorkRunView,
   IntegrationCatalogWire, IntegrationConnectionWire, IntegrationImportWire, WebhookEndpointWire,
-} from '@tent-nocode/core';
+} from '@nodeloom/core';
 
 export interface EventsFilter {
   type?: string;
@@ -63,11 +63,11 @@ export type OrgConfigPatch = {
   [K in keyof OrgConfig]?: OrgConfig[K] extends object ? Partial<OrgConfig[K]> : OrgConfig[K];
 };
 
-// MemberRow moved to @tent-nocode/core (E1 slice 8).
+// MemberRow moved to @nodeloom/core (E1 slice 8).
 
 // The standing-consent DTOs (ReactiveChainRow · TriggerWireRow ·
-// ConsentGrantRow) live in @tent-nocode/core.
-// The tab + scene read DTOs moved to @tent-nocode/core's workspace module (E1 slice 2 —
+// ConsentGrantRow) live in @nodeloom/core.
+// The tab + scene read DTOs moved to @nodeloom/core's workspace module (E1 slice 2 —
 // one definition, both mouths); re-exported below with the job/run block.
 
 export interface ComponentUsageRow { slug: string; title: string; ref: string }
@@ -223,7 +223,7 @@ export interface ProjectMemberDto {
 /**
  * The desktop-native set: the handlers the main process answers itself (the device, the disk, the
  * credentials, the delivery doors). Every other member of DeskApi is inferred from
- * the one router in @tent-nocode/kernel - no hand-written mirror of it exists.
+ * the one router in @nodeloom/kernel - no hand-written mirror of it exists.
  */
 export interface DesktopNativeApi {
   // The device (nativeShell.ts).

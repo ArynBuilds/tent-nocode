@@ -1,5 +1,5 @@
-import { NODE_CONTRACTS } from '@tent-nocode/core';
-import type { FaceId } from '@tent-nocode/core';
+import { NODE_CONTRACTS } from '@nodeloom/core';
+import type { FaceId } from '@nodeloom/core';
 import { SceneScreen } from '../tabs/SceneScreen.js';
 import { brandMarkFor } from './brandMarks.js';
 import { kindHue, kindIcon } from '../../lib/canvas/store.js';

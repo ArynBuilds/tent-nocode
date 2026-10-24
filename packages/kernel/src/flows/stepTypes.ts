@@ -1,4 +1,4 @@
-import type { FlowCondition, FlowItem } from '@tent-nocode/core';
+import type { FlowCondition, FlowItem } from '@nodeloom/core';
 
 /** Step-def types, a leaf module so def files and the registry never cycle. */
 

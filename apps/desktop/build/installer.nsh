@@ -3,5 +3,5 @@
 
 !macro customUnInstall
   IfSilent +2 0
-  MessageBox MB_ICONINFORMATION|MB_OK "Your data stays on this computer. Tent NoCode only removed the app."
+  MessageBox MB_ICONINFORMATION|MB_OK "Your data stays on this computer. Nodeloom only removed the app."
 !macroend

@@ -16,7 +16,7 @@ export function registerDeliveryHandlers(): void {
     const picked = await dialog.showSaveDialog({
       title: 'Export project',
       defaultPath: join(app.getPath('downloads'), wantedName),
-      filters: [{ name: 'Tent NoCode project', extensions: ['tproject'] }],
+      filters: [{ name: 'Nodeloom project', extensions: ['tproject'] }],
     });
     if (picked.canceled || picked.filePath === undefined || picked.filePath === '') return { canceled: true };
     const out = await workspaceCall('exportPackage', [{

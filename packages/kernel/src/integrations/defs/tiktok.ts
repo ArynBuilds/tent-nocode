@@ -19,7 +19,7 @@ export const tiktok: IntegrationDef = {
     tokenUrl: 'https://open.tiktokapis.com/v2/oauth/token/',
     scopes: ['video.publish'],
     clientEnv: 'TIKTOK',
-    tokenHelp: 'Sign in with your TikTok account when connecting - Tent NoCode holds the keys, nothing to paste.',
+    tokenHelp: 'Sign in with your TikTok account when connecting - Nodeloom holds the keys, nothing to paste.',
   },
   endpoints: [
     {

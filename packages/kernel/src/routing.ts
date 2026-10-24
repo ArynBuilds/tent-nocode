@@ -1,4 +1,4 @@
-import type { JobKind, OrgConfig } from '@tent-nocode/core';
+import type { JobKind, OrgConfig } from '@nodeloom/core';
 
 /** Resolve the model pin for a lane: chat prefers deskModel; null means the CLI default. */
 export function resolveModel(cfg: OrgConfig, lane: JobKind = 'work'): string | null {

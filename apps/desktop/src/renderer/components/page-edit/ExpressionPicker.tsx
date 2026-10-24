@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import type { DatasetWhere } from '@tent-nocode/core';
+import type { DatasetWhere } from '@nodeloom/core';
 import { desk } from '../../lib/desk.js';
 import { useOrg } from '../../lib/OrgContext.js';
 import { useFocusedProject } from '../../lib/FocusContext.js';

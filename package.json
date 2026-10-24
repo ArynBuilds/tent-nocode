@@ -1,5 +1,5 @@
 {
-  "name": "tent-nocode",
+  "name": "nodeloom",
   "private": true,
   "workspaces": [
     "packages/*",
@@ -7,7 +7,7 @@
     "apps/server"
   ],
   "scripts": {
-    "typecheck": "tsc --noEmit -p packages/core && tsc --noEmit -p packages/tentkit && tsc --noEmit -p packages/kernel && tsc --noEmit -p packages/runner && tsc --noEmit -p packages/room-server && tsc --noEmit -p apps/server && npm run typecheck -w @tent-nocode/desktop",
+    "typecheck": "tsc --noEmit -p packages/core && tsc --noEmit -p packages/tentkit && tsc --noEmit -p packages/kernel && tsc --noEmit -p packages/runner && tsc --noEmit -p packages/room-server && tsc --noEmit -p apps/server && npm run typecheck -w @nodeloom/desktop",
     "cli": "tsx packages/runner/src/cli.ts",
     "build:tentkit": "tsx scripts/build-tentkit.mts",
     "desktop": "npm run build:tentkit && npm run dev -w apps/desktop",

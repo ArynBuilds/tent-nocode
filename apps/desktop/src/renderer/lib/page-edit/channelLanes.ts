@@ -1,5 +1,5 @@
-import { primitiveOfNode } from '@tent-nocode/core';
-import type { SceneNode } from '@tent-nocode/core';
+import { primitiveOfNode } from '@nodeloom/core';
+import type { SceneNode } from '@nodeloom/core';
 import { desk } from '../desk.js';
 import { store } from '../canvas/store.js';
 import type { History } from '../canvas/history.js';

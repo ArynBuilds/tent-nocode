@@ -1,6 +1,6 @@
 # Architecture
 
-This guide explains how Tent NoCode is put together: the processes that run on your computer, the two databases, the one router every call goes through, the canvas, screens, data, flows, integrations, the AI builder, consent and publishing. [architecture.html](architecture.html) is an interactive map of the same system; download it and open it in a browser.
+This guide explains how Nodeloom is put together: the processes that run on your computer, the two databases, the one router every call goes through, the canvas, screens, data, flows, integrations, the AI builder, consent and publishing. [architecture.html](architecture.html) is an interactive map of the same system; download it and open it in a browser.
 
 ## The shape
 
@@ -27,7 +27,7 @@ Everything runs on one computer, in one desktop app:
 On launch, the main process (`apps/desktop/src/main/index.ts`):
 
 1. reads or creates this install's secrets (`account.ts`): a token secret and a vault key;
-2. starts the bundled Postgres under `%APPDATA%\Tent NoCode\pgdata` and then the host (`localServer.ts`);
+2. starts the bundled Postgres under `%APPDATA%\Nodeloom\pgdata` and then the host (`localServer.ts`);
 3. registers the window's channels and opens the window, which asks you to sign up or unlock.
 
 The host (`apps/server/src/host.ts`) creates the two databases if they are missing, applies both migration lines, gives the published-apps roles fresh passwords, and listens on `127.0.0.1:4700`.

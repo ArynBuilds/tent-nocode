@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import type { IntegrationCatalogWire, IntegrationConnectionWire, IntegrationImportWire } from '@tent-nocode/core';
+import type { IntegrationCatalogWire, IntegrationConnectionWire, IntegrationImportWire } from '@nodeloom/core';
 import { desk } from '../../lib/desk.js';
 import { useOrg } from '../../lib/OrgContext.js';
 import type { CitizenSelection } from '../../lib/canvas/store.js';

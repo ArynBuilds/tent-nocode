@@ -1,4 +1,4 @@
-# Running Tent NoCode
+# Running Nodeloom
 
 This guide covers running the app from source, building the installer, connecting an AI engine, publishing, running a project on your own server, where your data lives, backups and troubleshooting.
 
@@ -13,7 +13,7 @@ Postgres is bundled. There is nothing else to install.
 ## From source
 
 ```sh
-git clone https://github.com/ArynBuilds/tent-nocode.git && cd tent-nocode
+git clone https://github.com/ArynBuilds/nodeloom.git && cd nodeloom
 npm install
 npm run desktop
 ```
@@ -56,7 +56,7 @@ http://<name>.localhost:4700
 ```sh
 npm install
 npm run build:tentkit
-export DATABASE_URL=postgres://user:password@localhost:5432/tentnocode
+export DATABASE_URL=postgres://user:password@localhost:5432/nodeloom
 npm run server -- install app.tproject
 npm run server -- serve
 ```
@@ -69,7 +69,7 @@ Most services on the shelf connect with a key you paste in. Services that sign i
 
 ## Where your data lives
 
-Everything is in `%APPDATA%\Tent NoCode`:
+Everything is in `%APPDATA%\Nodeloom`:
 
 | Path | What it is |
 | --- | --- |
@@ -81,7 +81,7 @@ Everything is in `%APPDATA%\Tent NoCode`:
 
 ## Backups
 
-Close the app, then copy the whole `%APPDATA%\Tent NoCode` folder. To move a single project to another computer, export it as a `.tproject` file instead; secrets and API keys never travel in a project file.
+Close the app, then copy the whole `%APPDATA%\Nodeloom` folder. To move a single project to another computer, export it as a `.tproject` file instead; secrets and API keys never travel in a project file.
 
 ## Troubleshooting
 
@@ -91,4 +91,4 @@ Close the app, then copy the whole `%APPDATA%\Tent NoCode` folder. To move a sin
 | The AI says there is no engine | Install and sign in to Claude Code, or add an API key in Settings, Engines. Restart the app after installing Claude Code. |
 | "the database at ... is not UTF-8" | The data folder was created by something else. Close the app and move `pgdata` aside; a fresh one is created on the next launch. |
 | A published address does not open | Use `http://`, not `https://`, and keep the `:4700`. The app must be running. |
-| Start over completely | Close the app and delete `%APPDATA%\Tent NoCode`. |
+| Start over completely | Close the app and delete `%APPDATA%\Nodeloom`. |

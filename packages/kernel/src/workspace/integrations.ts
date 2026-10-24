@@ -1,4 +1,4 @@
-import type { IntegrationCatalogWire, IntegrationConnectionWire, IntegrationImportWire, WebhookEndpointWire } from '@tent-nocode/core';
+import type { IntegrationCatalogWire, IntegrationConnectionWire, IntegrationImportWire, WebhookEndpointWire } from '@nodeloom/core';
 import { z } from 'zod';
 import { assertOwnOrg, read, router, write } from './registry.js';
 import { listIntegrationDefs, type IntegrationDef } from '../integrations/catalog.js';

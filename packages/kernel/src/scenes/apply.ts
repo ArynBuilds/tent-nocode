@@ -1,5 +1,5 @@
 import type postgres from 'postgres';
-import { applyOpsToDocument, emptySceneDocument, sceneDocumentSchema, sceneOpsBatchSchema, type SceneDocument } from '@tent-nocode/core';
+import { applyOpsToDocument, emptySceneDocument, sceneDocumentSchema, sceneOpsBatchSchema, type SceneDocument } from '@nodeloom/core';
 import { emitEvent } from '../events.js';
 import { formatIssues, loadValidateContext, validateScene } from './validate.js';
 

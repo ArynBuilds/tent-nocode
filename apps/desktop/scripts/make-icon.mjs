@@ -1,5 +1,5 @@
 // The window/taskbar and .tproject icon generator. THE MARK is the one logo
-// file, src/renderer/assets/tent-nocode-logo.svg, rasterized by Playwright's Chromium
+// file, src/renderer/assets/nodeloom-logo.svg, rasterized by Playwright's Chromium
 // (a desktop dev dependency) - no second copy of the geometry lives here.
 //
 // Modes:
@@ -20,7 +20,7 @@ const INK = '#1b1b1b';
 const MARK_RADIUS = 0.178;
 
 const here = dirname(fileURLToPath(import.meta.url));
-const MARK_SVG = readFileSync(join(here, '..', 'src', 'renderer', 'assets', 'tent-nocode-logo.svg'), 'utf8')
+const MARK_SVG = readFileSync(join(here, '..', 'src', 'renderer', 'assets', 'nodeloom-logo.svg'), 'utf8')
   .replace(/<\?xml[^>]*\?>/, '')
   .replaceAll('#000000', INK);
 

@@ -1,5 +1,5 @@
 import type postgres from 'postgres';
-import { triggerKindWord } from '@tent-nocode/core';
+import { triggerKindWord } from '@nodeloom/core';
 import { projectArm } from './containment.js';
 import { paramWord, projectFlowSteps } from './observatorySteps.js';
 import { projectPeopleAndNotes } from './observatoryPeople.js';

@@ -1,5 +1,5 @@
 import { spawn } from 'node:child_process';
-import { resolveApiEngine, resolveCliEngine } from '@tent-nocode/kernel';
+import { resolveApiEngine, resolveCliEngine } from '@nodeloom/kernel';
 
 // Engine credential flow: probe-validate a key, then store it in the vault. The value never logs or echoes into an error.
 

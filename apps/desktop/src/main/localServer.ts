@@ -5,7 +5,7 @@ import { connect } from 'node:net';
 import { join } from 'node:path';
 import EmbeddedPostgres from 'embedded-postgres';
 import postgres from 'postgres';
-import { startHost } from '@tent-nocode/server/host';
+import { startHost } from '@nodeloom/server/host';
 import { resourcePath } from './resources.js';
 
 // THE LOCAL SERVER: the bundled Postgres under userData/pgdata, then the host on loopback - the
@@ -14,7 +14,9 @@ import { resourcePath } from './resources.js';
 const PG_PORT = 54329;
 export const HOST_PORT = 4700;
 const PG_USER = 'postgres';
-const PG_PASSWORD = 'tent-nocode-desktop';
+const PG_PASSWORD = 'nodeloom-desktop';
+// A database created under the app's former name answers to this password until it is switched once.
+const FORMER_PG_PASSWORD = 'tent-nocode-desktop';
 
 export class PortBusyError extends Error {
   readonly port: number;
@@ -63,6 +65,7 @@ async function startPostgres(userDataDir: string): Promise<{ superUrl: string; s
   });
   if (!existsSync(join(databaseDir, 'PG_VERSION'))) await pg.initialise();
   await pg.start();
+  await adoptPassword();
   const superUrl = `postgres://${PG_USER}:${PG_PASSWORD}@127.0.0.1:${PG_PORT}/postgres`;
   const probe = postgres(superUrl, { max: 1, onnotice: () => {} });
   try {
@@ -80,6 +83,26 @@ async function startPostgres(userDataDir: string): Promise<{ superUrl: string; s
       await pg.stop();
     },
   };
+}
+
+/** A database that refuses the current password but takes the former one is switched to the current one. */
+async function adoptPassword(): Promise<void> {
+  const urlWith = (password: string): string => `postgres://${PG_USER}:${password}@127.0.0.1:${PG_PORT}/postgres`;
+  const current = postgres(urlWith(PG_PASSWORD), { max: 1, onnotice: () => {} });
+  try {
+    await current`select 1`;
+    return;
+  } catch (e) {
+    if ((e as { code?: string }).code !== '28P01') throw e;
+  } finally {
+    await current.end();
+  }
+  const former = postgres(urlWith(FORMER_PG_PASSWORD), { max: 1, onnotice: () => {} });
+  try {
+    await former.unsafe(`alter user ${PG_USER} with password '${PG_PASSWORD}'`);
+  } finally {
+    await former.end();
+  }
 }
 
 /** Claude Code on PATH answers its version; the same launch the driver uses. */

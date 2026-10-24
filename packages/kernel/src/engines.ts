@@ -57,7 +57,7 @@ export const CLI_ENGINE_REGISTRY: Record<string, CliEngineEntry> = Object.freeze
     versionProbeArgs: ['--version'],
     validationProbe: { prompt: 'Reply with exactly: OK', expect: 'OK', model: 'claude-haiku-4-5-20251001' },
     installHint:
-      'Claude Code is not installed. Install it first (npm install -g @anthropic-ai/claude-code, or see claude.com/claude-code), then relaunch Tent NoCode.',
+      'Claude Code is not installed. Install it first (npm install -g @anthropic-ai/claude-code, or see claude.com/claude-code), then relaunch Nodeloom.',
     upstreamHost: 'api.anthropic.com',
     baseUrlEnvVar: 'ANTHROPIC_BASE_URL',
   },

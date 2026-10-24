@@ -1,4 +1,4 @@
-import { primitiveOfNode } from '@tent-nocode/core';
+import { primitiveOfNode } from '@nodeloom/core';
 import { StateNode, type PointerInfo } from '../StateNode.js';
 
 // SELECT / POINTING HANDLE (tldraw's PointingHandle + DraggingHandle): the spacing handles of a stack

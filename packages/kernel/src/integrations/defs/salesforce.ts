@@ -20,7 +20,7 @@ export const salesforce: IntegrationDef = {
     tokenUrl: 'https://login.salesforce.com/services/oauth2/token',
     scopes: ['api', 'refresh_token'],
     clientEnv: 'SALESFORCE',
-    tokenHelp: 'Click Sign in to Salesforce and approve access - Tent NoCode holds the sign-in, you never paste a key.',
+    tokenHelp: 'Click Sign in to Salesforce and approve access - Nodeloom holds the sign-in, you never paste a key.',
   },
   endpoints: [
     {

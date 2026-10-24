@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import type postgres from 'postgres';
 import { resolveProject } from '../containment.js';
-import type { ExecutionDriver } from '@tent-nocode/core';
+import type { ExecutionDriver } from '@nodeloom/core';
 import { applyUserRevision, type ApplyResult } from '../scenes/apply.js';
 import { compileSceneDialectAt, DIALECT_FIX_SENTENCE } from '../dialect.js';
 import { setOrgConfig } from '../config.js';

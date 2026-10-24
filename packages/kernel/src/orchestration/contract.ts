@@ -1,4 +1,4 @@
-import type { IoContract } from '@tent-nocode/core';
+import type { IoContract } from '@nodeloom/core';
 
 // Deterministic check that every declared output appears in what a run produced; non-empty prose passes.
 export interface ContractCheck { ok: boolean; missing: string[] }

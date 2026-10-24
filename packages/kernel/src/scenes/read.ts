@@ -1,5 +1,5 @@
 import type postgres from 'postgres';
-import { composedChildren, sceneOpsBatchSchema, type SceneDocument, type SceneNode } from '@tent-nocode/core';
+import { composedChildren, sceneOpsBatchSchema, type SceneDocument, type SceneNode } from '@nodeloom/core';
 import { getSceneDocument, requireScene } from './store.js';
 
 // Bounded scene reads: getSubtree (depth/count-budgeted) and explainProperty (provenance from the revision log).

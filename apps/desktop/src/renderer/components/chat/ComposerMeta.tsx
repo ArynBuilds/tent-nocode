@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Check, ChevronDown } from 'lucide-react';
-import type { OrgRole, ThreadMode } from '@tent-nocode/core';
+import type { OrgRole, ThreadMode } from '@nodeloom/core';
 import type { ThreadUsage } from '../../../shared/ipc.js';
 import { can } from '../../../shared/roles.js';
 import { desk } from '../../lib/desk.js';

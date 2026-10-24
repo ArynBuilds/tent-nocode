@@ -5,7 +5,7 @@ export const supabase: IntegrationDef = {
   name: 'supabase',
   version: 1,
   displayName: 'Supabase',
-  blurb: 'Bring your Supabase tables into Tent NoCode - an import recreates each table with its own columns.',
+  blurb: 'Bring your Supabase tables into Nodeloom - an import recreates each table with its own columns.',
   category: 'backend',
   surfaces: 'both',
   scope: 'builder',

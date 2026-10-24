@@ -34,7 +34,7 @@ export function classifyBootFailure(err: unknown): BootFailure {
     kind: 'unknown',
     sentence: err instanceof Error && err.name === 'PortBusyError'
       ? err.message
-      : "Tent NoCode couldn't start. Nothing was lost - your work stays on this computer.",
+      : "Nodeloom couldn't start. Nothing was lost - your work stays on this computer.",
     action: 'try-again',
     detail,
   };

@@ -3,7 +3,7 @@ import { randomBytes, randomUUID, scrypt, timingSafeEqual } from 'node:crypto';
 import { readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { promisify } from 'node:util';
-import { mintAccountToken } from '@tent-nocode/server/accountToken';
+import { mintAccountToken } from '@nodeloom/server/accountToken';
 import type { AuthState, MutationResult, SignUpInput } from '../shared/ipc.js';
 import { openSecret, sealSecret, vaultAvailable } from './vault.js';
 

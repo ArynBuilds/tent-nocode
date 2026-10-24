@@ -1,4 +1,4 @@
-import type { ConsentGrantRow, ReactiveChainRow, TriggerWireRow } from '@tent-nocode/core';
+import type { ConsentGrantRow, ReactiveChainRow, TriggerWireRow } from '@nodeloom/core';
 import type postgres from 'postgres';
 import { z } from 'zod';
 import { listConsentGrants, revokeConsentGrant } from '../consent.js';

@@ -1,6 +1,6 @@
 import { existsSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { isAbsolute, join } from 'node:path';
-import { packageExtRe } from '@tent-nocode/core';
+import { packageExtRe } from '@nodeloom/core';
 import { z } from 'zod';
 import type postgres from 'postgres';
 import type { ActionSpec } from '../chat/actions.js';

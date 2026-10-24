@@ -19,7 +19,7 @@ export const docusign: IntegrationDef = {
     tokenUrl: 'https://account.docusign.com/oauth/token',
     scopes: ['signature'],
     clientEnv: 'DOCUSIGN',
-    tokenHelp: 'Click Sign in to DocuSign and approve access - Tent NoCode holds the sign-in, you never paste a key.',
+    tokenHelp: 'Click Sign in to DocuSign and approve access - Nodeloom holds the sign-in, you never paste a key.',
   },
   endpoints: [
     {

@@ -1,4 +1,4 @@
-import type { ActivityStep } from '@tent-nocode/core';
+import type { ActivityStep } from '@nodeloom/core';
 import { summarizeToolInput } from '../streamParser.js';
 
 // Maps AI SDK stream parts to ActivitySteps; never throws, unknown parts map to nothing.

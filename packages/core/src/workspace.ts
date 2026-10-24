@@ -122,7 +122,7 @@ export interface AgentRow {
   currentVersion: number;
   capability: string;
   createdAt: string;
-  /** 'voice' (the Tent NoCode genome) | 'hands' (historical) | null. */
+  /** 'voice' (the Nodeloom genome) | 'hands' (historical) | null. */
   reserved: 'voice' | 'hands' | null;
 }
 

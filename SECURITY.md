@@ -2,7 +2,7 @@
 
 ## Supported versions
 
-Tent NoCode runs on your own computer. Security fixes land on the default branch and in the next release; please run the latest release.
+Nodeloom runs on your own computer. Security fixes land on the default branch and in the next release; please run the latest release.
 
 ## Reporting a vulnerability
 
@@ -14,7 +14,7 @@ We aim to acknowledge reports within 3 working days and to agree on a disclosure
 
 ## Security model
 
-Tent NoCode is designed for one person on their own computer. It runs a database, a server and an AI builder there, so the main questions are who can reach them and what the AI may do without asking.
+Nodeloom is designed for one person on their own computer. It runs a database, a server and an AI builder there, so the main questions are who can reach them and what the AI may do without asking.
 
 ### Actors
 
@@ -29,7 +29,7 @@ Tent NoCode is designed for one person on their own computer. It runs a database
 ### The account
 
 - The first launch creates the account. After that the app only asks for the password; there is no second account.
-- The password is hashed with scrypt and a random salt and stored in `account.json` in the app's data folder (`%APPDATA%\Tent NoCode`). It never leaves the computer.
+- The password is hashed with scrypt and a random salt and stored in `account.json` in the app's data folder (`%APPDATA%\Nodeloom`). It never leaves the computer.
 - Locking the app (Settings, sign out) ends the session; the account and everything built stay.
 
 ### The tokens and the keys

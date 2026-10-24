@@ -1,7 +1,7 @@
 import type postgres from 'postgres';
 import {
   KEBAB_RE, flowDocSchema, sceneActionsSchema, type FlowDoc, type LsgEntry, type LsgEntryDraft,
-} from '@tent-nocode/core';
+} from '@nodeloom/core';
 import { canonicalContentHash } from './packageVerify.js';
 import { projectArm } from '../containment.js';
 import { emitEvent } from '../events.js';

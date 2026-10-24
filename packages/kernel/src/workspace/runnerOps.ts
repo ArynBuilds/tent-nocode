@@ -1,4 +1,4 @@
-import { datasetQuerySchema } from '@tent-nocode/core';
+import { datasetQuerySchema } from '@nodeloom/core';
 import { z } from 'zod';
 import { claimNextExecution, settleExecution } from '../operations/dispatch.js';
 import { resolveOperation } from '../operations/registry.js';

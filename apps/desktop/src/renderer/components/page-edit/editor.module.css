@@ -46,9 +46,6 @@
 .segmentOn { background: var(--raised); color: var(--t0); }
 .segmentLive { color: var(--live); }
 
-/* The device row (Phase 14A): the segment floats above the focused screen. */
-.deviceRow { position: absolute; transform: translate(-50%, -100%); background: var(--float); box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35); white-space: nowrap; }
-
 .section { display: flex; flex-direction: column; padding: var(--s1) 0 var(--s2); }
 .sectionHead { display: flex; align-items: center; gap: var(--s1); height: 32px; padding: 0 var(--s3); color: var(--t1); font-size: var(--fs-small); font-weight: 600; text-align: left; }
 .sectionHead:hover { color: var(--t0); }

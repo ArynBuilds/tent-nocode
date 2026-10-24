@@ -4,7 +4,7 @@ import {
   libraryItemSchema, nearestNames, nearestPrimitiveNames, nearestPropertyNames, payloadSchema, primitiveOfNode, primitiveOfRef,
   validateExpression, validateSceneStructure, PRIMITIVES,
   type LibraryItem, type LibraryItemResolver, type PrimitiveName, type SceneAction, type SceneDocument,
-} from '@tent-nocode/core';
+} from '@nodeloom/core';
 import { projectArm } from '../containment.js';
 import { projectThemeSchema } from '../projects.js';
 

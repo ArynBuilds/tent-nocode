@@ -24,7 +24,7 @@ export function FocusedShell({ slug, onExit }: {
 
   useEffect(() => {
     if (room) document.title = room.title;
-    return () => { document.title = 'Tent NoCode'; };
+    return () => { document.title = 'Nodeloom'; };
   }, [room]);
 
   return (

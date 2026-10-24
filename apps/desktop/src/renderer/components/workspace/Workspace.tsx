@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import type { ComponentProps } from 'react';
 import { Play, Shapes } from 'lucide-react';
-import { PRIMITIVES, datasetGrantPatterns, primitiveRef } from '@tent-nocode/core';
-import type { PrimitiveName } from '@tent-nocode/core';
+import { PRIMITIVES, datasetGrantPatterns, primitiveRef } from '@nodeloom/core';
+import type { PrimitiveName } from '@nodeloom/core';
 import { desk } from '../../lib/desk.js';
 import { useFocusedProject } from '../../lib/FocusContext.js';
 import { useOrg } from '../../lib/OrgContext.js';

@@ -1,4 +1,4 @@
-import type { OrgConfig } from '@tent-nocode/core';
+import type { OrgConfig } from '@nodeloom/core';
 import type postgres from 'postgres';
 import { z } from 'zod';
 import { setOrgConfig } from '../config.js';

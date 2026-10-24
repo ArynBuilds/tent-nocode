@@ -1,5 +1,5 @@
 {
-  "name": "@tent-nocode/runner",
+  "name": "@nodeloom/runner",
   "version": "0.0.1",
   "type": "module",
   "exports": {
@@ -10,8 +10,8 @@
     "@ai-sdk/anthropic": "^4.0.38",
     "@ai-sdk/openai": "^4.0.39",
     "@modelcontextprotocol/sdk": "^1.29.0",
-    "@tent-nocode/core": "*",
-    "@tent-nocode/kernel": "*",
+    "@nodeloom/core": "*",
+    "@nodeloom/kernel": "*",
     "ai": "^7.0.61",
     "postgres": "^3.4.4",
     "pyodide": "^314.0.2",

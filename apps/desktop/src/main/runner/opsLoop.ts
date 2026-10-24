@@ -1,5 +1,5 @@
-import type { OpsKernelPort } from '@tent-nocode/runner';
-import { processPendingOperationExecutions, type OpsExecutorConfig } from '@tent-nocode/runner/ops';
+import type { OpsKernelPort } from '@nodeloom/runner';
+import { processPendingOperationExecutions, type OpsExecutorConfig } from '@nodeloom/runner/ops';
 
 // Ops loop: claims pending operation executions over the workspace wall and runs them locally.
 

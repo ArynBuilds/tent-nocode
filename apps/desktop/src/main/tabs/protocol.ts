@@ -5,7 +5,7 @@ import { net, protocol } from 'electron';
 import {
   buildThemeCss, composeSceneHostPage, FONT_ALLOWLIST, readTentkitBuild, serveTentkitBuild,
   TAB_CSP, TAB_TOKENS_CSS, type ProjectTheme,
-} from '@tent-nocode/kernel';
+} from '@nodeloom/kernel';
 import { randomUUID } from 'node:crypto';
 import { identityReady } from '../identity.js';
 import { mintPreviewPage } from '../scenes/mintPreview.js';

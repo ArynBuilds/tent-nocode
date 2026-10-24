@@ -7,7 +7,7 @@ import {
   SCENE_ROOT_ID, breakpointsOf, channelRefParts, composedChildren, evaluateExpression, expandInstanceNodes, initialValues,
   isChannelRef, isExprValue, primitiveOfNode, sceneDocumentSchema,
   type Breakpoint, type FlowEffect, type LibraryItem, type PrimitiveName, type SceneDocument, type SceneNode,
-} from '@tent-nocode/core';
+} from '@nodeloom/core';
 
 // TENTKIT - THE ENGINE (Phase 12, ruling 7; the 500-line law is waived - one system, one file).
 // Typed React source that renders a document of the five primitives from packages/core/src/primitives.ts:
@@ -402,7 +402,7 @@ interface SceneState {
   /** The last action result per action name, shown in place until the next fire. */
   results: Map<string, { ok: boolean; failures: string[] }>;
   breakpoints: Record<string, Breakpoint>;
-  /** The forced breakpoint (the editor's device row); null = the window's own width decides. */
+  /** The forced breakpoint (the properties panel's Phone / Tablet switch); null = the window's own width decides. */
   forced: string | null;
   /** The design width the reflow measures against; null = no reflow. */
   designWidth: number | null;

@@ -15,7 +15,7 @@ import { useOrg } from './OrgContext.js';
  * the center, and every birth lane auto-focuses its result via `focusProject`).
  */
 
-const FOCUS_KEY = 'tent-nocode-focus';
+const FOCUS_KEY = 'nodeloom-focus';
 
 export interface FocusValue {
   /** Null only while no project exists (or the default is still resolving for one beat). */

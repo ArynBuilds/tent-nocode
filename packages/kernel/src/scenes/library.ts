@@ -2,7 +2,7 @@ import type postgres from 'postgres';
 import {
   SCENE_ROOT_ID, libraryItemRef, libraryItemSchema, payloadSchema, primitiveOfNode, primitiveRef, sceneDocumentSchema,
   type LibraryItem, type SceneDocument, type SceneNode,
-} from '@tent-nocode/core';
+} from '@nodeloom/core';
 import { emitEvent } from '../events.js';
 import { projectArm } from '../containment.js';
 

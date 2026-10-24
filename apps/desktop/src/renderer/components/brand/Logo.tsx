@@ -1,6 +1,6 @@
 import { useId } from 'react';
 
-// THE MARK: the Tent NoCode logo drawn in currentColor, so each place sets its own tone with CSS color.
+// THE MARK: the Nodeloom logo drawn in currentColor, so each place sets its own tone with CSS color.
 
 export function Logo({ size = 40, className, title }: { size?: number; className?: string; title?: string }) {
   const mask = `logo-dot-${useId().replace(/:/g, '')}`;

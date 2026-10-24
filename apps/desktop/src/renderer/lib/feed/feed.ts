@@ -1,4 +1,4 @@
-import type { ActivityStep } from '@tent-nocode/core';
+import type { ActivityStep } from '@nodeloom/core';
 import type { ActivityRow, ConversationView, EventRow, IntentPartDto, MessageRow, RunRow, ThreadIntent, WorkRunView } from '../../../shared/ipc.js';
 import { stripLiveWindow, stripMachineryFences } from './fences.js';
 import { toolLabel } from './labels.js';
@@ -140,7 +140,7 @@ export function hasActiveWork(view: Pick<ConversationView, 'work'>): boolean {
 }
 
 /** Driver-hygiene artifacts are plumbing — they never reach a user-facing line. */
-const HYGIENE_FILES = new Set(['.tent-nocode-mcp.json', '.tent-nocode-system.md']);
+const HYGIENE_FILES = new Set(['.nodeloom-mcp.json', '.nodeloom-system.md']);
 
 /** Outcomes speak deliverable-first: bookkeeping lines strip; honest sentences pass verbatim. */
 export function outcomeText(summary: string): string {

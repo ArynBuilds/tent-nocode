@@ -1,7 +1,7 @@
 import type postgres from 'postgres';
-import { expandInstanceNodes, instanceRefsIn, isSystemQueryTable, sceneBindingsSchema, type SceneBindingFeed } from '@tent-nocode/core';
-import { executeSceneBinding, getSceneForHost, libraryItemsFor, requireScene, stampIconGlyphs } from '@tent-nocode/kernel';
-import type { HostLookup, LiveTarget } from '@tent-nocode/kernel';
+import { expandInstanceNodes, instanceRefsIn, isSystemQueryTable, sceneBindingsSchema, type SceneBindingFeed } from '@nodeloom/core';
+import { executeSceneBinding, getSceneForHost, libraryItemsFor, requireScene, stampIconGlyphs } from '@nodeloom/kernel';
+import type { HostLookup, LiveTarget } from '@nodeloom/kernel';
 import { withTenant } from './tenancy.js';
 
 // Room data plane: the first feed of a published screen through the one executor under tenant context; the

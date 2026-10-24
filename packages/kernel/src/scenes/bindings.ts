@@ -2,7 +2,7 @@ import type postgres from 'postgres';
 import {
   SYSTEM_TABLE_SCHEMAS, bindingWithRowKey, isSystemQueryTable,
   type AssetBinding, type DatasetQuery, type QueryBinding, type SceneBinding, type SystemQueryTable,
-} from '@tent-nocode/core';
+} from '@nodeloom/core';
 import { queryDatasetRows } from '../tabs/datasetQuery.js';
 import { resolveMediaFiles } from '../tabs/media.js';
 

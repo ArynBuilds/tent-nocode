@@ -58,7 +58,7 @@ export function DashboardRail({ filter, onFilter }: { filter: ProjectFilter; onF
     <aside className={`${shell.sidebar} ${styles.rail}`}>
       <div className={styles.brand}>
         <Logo size={22} className={styles.mark} />
-        <span className={styles.word}>Tent NoCode</span>
+        <span className={styles.word}>Nodeloom</span>
       </div>
 
       <nav className={styles.nav} aria-label="Projects">

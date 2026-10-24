@@ -1,4 +1,4 @@
-import { isPill } from '@tent-nocode/core';
+import { isPill } from '@nodeloom/core';
 import { SINGLE_IN, type FlowStepDef } from '../stepTypes.js';
 
 // Sets the declared fields per item (pills resolve against the item); keep-others defaults on.

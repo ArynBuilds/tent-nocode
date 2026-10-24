@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto';
 import type postgres from 'postgres';
 import { z } from 'zod';
-import { KEBAB_RE, datasetQuerySchema } from '@tent-nocode/core';
+import { KEBAB_RE, datasetQuerySchema } from '@nodeloom/core';
 import { emitEvent } from '../events.js';
 import { projectArm } from '../containment.js';
 

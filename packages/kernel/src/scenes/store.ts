@@ -2,7 +2,7 @@ import type postgres from 'postgres';
 import {
   SCENE_SCHEMA_VERSION, emptySceneDocument, primitiveRef, sceneBindingsSchema, sceneDocumentSchema,
   type SceneBinding, type SceneDocument,
-} from '@tent-nocode/core';
+} from '@nodeloom/core';
 import { emitEvent } from '../events.js';
 import { applyRevision } from './apply.js';
 import { projectThemeSchema, type ProjectTheme } from '../projects.js';

@@ -2,17 +2,17 @@ import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import type postgres from 'postgres';
-import { primitiveCatalogBlock } from '@tent-nocode/core';
+import { primitiveCatalogBlock } from '@nodeloom/core';
 import {
   BRIDGE_PROMPT, compose, renderBriefText, renderThemeBlock,
   resolveModel, resolveCliEngine,
-} from '@tent-nocode/kernel';
+} from '@nodeloom/kernel';
 import { compileCliInvocation } from './claudeDriver.js';
-import type { SpawnedRun } from '@tent-nocode/kernel';
+import type { SpawnedRun } from '@nodeloom/kernel';
 import { toKernelPort, type KernelPort } from './kernelPort.js';
 import { resolveEngineCredential, type ResolvedEngineCredential } from './engineCredential.js';
 import { scrubSecretValues } from './scrub.js';
-import type { DriverHooks, DriverResult, PreparedContinuation } from '@tent-nocode/core';
+import type { DriverHooks, DriverResult, PreparedContinuation } from '@nodeloom/core';
 import type { ExecutionDriver } from './driver.js';
 import type { ApiDriver } from './api/driver.js';
 import { ActivitySink } from './activitySink.js';
@@ -56,7 +56,7 @@ export interface RunnerConfig {
   pyodideDir?: string;
   /** Vendored ONNX Runtime wasm dir; unset = model-carrying operations fail with a named error. */
   onnxDir?: string;
-  /** Command+args for the tent-nocode-browser MCP server, mounted only on browse-scoped work runs. */
+  /** Command+args for the nodeloom-browser MCP server, mounted only on browse-scoped work runs. */
   browserMcpCommand?: string[];
   /** Main-process loopback browse channel (url + per-boot token); absent = browsing off. */
   browseChannel?: { url: string; token: string };
@@ -333,7 +333,7 @@ export async function executeRun(
   // Per-run settings file lives in a temp dir outside the workspace; written after compile.
   let settingsOwnDir: string | null = null;
   if (mount.mcpConfigDir === null) {
-    settingsOwnDir = await mkdtemp(join(tmpdir(), 'tent-nocode-settings-'));
+    settingsOwnDir = await mkdtemp(join(tmpdir(), 'nodeloom-settings-'));
   }
   const settingsPath = join(mount.mcpConfigDir ?? settingsOwnDir!, 'settings.json');
 

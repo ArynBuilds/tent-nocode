@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import postgres from 'postgres';
-import { DowngradeError, emitEvent, runMigrations, type RunMigrationsResult } from '@tent-nocode/kernel';
+import { DowngradeError, emitEvent, runMigrations, type RunMigrationsResult } from '@nodeloom/kernel';
 import type { ServerConfig } from './config.js';
 import { ConfigRefusal } from './config.js';
 
@@ -16,7 +16,7 @@ export interface BootResult {
   migrations: RunMigrationsResult;
 }
 
-const ORG_NAME = 'tent-nocode-server';
+const ORG_NAME = 'nodeloom-server';
 const OWNER_EMAIL = 'owner@server.local';
 const VISITOR_EMAIL = 'visitor@server.local';
 
@@ -80,7 +80,7 @@ export function bootFailureSentence(err: unknown): { sentence: string; detail: s
   if (err instanceof DowngradeError) {
     return {
       sentence: 'This database was created by a NEWER version of this app. '
-        + 'Update the server (tent-nocode update), or point DATABASE_URL at a fresh database. Nothing was changed.',
+        + 'Update the server (nodeloom update), or point DATABASE_URL at a fresh database. Nothing was changed.',
       detail,
     };
   }

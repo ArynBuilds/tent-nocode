@@ -1,4 +1,4 @@
-import { flowDocSchema, flowEnvelopeSchema, flowItemSchema, planPartialRun } from '@tent-nocode/core';
+import { flowDocSchema, flowEnvelopeSchema, flowItemSchema, planPartialRun } from '@nodeloom/core';
 import { z } from 'zod';
 import { assertOwnOrg, read, router, write } from './registry.js';
 import { getSceneActionExecutionResult } from '../integrations/dispatch.js';

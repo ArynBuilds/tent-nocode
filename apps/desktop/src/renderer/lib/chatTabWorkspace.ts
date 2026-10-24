@@ -13,13 +13,13 @@ import { useOrg } from './OrgContext.js';
  * Each project remembers ITS OWN open-chat set (the console tabs);
  * a focus switch SWAPS the whole set — the outgoing project's set is saved exactly as
  * left (never closed-closed), the incoming project's set is restored (none remembered →
- * none loaded). Persistence rides localStorage per project (the `tent-nocode-last-view`
+ * none loaded). Persistence rides localStorage per project (the `nodeloom-last-view`
  * idiom). A thread's project comes from its ROW: restore drops threads that no longer
  * exist or were moved to another project. Drafts (threadId null) carry no thread and
  * don't persist; panel tabs (map/code/file/inspector/browser) never swap.
  */
 
-const key = (projectId: string) => `tent-nocode-chat-tabs:${projectId}`;
+const key = (projectId: string) => `nodeloom-chat-tabs:${projectId}`;
 
 /** One project's remembered open-chat set — thread ids only (tab ids are session-local). */
 export interface ChatTabSet {

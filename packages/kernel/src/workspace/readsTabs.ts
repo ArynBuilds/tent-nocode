@@ -1,11 +1,11 @@
 import {
   PRIMITIVES, PRIMITIVE_NAMES, columnSentence, initialValues, prettifyColumn, primitiveOfRef, primitiveRef, propertiesOf, typeText,
-} from '@tent-nocode/core';
+} from '@nodeloom/core';
 import type {
   BindableOutputRow, ColumnStats, ComponentCatalogEntry, ComponentCatalogParam, ComponentShelfRow, PrimitiveName,
   SceneBindingFeed, SceneCatalogEntry, SceneDataResult, SceneEditRead, SceneExplainResult,
   SceneNodeInspect, SceneProjectionResult, TabDataResult, TabRow,
-} from '@tent-nocode/core';
+} from '@nodeloom/core';
 import type postgres from 'postgres';
 import { createThread } from '../chat/chat.js';
 import { listConnections, MCP_GALLERY } from '../connections.js';

@@ -1,5 +1,5 @@
 {
-  "name": "@tent-nocode/server",
+  "name": "@nodeloom/server",
   "version": "0.0.1",
   "private": true,
   "type": "module",
@@ -12,10 +12,10 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@tent-nocode/core": "*",
-    "@tent-nocode/kernel": "*",
-    "@tent-nocode/room-server": "*",
-    "@tent-nocode/runner": "*",
+    "@nodeloom/core": "*",
+    "@nodeloom/kernel": "*",
+    "@nodeloom/room-server": "*",
+    "@nodeloom/runner": "*",
     "postgres": "^3.4.4",
     "zod": "^3.23.8"
   }

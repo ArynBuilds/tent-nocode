@@ -1,7 +1,7 @@
 import { readdir, rm } from 'node:fs/promises';
 import { join } from 'node:path';
 import type postgres from 'postgres';
-import type { CompiledInvocation, DriverHooks, DriverResult, ExecutionDriver } from '@tent-nocode/core';
+import type { CompiledInvocation, DriverHooks, DriverResult, ExecutionDriver } from '@nodeloom/core';
 import { toKernelPort, type KernelPort } from './kernelPort.js';
 import { sweepScratchWorkspaces } from './scratchGc.js';
 import { sweepClaudeSessions } from './continuationClaude.js';

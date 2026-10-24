@@ -1,7 +1,7 @@
 import type { IntegrationDefInput as IntegrationDef } from '../catalog.js';
 
 // Pinterest integration def: publish pins and list boards.
-// Upcoming - waits on Tent NoCode app registration; the token call also requires basic auth the oauth exchange does not carry yet.
+// Upcoming - waits on Nodeloom app registration; the token call also requires basic auth the oauth exchange does not carry yet.
 export const pinterest: IntegrationDef = {
   name: 'pinterest',
   version: 1,
@@ -18,7 +18,7 @@ export const pinterest: IntegrationDef = {
     tokenUrl: 'https://api.pinterest.com/v5/oauth/token',
     scopes: ['boards:read', 'boards:write', 'pins:read', 'pins:write'],
     clientEnv: 'PINTEREST',
-    tokenHelp: 'Sign in with your Pinterest account when connecting - Tent NoCode holds the keys, nothing to paste.',
+    tokenHelp: 'Sign in with your Pinterest account when connecting - Nodeloom holds the keys, nothing to paste.',
   },
   endpoints: [
     {

@@ -2,7 +2,7 @@ import { copyFileSync, mkdirSync } from 'node:fs';
 import { basename, join } from 'node:path';
 import { randomUUID } from 'node:crypto';
 import type postgres from 'postgres';
-import { KEBAB_RE, importFormatFor, stripImportExt } from '@tent-nocode/core';
+import { KEBAB_RE, importFormatFor, stripImportExt } from '@nodeloom/core';
 import { emitEvent } from '../events.js';
 import { projectArm } from '../containment.js';
 import { runOperation } from '../operations/dispatch.js';

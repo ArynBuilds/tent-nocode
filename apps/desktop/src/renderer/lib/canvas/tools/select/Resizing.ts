@@ -1,4 +1,4 @@
-import { primitiveOfNode } from '@tent-nocode/core';
+import { primitiveOfNode } from '@nodeloom/core';
 import { StateNode, type PointerInfo } from '../StateNode.js';
 import { inFreeParent } from '../../managers/nudge.js';
 import { withScopedValues } from '../../../../components/page-edit/panelGroups.js';

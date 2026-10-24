@@ -1,4 +1,4 @@
-import type { FlowItem } from '@tent-nocode/core';
+import type { FlowItem } from '@nodeloom/core';
 import type { FlowStepDef, PureRunOutput } from '../stepTypes.js';
 
 // Matches two streams by a key field and splits rows onto in-both / only-a / only-b.

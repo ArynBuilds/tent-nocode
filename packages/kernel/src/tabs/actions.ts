@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import type postgres from 'postgres';
-import { isSystemQueryTable, sceneActionsSchema, sceneBindingsSchema, type SceneAction, type SceneBinding } from '@tent-nocode/core';
+import { isSystemQueryTable, sceneActionsSchema, sceneBindingsSchema, type SceneAction, type SceneBinding } from '@nodeloom/core';
 import type { ActionSpec } from '../chat/actions.js';
 import { projectArm, resolveProject } from '../containment.js';
 import { projectThemeSchema, setProjectTheme } from '../projects.js';

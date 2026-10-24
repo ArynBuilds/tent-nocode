@@ -1,10 +1,10 @@
 {
-  "name": "@tent-nocode/tentkit",
+  "name": "@nodeloom/tentkit",
   "version": "1.0.0",
   "type": "module",
   "exports": { ".": "./src/tentkit.tsx" },
   "dependencies": {
-    "@tent-nocode/core": "*",
+    "@nodeloom/core": "*",
     "react": "^19",
     "react-dom": "^19"
   }

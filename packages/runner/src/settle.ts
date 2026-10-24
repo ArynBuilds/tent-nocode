@@ -1,7 +1,7 @@
 import type postgres from 'postgres';
-import type { DriverResult } from '@tent-nocode/core';
-import { checkContract } from '@tent-nocode/kernel';
-import type { SpawnedRun } from '@tent-nocode/kernel';
+import type { DriverResult } from '@nodeloom/core';
+import { checkContract } from '@nodeloom/kernel';
+import type { SpawnedRun } from '@nodeloom/kernel';
 import { toKernelPort, type KernelPort } from './kernelPort.js';
 import { snapshotWorkspace, diffSnapshots, type WorkspaceSnapshot } from './workspaceDiff.js';
 import { checkpoint, mergeRunBranch, surgicalRevert, worktreeRemove } from './workspaceGit.js';

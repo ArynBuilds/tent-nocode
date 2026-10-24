@@ -75,7 +75,7 @@ export async function startPanelBrowserMcpServer(): Promise<void> {
     },
   });
 
-  const server = new McpServer({ name: 'tent-nocode-panelbrowser', version: '0.1.0' });
+  const server = new McpServer({ name: 'nodeloom-panelbrowser', version: '0.1.0' });
   const text = (h: (args: never) => Promise<PanelToolResult>) => async (args: unknown) => {
     const out = await h(args as never);
     if (out.image) {

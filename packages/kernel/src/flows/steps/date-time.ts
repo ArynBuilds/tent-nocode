@@ -1,4 +1,4 @@
-import { isPill } from '@tent-nocode/core';
+import { isPill } from '@nodeloom/core';
 import { SINGLE_IN, type FlowStepDef, type PureRunOutput } from '../stepTypes.js';
 
 // Shifts or reformats one field's date; unparseable values pass through, never reads the clock.

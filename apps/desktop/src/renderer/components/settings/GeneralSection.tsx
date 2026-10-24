@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import type { OrgConfig, OrgRole, ThreadMode } from '@tent-nocode/core';
+import type { OrgConfig, OrgRole, ThreadMode } from '@nodeloom/core';
 import type { AuthState } from '../../../shared/ipc.js';
 import { can } from '../../../shared/roles.js';
 import { useQuery } from '../../lib/data/useQuery.js';

@@ -1,8 +1,8 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef } from 'react';
 import type { ReactNode } from 'react';
 import { atom, computed, react } from '@tldraw/state';
-import { EDGE_VERB_WIRE_KINDS, elementPortRule, legalTargets } from '@tent-nocode/core';
-import type { VerbDoor } from '@tent-nocode/core';
+import { EDGE_VERB_WIRE_KINDS, elementPortRule, legalTargets } from '@nodeloom/core';
+import type { VerbDoor } from '@nodeloom/core';
 import {
   SCREEN_VIEW_SCALE, canvasView, fitCameraTo, gridSpacing, isActiveAt, sameWire, store, toWorld, trioCamera, useValue, verbSentence, wireAddressOf, zoomAt, zoomRegimeOf,
   type EdgeRecord, type NodeRecord, type Placed, type Rect,

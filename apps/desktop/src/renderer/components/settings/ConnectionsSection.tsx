@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { OrgRole } from '@tent-nocode/core';
+import type { OrgRole } from '@nodeloom/core';
 import { can } from '../../../shared/roles.js';
 import { useQuery } from '../../lib/data/useQuery.js';
 import { desk } from '../../lib/desk.js';

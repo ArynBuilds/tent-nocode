@@ -1,4 +1,4 @@
-import { PRIMITIVES, elementClassOf, primitiveOfNode } from '@tent-nocode/core';
+import { PRIMITIVES, elementClassOf, primitiveOfNode } from '@nodeloom/core';
 import { SCREEN_VIEW_SCALE, store, toScreen, useValue } from '../../lib/canvas/store.js';
 import type { Camera, ElementRecord, Placed, Rect, ScreenRecord } from '../../lib/canvas/store.js';
 import { alignElements } from '../../lib/page-edit/positionGround.js';
@@ -146,50 +146,20 @@ function doorCtx(orgId: string, slug: string, size: { w: number; h: number }, qu
   };
 }
 
-const DEVICES = [
-  { label: 'Desktop', bp: null },
-  { label: 'Tablet', bp: 'tablet' },
-  { label: 'Mobile', bp: 'phone' },
-] as const;
-
 export function FrameEditOverlay({ screen }: { screen: ScreenRecord }) {
   const editor = useEditor();
   const slug = screen.slug;
-  const { origin, rectOf } = useWorldRects(screen);
+  const { rectOf } = useWorldRects(screen);
   const cam = useValue('overlay.cam', () => store.camera, []);
   const sel = useValue('overlay.sel', () => store.selectedElement(), []);
   const gesture = useValue('overlay.gesture', () => ({ badge: store.gesture.badge, busy: store.gesture.ghost !== null || store.gesture.wire !== null || store.gesture.brush !== null }), []);
   const pendingRun = useValue('overlay.run', () => store.editing.pendingRun, []);
-  const editBp = useValue('overlay.bp', () => store.editing.breakpoint, []);
   const mine = sel !== null && sel.scene === slug && sel.elementId !== 'root' ? sel : null;
   const el = mine !== null ? store.element(slug, mine.elementId) : undefined;
   const rect = mine !== null ? rectOf(mine.elementId) : null;
   const view = editor.view();
   const c: Camera = cam;
-  // THE DEVICE ROW (Phase 14A, row 14.3): Desktop / Tablet / Mobile above the focused screen - the editing
-  // breakpoint and the artboard width (1440 / 810 / 390) switch together, atomically through the store.
-  const deviceRow = origin !== null && !gesture.busy ? (() => {
-    const size = store.sizeOf(screen.nodeId);
-    const at = toScreen(c, { x: origin.x + size.w / 2, y: origin.y });
-    return (
-      <span className={`${styles.segment} ${styles.deviceRow}`} style={{ left: at.x, top: at.y - 10 }}>
-        {DEVICES.map(({ label, bp }) => (
-          <button
-            key={label} type="button"
-            className={`${styles.segmentBtn} ${editBp === bp ? styles.segmentOn : ''} ${editBp === bp && bp !== null ? styles.segmentLive : ''}`}
-            onClick={() => { void editor.history.transaction(`view ${label.toLowerCase()}`, () => store.setDeviceBreakpoint(screen.nodeId, bp)); }}
-          >
-            {label}
-          </button>
-        ))}
-      </span>
-    );
-  })() : null;
-  if (mine === null || el === undefined || rect === null) {
-    return deviceRow !== null
-      ? <div className={styles.frameEditOverlay} style={{ left: 0, top: 0, width: view?.width ?? 0, height: view?.height ?? 0 }}>{deviceRow}</div>
-      : null;
-  }
+  if (mine === null || el === undefined || rect === null) return null;
   const px = (p: Placed): Placed => { const q = toScreen(c, p); return { x: q.x - 0, y: q.y - 0 }; };
   const topLeft = px({ x: rect.x, y: rect.y });
   const bottomRight = px({ x: rect.x + rect.w, y: rect.y + rect.h });
@@ -216,7 +186,6 @@ export function FrameEditOverlay({ screen }: { screen: ScreenRecord }) {
     : [];
   return (
     <div className={styles.frameEditOverlay} style={{ left: 0, top: 0, width: view?.width ?? 0, height: view?.height ?? 0 }}>
-      {deviceRow}
       {!gesture.busy || gesture.badge !== null ? (
         <span className={styles.badge} style={{ left: (topLeft.x + bottomRight.x) / 2, top: bottomRight.y }}>{gesture.badge ?? `${frameW} x ${frameH}`}</span>
       ) : null}

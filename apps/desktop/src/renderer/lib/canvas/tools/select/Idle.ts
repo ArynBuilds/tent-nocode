@@ -1,5 +1,5 @@
-import { primitiveOfNode } from '@tent-nocode/core';
-import type { VerbDoor } from '@tent-nocode/core';
+import { primitiveOfNode } from '@nodeloom/core';
+import type { VerbDoor } from '@nodeloom/core';
 import { desk } from '../../../desk.js';
 import { navigate } from '../../../router.js';
 import { NO_DOORS_SENTENCE, pickConnectionDoor, resolveConnectionDoors } from '../../../page-edit/endpointPick.js';

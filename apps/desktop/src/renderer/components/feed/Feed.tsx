@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Check, ChevronRight, FileText, Square, X } from 'lucide-react';
-import type { ActivityStep } from '@tent-nocode/core';
+import type { ActivityStep } from '@nodeloom/core';
 import type { MessageRow } from '../../../shared/ipc.js';
 import { groupLiveVerb, toolLabel, type FeedChip, type FeedItem, type FoldedItem } from '../../lib/feed/feed.js';
 import { advanceReveal } from '../../lib/feed/smooth.js';

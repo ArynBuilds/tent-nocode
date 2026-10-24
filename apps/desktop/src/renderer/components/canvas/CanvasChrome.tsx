@@ -1,5 +1,5 @@
 import { memo, useEffect, useRef, useState } from 'react';
-import type { VerbDoor } from '@tent-nocode/core';
+import type { VerbDoor } from '@nodeloom/core';
 import { PROXIMITY_RADIUS, SCREEN_VIEW_SCALE, hasInPort, hasOutPort, nearestNode, nodeScreenRect, store, toScreen, toolbarFor, useValue } from '../../lib/canvas/store.js';
 import type { Placed } from '../../lib/canvas/store.js';
 import { SelectionChrome } from './SelectionChrome.js';

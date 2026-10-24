@@ -1,11 +1,11 @@
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from 'node:http';
 import postgres from 'postgres';
-import { applyRoomsLineage, createPublishDoor, createRoomRouter, type RoomRouter } from '@tent-nocode/room-server';
+import { applyRoomsLineage, createPublishDoor, createRoomRouter, type RoomRouter } from '@nodeloom/room-server';
 import {
   evaluateTriggers, handleOauthCallback, processPendingIntegrationExecutions, receiveWebhook,
   runMigrations, startLiveWatcher, sweepDueImports, sweepDueMirrors, sweepFlowExecutions, triggerSweepDueOrgs,
   type LiveWatcherHandle, type WorkspaceDeps,
-} from '@tent-nocode/kernel';
+} from '@nodeloom/kernel';
 import { verifyAccountToken } from './accountToken.js';
 import { armServingRoles, ensureHostDatabases, withDatabase, type HostDatabaseUrls } from './hostDatabases.js';
 import { readBodyCapped } from './visitor.js';
@@ -105,7 +105,7 @@ function createHostServer({ cfg, urls, runtime, workspace }: HostDeps): { server
         clients: oauthClientsFromEnv,
       }, { code, state });
       res.writeHead(verdict.ok ? 200 : 400, { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store' });
-      res.end(`<!doctype html><meta charset="utf-8"><title>Tent NoCode</title><body style="font-family:system-ui;background:#141414;color:#ececec;display:grid;place-items:center;height:100vh;margin:0"><p>${verdict.sentence}</p></body>`);
+      res.end(`<!doctype html><meta charset="utf-8"><title>Nodeloom</title><body style="font-family:system-ui;background:#141414;color:#ececec;display:grid;place-items:center;height:100vh;margin:0"><p>${verdict.sentence}</p></body>`);
       return;
     }
 
@@ -121,7 +121,7 @@ function createHostServer({ cfg, urls, runtime, workspace }: HostDeps): { server
       // Signature headers for scheme dispatch (Node lowercases names) plus content-type for urlencoded parse.
       const sigHeaders: Record<string, string> = {};
       for (const name of [
-        'x-tent-nocode-signature', 'x-signature', 'stripe-signature', 'paddle-signature',
+        'x-nodeloom-signature', 'x-signature', 'stripe-signature', 'paddle-signature',
         'x-slack-signature', 'x-slack-request-timestamp', 'linear-signature',
         'x-gitlab-token', 'calendly-webhook-signature', 'x-telegram-bot-api-secret-token',
         'box-signature-primary', 'box-signature-secondary', 'box-delivery-timestamp',

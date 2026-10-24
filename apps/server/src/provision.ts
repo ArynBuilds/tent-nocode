@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import type postgres from 'postgres';
-import { importPackage, validateLsgPackage, type ImportResult } from '@tent-nocode/kernel';
-import type { LsgPackage } from '@tent-nocode/core';
+import { importPackage, validateLsgPackage, type ImportResult } from '@nodeloom/kernel';
+import type { LsgPackage } from '@nodeloom/core';
 
 /** Provision is the owner's act: renders closure verbatim, requires consent by hash, never bare --yes. */
 
@@ -80,7 +80,7 @@ export async function provisionApp(
   }
   const validated = validateLsgPackage(raw);
   if (!validated.ok) {
-    return { ok: false, refusal: `This file is not a valid Tent NoCode package: ${validated.errors[0] ?? 'malformed'}. Nothing was installed.` };
+    return { ok: false, refusal: `This file is not a valid Nodeloom package: ${validated.errors[0] ?? 'malformed'}. Nothing was installed.` };
   }
   const pkg = validated.pkg;
 

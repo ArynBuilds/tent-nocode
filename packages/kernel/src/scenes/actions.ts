@@ -2,7 +2,7 @@ import type postgres from 'postgres';
 import {
   flowEnvelopeSchema, sceneActionsSchema, sceneBindingsSchema, sceneDocumentSchema,
   type ActionAnswer, type ActionCriterion, type ActionEffect, type ActionExecution, type ActionRule, type ActionWhen, type SceneAction,
-} from '@tent-nocode/core';
+} from '@nodeloom/core';
 import { emitEvent } from '../events.js';
 import { projectArm } from '../containment.js';
 import { validateRows } from '../tabs/datasets.js';

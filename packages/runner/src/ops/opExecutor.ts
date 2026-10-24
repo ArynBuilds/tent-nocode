@@ -3,8 +3,8 @@ import { closeSync, copyFileSync, existsSync, mkdirSync, openSync, statSync, wri
 import { readFileSync as readBytes } from 'node:fs';
 import { join } from 'node:path';
 import type postgres from 'postgres';
-import { operationCodeHash } from '@tent-nocode/kernel';
-import { parseNpyHeader, type DatasetQuery } from '@tent-nocode/core';
+import { operationCodeHash } from '@nodeloom/kernel';
+import { parseNpyHeader, type DatasetQuery } from '@nodeloom/core';
 import { readFileSync } from 'node:fs';
 import { toOpsKernelPort, type OpsKernelPort } from '../kernelPort.js';
 import { getOpsPool } from './workerPool.js';

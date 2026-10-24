@@ -1,5 +1,5 @@
-import { PRIMITIVES, SHARED_GROUPS, STATE_NAMES, typeText } from '@tent-nocode/core';
-import type { GroupName, PrimitiveName, PropertyDef, PropertyTable, StateName, UnitGroup } from '@tent-nocode/core';
+import { PRIMITIVES, SHARED_GROUPS, STATE_NAMES, typeText } from '@nodeloom/core';
+import type { GroupName, PrimitiveName, PropertyDef, PropertyTable, StateName, UnitGroup } from '@nodeloom/core';
 
 // THE PANEL'S PURE HALF (Phase 12, row 12.16): primitives.ts is the schema, this file turns it into
 // sections and rows - one section per shared group plus the primitive's own group, a row kind per

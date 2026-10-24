@@ -1,5 +1,5 @@
-import { keyBetween, primitiveOfNode, primitiveRef } from '@tent-nocode/core';
-import type { SceneNode } from '@tent-nocode/core';
+import { keyBetween, primitiveOfNode, primitiveRef } from '@nodeloom/core';
+import type { SceneNode } from '@nodeloom/core';
 import { StateNode, type Editor, type PointerInfo } from '../StateNode.js';
 import { inFreeParent } from '../../managers/nudge.js';
 import { withScopedValues } from '../../../../components/page-edit/panelGroups.js';

@@ -1,4 +1,4 @@
-import type { OrgRole } from '@tent-nocode/core';
+import type { OrgRole } from '@nodeloom/core';
 
 /** Single source for actions and their role gates; enforced in main/ipc/registry.ts. */
 export type DeskAction =

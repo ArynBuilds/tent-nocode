@@ -3,7 +3,7 @@ import {
   emptyDiff, isDiffEmpty, reverseDiff, squashInto, store,
   type ArrangementRecord, type CanvasStore, type ElementRecord, type RecordsDiff, type ScreenRecord,
 } from './store.js';
-import type { SceneNode } from '@tent-nocode/core';
+import type { SceneNode } from '@nodeloom/core';
 
 // HISTORY AS DIFFS (Phase 12, row 12.14; tldraw's HistoryManager shape). Every user change to the store
 // lands in the pending diff through one interceptor; a gesture marks a stop when it starts and completes

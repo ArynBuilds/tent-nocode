@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-/** Loads server config from env and tent-nocode-server.config.json with named refusals for missing keys. */
+/** Loads server config from env and nodeloom-server.config.json with named refusals for missing keys. */
 
 export class ConfigRefusal extends Error {
   constructor(message: string) {
@@ -26,7 +26,7 @@ export interface ServerConfig {
 }
 
 export const DEFAULT_PORT = 4680;
-export const CONFIG_FILE_NAME = 'tent-nocode-server.config.json';
+export const CONFIG_FILE_NAME = 'nodeloom-server.config.json';
 
 interface FileConfig {
   port?: number;
@@ -63,7 +63,7 @@ function parsePort(raw: string): number {
   return port;
 }
 
-/** A Tent NoCode checkout runs from its own tree; a built bundle carries resources/ and migrations/ beside it. */
+/** A Nodeloom checkout runs from its own tree; a built bundle carries resources/ and migrations/ beside it. */
 function layoutOf(rootDir: string): Pick<ServerConfig, 'enginesDir' | 'fontsDir' | 'opsDir' | 'opsWorkerFile' | 'migrationsDir'> {
   if (existsSync(join(rootDir, 'apps', 'desktop'))) {
     return {
@@ -98,7 +98,7 @@ export function loadConfig(input: {
   if (databaseUrl === undefined || databaseUrl === '') {
     throw new ConfigRefusal(
       'DATABASE_URL is not set. Point it at any Postgres 15+ database, e.g. '
-      + 'postgres://user:password@localhost:5432/tent-nocode.',
+      + 'postgres://user:password@localhost:5432/nodeloom.',
     );
   }
 
@@ -117,7 +117,7 @@ export function loadConfig(input: {
     throw new ConfigRefusal(`TENT_APP points at "${appPath}", but no file exists there.`);
   }
 
-  const dataDir = env['TENT_DATA'] !== undefined && env['TENT_DATA'] !== '' ? env['TENT_DATA'] : join(rootDir, 'tent-nocode-data');
+  const dataDir = env['NODELOOM_DATA'] !== undefined && env['NODELOOM_DATA'] !== '' ? env['NODELOOM_DATA'] : join(rootDir, 'nodeloom-data');
 
   return {
     databaseUrl,

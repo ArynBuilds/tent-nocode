@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import type postgres from 'postgres';
-import { KEBAB_RE } from '@tent-nocode/core';
+import { KEBAB_RE } from '@nodeloom/core';
 import { createReactiveChain, revokeReactiveChain } from './reactive.js';
 import type { ActionSpec } from '../chat/actions.js';
 

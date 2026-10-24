@@ -1,11 +1,11 @@
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import type postgres from 'postgres';
-import { encodeWorkspaceWire } from '@tent-nocode/core';
-import { buildPackageClosure, projectAssistantName } from '@tent-nocode/kernel';
+import { encodeWorkspaceWire } from '@nodeloom/core';
+import { buildPackageClosure, projectAssistantName } from '@nodeloom/kernel';
 import {
   callProcedure, workspaceRouter, type WorkspaceDeps,
   activeSceneTargets, createLiveDeltas, isPointerEvent, type LiveDeltas, type LivePush,
-} from '@tent-nocode/kernel';
+} from '@nodeloom/kernel';
 import { readBodyCapped } from '../visitor.js';
 import { resolveWorkspaceIdentity } from './auth.js';
 

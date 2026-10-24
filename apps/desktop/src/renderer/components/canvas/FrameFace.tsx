@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
-import { DEFAULT_BREAKPOINTS } from '@tent-nocode/core';
-import { mountScene } from '@tent-nocode/tentkit';
-import type { EditorEvent, SceneData, SceneMount } from '@tent-nocode/tentkit';
+import { DEFAULT_BREAKPOINTS } from '@nodeloom/core';
+import { mountScene } from '@nodeloom/tentkit';
+import type { EditorEvent, SceneData, SceneMount } from '@nodeloom/tentkit';
 import { desk } from '../../lib/desk.js';
 import { useOrg } from '../../lib/OrgContext.js';
 import { useLivePush } from '../../lib/data/useLive.js';
@@ -96,7 +96,7 @@ function LiveFrame({ frame, width, height }: { frame: ScreenFrameProps; width: n
     const mount = mountScene(host, {
       document: first, mode: 'edit', hostEvents: true, library,
       theme: { breakpoints: { ...DEFAULT_BREAKPOINTS } },
-      // The design width feeds the reflow; the breakpoint survives the device-switch remount (:115's size dep).
+      // The design width feeds the reflow; a width change remounts the face and keeps the editing breakpoint.
       designWidth: screen.size.w,
       breakpoint: store.editing.breakpoint,
       onAction: (name, values) => {

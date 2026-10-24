@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Plug, Shapes, Workflow } from 'lucide-react';
-import { PRIMITIVES, citizenWord, elementPortRule, legalTargets } from '@tent-nocode/core';
-import type { PrimitiveName } from '@tent-nocode/core';
+import { PRIMITIVES, citizenWord, elementPortRule, legalTargets } from '@nodeloom/core';
+import type { PrimitiveName } from '@nodeloom/core';
 import { useFocusedProject } from '../../lib/FocusContext.js';
 import { useOrg } from '../../lib/OrgContext.js';
 import { INSERT_ROWS, NAMED_INSERTS, kebabName, store, useValue } from '../../lib/canvas/store.js';

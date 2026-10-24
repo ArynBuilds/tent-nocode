@@ -2,7 +2,7 @@ import { mkdtemp, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import type postgres from 'postgres';
-import type { SpawnedRun } from '@tent-nocode/kernel';
+import type { SpawnedRun } from '@nodeloom/kernel';
 import { toKernelPort, type KernelPort } from './kernelPort.js';
 import type { RunnerConfig } from './runner.js';
 
@@ -71,7 +71,7 @@ export async function mountRunServers(
     // THE ROSTER: one server serving tools.ts, on every CLI-lane run.
     if (cfg.toolsMcpCommand !== undefined && cfg.toolsMcpCommand.length > 0) {
       const [tcmd, ...targs] = cfg.toolsMcpCommand;
-      servers['tent-nocode-tools'] = {
+      servers['nodeloom-tools'] = {
         command: tcmd as string, args: targs,
         env: {
           TOOLS_MCP_ORG: claim.orgId, TOOLS_MCP_RUN_ID: claim.runId, ELECTRON_RUN_AS_NODE: '1',
@@ -95,7 +95,7 @@ export async function mountRunServers(
         maxPagesPerRun: 20, minContentBytes: 200, lowContentLimit: 4,
       }));
       const [bcmd, ...bargs] = cfg.browserMcpCommand;
-      servers['tent-nocode-browser'] = {
+      servers['nodeloom-browser'] = {
         command: bcmd as string, args: bargs,
         env: {
           BROWSE_MCP_ORG: claim.orgId, BROWSE_MCP_RUN_ID: claim.runId,
@@ -117,7 +117,7 @@ export async function mountRunServers(
         && cfg.panelBrowserMcpCommand !== undefined && cfg.panelBrowserMcpCommand.length > 0
         && cfg.browseChannel !== undefined) {
       const [pcmd, ...pargs] = cfg.panelBrowserMcpCommand;
-      servers['tent-nocode-panelbrowser'] = {
+      servers['nodeloom-panelbrowser'] = {
         command: pcmd as string, args: pargs,
         env: {
           PANEL_MCP_ORG: claim.orgId, PANEL_MCP_RUN_ID: claim.runId,
@@ -148,7 +148,7 @@ export async function mountRunServers(
     if (Object.keys(servers).length > 0) {
       // The config carries secrets, so it must live outside the model's workspace;
       // write it to an unguessable temp dir and hand the CLI its absolute path.
-      out.mcpConfigDir = await mkdtemp(join(tmpdir(), 'tent-nocode-mcp-'));
+      out.mcpConfigDir = await mkdtemp(join(tmpdir(), 'nodeloom-mcp-'));
       out.mcpConfigFile = join(out.mcpConfigDir, 'mcp.json');
       await writeFile(out.mcpConfigFile, JSON.stringify({ mcpServers: servers }, null, 2), 'utf8');
     }

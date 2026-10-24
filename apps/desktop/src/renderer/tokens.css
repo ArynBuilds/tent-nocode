@@ -55,7 +55,7 @@
   --code-function: #f0f0f0;
   --code-type: #9fd3e6;
   --mono: 'JetBrains Mono', ui-monospace, monospace;
-  /* Geist ratified 2026-08-11 (the type bake-off): Tent NoCode CHROME wears Geist;
+  /* Geist ratified 2026-08-11 (the type bake-off): Nodeloom CHROME wears Geist;
      scenes keep their own faces (the serving font stack is untouched by law). */
   --sans: 'Geist', 'Inter', system-ui, sans-serif;
   /* Radius scale (ratified 2026-07-20): rounded, tiered, capsule reserved.

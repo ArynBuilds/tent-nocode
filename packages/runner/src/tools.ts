@@ -1,11 +1,11 @@
 import type postgres from 'postgres';
 import { z } from 'zod';
 import { tool, type Tool, type ToolSet } from 'ai';
-import type { ApiTurnContext, DatasetQuery, PrimitiveName, SceneOp } from '@tent-nocode/core';
+import type { ApiTurnContext, DatasetQuery, PrimitiveName, SceneOp } from '@nodeloom/core';
 import {
   datasetQuerySchema, isPrimitiveName, nearestPrimitiveNames, plainValue, primitiveOfNode, primitiveRef,
   renderPrimitiveTypedef, renderSharedGroupsTypedef,
-} from '@tent-nocode/core';
+} from '@nodeloom/core';
 import {
   applyIntentBlock, compileFlowDialectAt,
   compileProjectDialectAt, compileSceneDialectAt, emitEvent, ensureDataset, evolveDataset,
@@ -18,7 +18,7 @@ import {
   setProjectTheme, landCanvasDoor, findOpenRuntimeApproval, requestRuntimeApproval, MAIN_FLOW, createDb, DIALECT_FIX_SENTENCE,
   BRIEF_PROMPT, projectBriefSchema, projectThemeSchema, THEME_COLOR_NAMES,
   type ConstructKind, type GovernedActionResult, type LintFinding, type ProjectBrief, type ProjectOp, type ProjectTheme, type ToolCall,
-} from '@tent-nocode/kernel';
+} from '@nodeloom/kernel';
 import { editExact, globBounded, grepBounded, readBounded, resolveAgainst, writeWhole } from './api/fileTools.js';
 import { ClaudeCodeDriver, compileCliInvocation } from './claudeDriver.js';
 
@@ -1134,7 +1134,7 @@ export async function startToolsMcpServer(): Promise<void> {
   };
   const { McpServer } = await import('@modelcontextprotocol/sdk/server/mcp.js');
   const { StdioServerTransport } = await import('@modelcontextprotocol/sdk/server/stdio.js');
-  const server = new McpServer({ name: 'tent-nocode-tools', version: '0.1.0' });
+  const server = new McpServer({ name: 'nodeloom-tools', version: '0.1.0' });
   for (const spec of productToolSpecs(deps)) {
     server.registerTool(
       spec.name,

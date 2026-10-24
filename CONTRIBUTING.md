@@ -1,6 +1,6 @@
-# Contributing to Tent NoCode
+# Contributing to Nodeloom
 
-Thank you for helping. Tent NoCode is an app builder people trust with their data and their projects, so we value small, well-explained changes that were tried in the running app over large rewrites.
+Thank you for helping. Nodeloom is an app builder people trust with their data and their projects, so we value small, well-explained changes that were tried in the running app over large rewrites.
 
 ## Ways to contribute
 
@@ -16,14 +16,14 @@ Good first areas: more integrations on the shelf (one data file each in `package
 You need Node.js 20 or newer and npm, on Windows. Claude Code, installed and signed in, is optional but makes the AI builder work without a key.
 
 ```sh
-git clone <your fork> tent-nocode && cd tent-nocode
+git clone <your fork> nodeloom && cd nodeloom
 npm install
 npm run desktop
 ```
 
 `npm run desktop` builds the screen engine and starts the app with hot reload for the interface. Main-process changes (`apps/desktop/src/main`, `apps/server`, `packages/*`) need a restart: close the window and run it again.
 
-The app keeps its data in `%APPDATA%\Tent NoCode`. To start over, close the app and delete that folder; your next launch creates a fresh database and asks you to sign up again.
+The app keeps its data in `%APPDATA%\Nodeloom`. To start over, close the app and delete that folder; your next launch creates a fresh database and asks you to sign up again.
 
 ## Checks
 

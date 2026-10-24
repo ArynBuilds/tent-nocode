@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
-import type { ContinuationRequest } from '@tent-nocode/core';
+import type { ContinuationRequest } from '@nodeloom/core';
 
 export interface MaterializedClaudeSession {
   sessionId: string;
@@ -39,11 +39,11 @@ export function materializeClaudeSession(
   projectsRoot: string = join(homedir(), '.claude', 'projects'),
 ): MaterializedClaudeSession {
   const cwd = normalizeCwd(req.cwd);
-  const sessionId = deterministicUuid(`tent-nocode-session:${req.key}`);
+  const sessionId = deterministicUuid(`nodeloom-session:${req.key}`);
   let parent: string | null = null;
   const lines: string[] = [];
   req.history.forEach((entry, idx) => {
-    const uuid = deterministicUuid(`tent-nocode-entry:${req.key}:${idx}`);
+    const uuid = deterministicUuid(`nodeloom-entry:${req.key}:${idx}`);
     const base = {
       parentUuid: parent,
       isSidechain: false,
@@ -51,7 +51,7 @@ export function materializeClaudeSession(
       message: entry.role === 'user'
         ? { role: 'user', content: entry.text }
         : {
-            model: 'claude-fable-5', id: `msg_tent_nocode_${idx}`, type: 'message', role: 'assistant',
+            model: 'claude-fable-5', id: `msg_nodeloom_${idx}`, type: 'message', role: 'assistant',
             content: [{ type: 'text', text: entry.text }], stop_reason: 'end_turn', stop_sequence: null,
           },
       uuid,

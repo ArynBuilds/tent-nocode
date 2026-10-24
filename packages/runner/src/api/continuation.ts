@@ -1,6 +1,6 @@
 import type postgres from 'postgres';
 import type { ModelMessage } from 'ai';
-import type { ContinuationHistoryEntry } from '@tent-nocode/core';
+import type { ContinuationHistoryEntry } from '@nodeloom/core';
 
 // Persists per-thread message arrays in Postgres; a disposable cache rebuilt from kernel history past the cap.
 

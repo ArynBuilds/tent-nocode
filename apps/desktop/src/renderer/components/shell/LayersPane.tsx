@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { BarChart3, Box, ChevronDown, ChevronRight, Square, TextCursorInput, Type } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
-import { keyBetween, primitiveOfNode } from '@tent-nocode/core';
-import type { PrimitiveName } from '@tent-nocode/core';
+import { keyBetween, primitiveOfNode } from '@nodeloom/core';
+import type { PrimitiveName } from '@nodeloom/core';
 import { store, useValue } from '../../lib/canvas/store.js';
 import type { ElementRecord, ScreenRecord } from '../../lib/canvas/store.js';
 import { useActiveEditor } from '../canvas/CanvasEngine.js';

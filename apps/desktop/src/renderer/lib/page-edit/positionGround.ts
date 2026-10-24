@@ -1,5 +1,5 @@
-import { keyBetween, primitiveOfNode, primitiveRef } from '@tent-nocode/core';
-import type { SceneNode } from '@tent-nocode/core';
+import { keyBetween, primitiveOfNode, primitiveRef } from '@nodeloom/core';
+import type { SceneNode } from '@nodeloom/core';
 import type { ElementRecord, Rect } from '../canvas/store.js';
 
 // The position ground over the five: a free child carries its own x/y and sizes on the shared groups.

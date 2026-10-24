@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import type { ConditionOp, FlowCondition } from '@tent-nocode/core';
+import type { ConditionOp, FlowCondition } from '@nodeloom/core';
 import { desk } from '../../lib/desk.js';
 import {
   ALL_CONDITION_OPS, CONDITION_WORDS, NO_RIGHT_OPS, cardControlsFor, cardParamWord,

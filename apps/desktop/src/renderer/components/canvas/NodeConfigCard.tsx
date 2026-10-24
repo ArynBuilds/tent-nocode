@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import { NODE_CONTRACTS } from '@tent-nocode/core';
-import type { NodeContract, VerbDoor } from '@tent-nocode/core';
+import { NODE_CONTRACTS } from '@nodeloom/core';
+import type { NodeContract, VerbDoor } from '@nodeloom/core';
 import type { CitizenSelection } from '../../lib/canvas/store.js';
 import { kindIcon } from '../../lib/canvas/store.js';
 import { humanLabel } from '../../lib/page-edit/flowWires.js';

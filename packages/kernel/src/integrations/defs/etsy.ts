@@ -18,7 +18,7 @@ export const etsy: IntegrationDef = {
     tokenUrl: 'https://api.etsy.com/v3/public/oauth/token',
     scopes: ['transactions_r', 'shops_r'],
     clientEnv: 'ETSY',
-    tokenHelp: 'Sign in with your Etsy account when connecting - Tent NoCode holds the keys, nothing to paste.',
+    tokenHelp: 'Sign in with your Etsy account when connecting - Nodeloom holds the keys, nothing to paste.',
   },
   endpoints: [
     {

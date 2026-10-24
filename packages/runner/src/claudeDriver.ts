@@ -4,8 +4,8 @@ import { join } from 'node:path';
 import type {
   CompiledInvocation, ContinuationRequest, DriverCapabilities, DriverHooks, DriverResult,
   PreparedContinuation, RunUsage,
-} from '@tent-nocode/core';
-import { KERNEL_DENY_RULES, cliSettingsFor, floorAskRules, type PermissionRule } from '@tent-nocode/kernel';
+} from '@nodeloom/core';
+import { KERNEL_DENY_RULES, cliSettingsFor, floorAskRules, type PermissionRule } from '@nodeloom/kernel';
 import type { ExecutionDriver } from './driver.js';
 import { materializeClaudeSession, writeClaudeSession } from './continuationClaude.js';
 import { NdjsonBuffer, mapStreamLine } from './streamParser.js';
@@ -179,7 +179,7 @@ export function compileCliInvocation(input: CliCompileInput): CompiledCliInvocat
     '--output-format', 'stream-json', '--verbose', '--include-partial-messages',
     // One ceiling for every run kind; budget caps, heartbeats, and cancel are the real guards.
     '--max-turns', String(input.maxTurns ?? 50),
-    '--append-system-prompt-file', '.tent-nocode-system.md',
+    '--append-system-prompt-file', '.nodeloom-system.md',
     // Deterministic permission surface, independent of the host's ~/.claude config.
     '--setting-sources', '',
     '--permission-mode', 'default',
@@ -187,24 +187,24 @@ export function compileCliInvocation(input: CliCompileInput): CompiledCliInvocat
   const mcpToolIds = [
     // The tools.ts roster server mounts the seven on every CLI-lane run.
     ...(input.surfaceTools === true
-      ? ['mcp__tent-nocode-tools__read', 'mcp__tent-nocode-tools__contract', 'mcp__tent-nocode-tools__rows',
-         'mcp__tent-nocode-tools__record', 'mcp__tent-nocode-tools__pixels', 'mcp__tent-nocode-tools__edit',
-         'mcp__tent-nocode-tools__brief']
+      ? ['mcp__nodeloom-tools__read', 'mcp__nodeloom-tools__contract', 'mcp__nodeloom-tools__rows',
+         'mcp__nodeloom-tools__record', 'mcp__nodeloom-tools__pixels', 'mcp__nodeloom-tools__edit',
+         'mcp__nodeloom-tools__brief']
       : []),
-    ...(input.browseTools === true ? ['mcp__tent-nocode-browser__browse_open'] : []),
+    ...(input.browseTools === true ? ['mcp__nodeloom-browser__browse_open'] : []),
     // acquire_browser is deliberately absent: its call falls to the permission wall; the other verbs are walled by the single-holder lease.
     ...(input.panelBrowserTools === true
-      ? ['mcp__tent-nocode-panelbrowser__open_page', 'mcp__tent-nocode-panelbrowser__read_page',
-         'mcp__tent-nocode-panelbrowser__screenshot', 'mcp__tent-nocode-panelbrowser__click',
-         'mcp__tent-nocode-panelbrowser__type_text', 'mcp__tent-nocode-panelbrowser__scroll',
-         'mcp__tent-nocode-panelbrowser__wait', 'mcp__tent-nocode-panelbrowser__hand_back',
-         'mcp__tent-nocode-panelbrowser__release_browser']
+      ? ['mcp__nodeloom-panelbrowser__open_page', 'mcp__nodeloom-panelbrowser__read_page',
+         'mcp__nodeloom-panelbrowser__screenshot', 'mcp__nodeloom-panelbrowser__click',
+         'mcp__nodeloom-panelbrowser__type_text', 'mcp__nodeloom-panelbrowser__scroll',
+         'mcp__nodeloom-panelbrowser__wait', 'mcp__nodeloom-panelbrowser__hand_back',
+         'mcp__nodeloom-panelbrowser__release_browser']
       : []),
   ];
   // An explicit mcpConfigPath also forces the flag: external MCP mounts have no pre-enumerable tool ids.
   if (mcpToolIds.length > 0 || input.mcpConfigPath !== undefined) {
     // The mcp-config can carry secrets, so it lives outside the model's workspace.
-    argv.push('--mcp-config', input.mcpConfigPath ?? '.tent-nocode-mcp.json');
+    argv.push('--mcp-config', input.mcpConfigPath ?? '.nodeloom-mcp.json');
   }
   let settingsJson: string | null = null;
   if (input.permissionRules.length > 0 || mcpToolIds.length > 0) {
@@ -216,7 +216,7 @@ export function compileCliInvocation(input: CliCompileInput): CompiledCliInvocat
       ...mcpToolIds.map((id) => ({ effect: 'allow' as const, pattern: id })),
     ]);
     settingsJson = JSON.stringify(settings, null, 2);
-    argv.push('--settings', input.settingsPath ?? '.tent-nocode-settings.json');
+    argv.push('--settings', input.settingsPath ?? '.nodeloom-settings.json');
   } else {
     // Tool-less by construction: --tools '' disables all tools, including any future built-ins.
     argv.push('--tools', '');
@@ -291,7 +291,7 @@ export class ClaudeCodeDriver implements ExecutionDriver {
   }
 
   async execute(inv: CompiledInvocation, hooks?: DriverHooks): Promise<DriverResult> {
-    const systemPromptFile = join(inv.cwd, '.tent-nocode-system.md');
+    const systemPromptFile = join(inv.cwd, '.nodeloom-system.md');
     await writeFile(systemPromptFile, inv.systemPrompt, 'utf8');
     const [file, ...prefix] = this.command;
     if (!file) throw new Error('ClaudeCodeDriver: empty command');

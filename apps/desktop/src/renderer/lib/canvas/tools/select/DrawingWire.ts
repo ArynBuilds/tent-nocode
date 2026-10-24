@@ -1,5 +1,5 @@
-import { checkWire, datasetGrantPatterns, elementPortRule, keyBetween, legalTargets, primitiveOfNode, primitiveRef, triggerKindWord } from '@tent-nocode/core';
-import type { ElementClass, WireEnd } from '@tent-nocode/core';
+import { checkWire, datasetGrantPatterns, elementPortRule, keyBetween, legalTargets, primitiveOfNode, primitiveRef, triggerKindWord } from '@nodeloom/core';
+import type { ElementClass, WireEnd } from '@nodeloom/core';
 import { desk } from '../../../desk.js';
 import { StateNode, type Editor, type PointerInfo } from '../StateNode.js';
 import { store, type ElementRecord, type NodeRecord, type Placed } from '../../store.js';

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-const KEY = 'tent-nocode-theme';
+const KEY = 'nodeloom-theme';
 type Theme = 'dark' | 'light';
 
 const HAS_DOM = typeof localStorage !== 'undefined' && typeof document !== 'undefined';

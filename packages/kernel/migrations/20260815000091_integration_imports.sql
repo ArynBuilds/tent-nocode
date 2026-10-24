@@ -1,7 +1,7 @@
 -- THE IMPORT DOORS (the 2026-08-14 factory spec §8.3 + the overnight ruling
 -- "leave them last, but build them all"): a migration door pulls a service's
 -- data ONCE (page by page through the ONE integration dispatch door, {kind:
--- 'import'} provenance) and RECREATES it as an ordinary Tent NoCode Table -
+-- 'import'} provenance) and RECREATES it as an ordinary Nodeloom Table -
 -- schema inferred from the rows themselves, landed upsert-by-key (repeatable,
 -- additive, the REC). This row is the import's whole record: what was asked,
 -- where it lands, how far it got, and its one honest error.

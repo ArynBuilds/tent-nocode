@@ -1,11 +1,11 @@
 import { z } from 'zod';
 import type postgres from 'postgres';
-import { releaseEngineSchema } from '@tent-nocode/core';
+import { releaseEngineSchema } from '@nodeloom/core';
 import {
   appendRoomRelease, currentRelease, deleteScene, emitEvent, ensureRoom, ensureRoomApp,
   findReleaseByPackageHash, importPackage, readTentkitBuild, setAppVisibility, validateAppSlug,
   validateLsgPackage,
-} from '@tent-nocode/kernel';
+} from '@nodeloom/kernel';
 
 // Publish door: validates the tproject@2 package, lands it through the one merge (supersede over the prior
 // release), appends the release with the tentkit build's integrity in its envelope; idempotent by package hash.
@@ -67,7 +67,7 @@ export function createPublishDoor(deps: {
     /** Unpublish: served screens tombstone and visibility flips off; releases stay append-only. */
     async unpublish(input: UnpublishInput): Promise<UnpublishResult> {
       const who = input.token ? await deps.verifyToken(input.token) : null;
-      if (!who) return { ok: false, refusal: 'sign in to unpublish - this door is tent-nocode-account authenticated' };
+      if (!who) return { ok: false, refusal: 'sign in to unpublish - this door is nodeloom-account authenticated' };
       const slugCheck = validateAppSlug(input.appSlug);
       if (!slugCheck.ok) return { ok: false, refusal: slugCheck.error };
       const lane = deps.connect();
@@ -101,7 +101,7 @@ export function createPublishDoor(deps: {
     },
     async publish(input: PublishInput): Promise<PublishResult> {
       const who = input.token ? await deps.verifyToken(input.token) : null;
-      if (!who) return { ok: false, refusal: 'sign in to publish - this door is tent-nocode-account authenticated' };
+      if (!who) return { ok: false, refusal: 'sign in to publish - this door is nodeloom-account authenticated' };
 
       const slugCheck = validateAppSlug(input.appSlug);
       if (!slugCheck.ok) return { ok: false, refusal: slugCheck.error };

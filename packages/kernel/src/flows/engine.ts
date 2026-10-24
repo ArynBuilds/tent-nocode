@@ -2,7 +2,7 @@ import type postgres from 'postgres';
 import {
   evalCondition, resolvePillValue, type FlowCondition, type FlowDoc, type FlowEnvelope,
   type FlowItem, type PillContext,
-} from '@tent-nocode/core';
+} from '@nodeloom/core';
 import { resolveFlowStepDef, type FlowStepDef } from './registry.js';
 import { runIntegrationCall } from '../integrations/dispatch.js';
 import { runOperation } from '../operations/dispatch.js';

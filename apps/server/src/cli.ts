@@ -3,7 +3,7 @@ import { join, resolve as resolvePath } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createInterface } from 'node:readline/promises';
 import postgres from 'postgres';
-import { listScenes } from '@tent-nocode/kernel';
+import { listScenes } from '@nodeloom/kernel';
 import { ConfigRefusal, loadConfig, type ServerConfig } from './config.js';
 import { bootFailureSentence, bootServer } from './boot.js';
 import { provisionApp } from './provision.js';
@@ -161,7 +161,7 @@ export async function runServerCli(argv: string[]): Promise<number> {
       case 'install': return await cmdInstall(flags);
       case 'serve': return await cmdServe(flags);
       default:
-        console.error('Usage: tent-nocode-server <install <app.tproject>|serve|status> [--root <dir>] [--accept-closure <hash>] [--arm <chain>]');
+        console.error('Usage: nodeloom-server <install <app.tproject>|serve|status> [--root <dir>] [--accept-closure <hash>] [--arm <chain>]');
         return 1;
     }
   } catch (err) {

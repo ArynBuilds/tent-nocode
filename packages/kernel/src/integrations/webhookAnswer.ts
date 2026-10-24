@@ -1,5 +1,5 @@
 import type postgres from 'postgres';
-import { flowEnvelopeSchema } from '@tent-nocode/core';
+import { flowEnvelopeSchema } from '@nodeloom/core';
 import { getFlow } from '../flows/store.js';
 
 // Holds a webhook caller up to ~8s for an answering flow's recorded answer; past the cap the 204 answers.

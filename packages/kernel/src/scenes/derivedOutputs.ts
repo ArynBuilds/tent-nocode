@@ -7,7 +7,7 @@ import {
   arrayDescriptorSchema, parseNpyHeader, npyByteLength, KEBAB_RE, DTYPE_BYTES,
   foldArrayStats, sceneBindingSchema,
   type ArrayDescriptor, type ArrayDtype, type ArrayStats, type AssetBinding, type StatsChunk,
-} from '@tent-nocode/core';
+} from '@nodeloom/core';
 import { emitEvent } from '../events.js';
 import { projectArm } from '../containment.js';
 

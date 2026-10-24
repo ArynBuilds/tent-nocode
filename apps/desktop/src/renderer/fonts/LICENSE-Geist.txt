@@ -1,4 +1,4 @@
 Geist (Vercel) - SIL Open Font License 1.1.
 Copyright 2023 Vercel, in collaboration with basement.studio.
-Bundled as Tent NoCode chrome type (Geist-Regular/Medium/SemiBold.woff2), self-hosted,
+Bundled as Nodeloom chrome type (Geist-Regular/Medium/SemiBold.woff2), self-hosted,
 no network fetch. Full license: https://openfontlicense.org

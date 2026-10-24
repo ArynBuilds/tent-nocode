@@ -1,4 +1,4 @@
-import type { FlowItem } from '@tent-nocode/core';
+import type { FlowItem } from '@nodeloom/core';
 import { SINGLE_IN, type FlowStepDef, type PureRunOutput } from '../stepTypes.js';
 
 /** Parses an RSS or Atom feed text field into one row per entry; fetching is not this step's job. */

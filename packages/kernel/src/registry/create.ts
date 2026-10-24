@@ -1,5 +1,5 @@
 import type postgres from 'postgres';
-import { genomeInputSchema, type GenomeInput } from '@tent-nocode/core';
+import { genomeInputSchema, type GenomeInput } from '@nodeloom/core';
 import { emitEvent } from '../events.js';
 
 /** Register a new draft agent; version content is only stored on publish. */

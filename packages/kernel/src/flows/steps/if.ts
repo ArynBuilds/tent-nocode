@@ -1,4 +1,4 @@
-import { conditionSchema, type FlowItem } from '@tent-nocode/core';
+import { conditionSchema, type FlowItem } from '@nodeloom/core';
 import { SINGLE_IN, type FlowStepDef, type PureRunOutput } from '../stepTypes.js';
 
 // Splits items disjoint onto true/false outputs via the shared condition grammar.

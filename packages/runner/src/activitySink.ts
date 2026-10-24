@@ -1,4 +1,4 @@
-import type { ActivityStep } from '@tent-nocode/core';
+import type { ActivityStep } from '@nodeloom/core';
 
 // Batches ActivitySteps into periodic flushes; caps per run and marks drops honestly.
 export class ActivitySink {

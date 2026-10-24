@@ -2,8 +2,8 @@ import { randomUUID } from 'node:crypto';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { BrowserWindow } from 'electron';
-import { libraryItemSchema, type LibraryItem } from '@tent-nocode/core';
-import { buildThemeCss, composeSceneHostPage, readTentkitBuild, registerMintPreviewRenderer } from '@tent-nocode/kernel';
+import { libraryItemSchema, type LibraryItem } from '@nodeloom/core';
+import { buildThemeCss, composeSceneHostPage, readTentkitBuild, registerMintPreviewRenderer } from '@nodeloom/kernel';
 import { feedSceneScript } from '../tabs/sceneEyes.js';
 
 // Renders an unpublished library item candidate to a preview PNG through the tentkit build; any failure

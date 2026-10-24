@@ -1,5 +1,5 @@
 import type postgres from 'postgres';
-import { ensureAccountOrg, type WorkspaceIdentity } from '@tent-nocode/kernel';
+import { ensureAccountOrg, type WorkspaceIdentity } from '@nodeloom/kernel';
 import { verifyAccountToken } from '../accountToken.js';
 
 /** Workspace door auth: the bearer is the desktop's account token; the account's workspace org resolves idempotently. */

@@ -3,7 +3,7 @@ import { generateText, stepCountIs, streamText, type LanguageModel, type ModelMe
 import type {
   CompiledInvocation, ContinuationRequest, DriverCapabilities, DriverHooks, DriverResult,
   PreparedContinuation, RunUsage,
-} from '@tent-nocode/core';
+} from '@nodeloom/core';
 import type { ExecutionDriver } from '../driver.js';
 import { STALL_MS } from '../claudeDriver.js';
 import { languageModelFor, resolveRegistryModel, vaultNameFor, type ModelEntry } from './providers.js';

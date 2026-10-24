@@ -1,4 +1,4 @@
-import type { RunUsage } from '@tent-nocode/core';
+import type { RunUsage } from '@nodeloom/core';
 
 // Maps AI SDK usage onto the effective-token weighting shared with the CLI lane.
 // SDK inputTokens is the TOTAL prompt count; the CLI's is uncached input - normalize first.

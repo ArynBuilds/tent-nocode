@@ -1,5 +1,5 @@
 import type postgres from 'postgres';
-import { flowDocSchema, FLOW_DOC_VERSION, type FlowDoc, type FlowItem } from '@tent-nocode/core';
+import { flowDocSchema, FLOW_DOC_VERSION, type FlowDoc, type FlowItem } from '@nodeloom/core';
 import { emitEvent } from '../events.js';
 import { resolveFlowStepDef } from './registry.js';
 import { getFlow, saveFlow, type FlowRow } from './store.js';

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import type { IntegrationCatalogWire } from '@tent-nocode/core';
+import type { IntegrationCatalogWire } from '@nodeloom/core';
 import { desk } from '../desk.js';
 
 /**

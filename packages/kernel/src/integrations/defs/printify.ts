@@ -16,7 +16,7 @@ export const printify: IntegrationDef = {
     tokenHelp: 'Generate a Personal Access Token under Connections in your Printify account settings.',
   },
   // Printify requires a User-Agent header on every request.
-  headers: { 'user-agent': 'tent-nocode' },
+  headers: { 'user-agent': 'nodeloom' },
   endpoints: [
     {
       id: 'list-orders',

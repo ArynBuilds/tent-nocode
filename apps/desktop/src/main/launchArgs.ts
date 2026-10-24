@@ -1,4 +1,4 @@
-import { importFormatFor } from '@tent-nocode/core';
+import { importFormatFor } from '@nodeloom/core';
 
 // Parses every launch payload: --focus-scene=<slug> and positional import files.
 // Flags are never trusted as payloads; import suffixes come from the import registry.

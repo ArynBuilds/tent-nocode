@@ -3,7 +3,7 @@ import { readFile, writeFile } from 'node:fs/promises';
 import { randomUUID } from 'node:crypto';
 import { basename, dirname, isAbsolute, join } from 'node:path';
 import { app, shell } from 'electron';
-import { importFormatFor } from '@tent-nocode/core';
+import { importFormatFor } from '@nodeloom/core';
 import { workspaceCall } from '../workspaceClient.js';
 import { assertOwnOrg, handle } from './registry.js';
 

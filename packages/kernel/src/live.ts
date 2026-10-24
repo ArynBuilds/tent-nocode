@@ -1,5 +1,5 @@
 import postgres from 'postgres';
-import { flowEnvelopeSchema, sceneBindingsSchema, tablesReadBy, type FlowEffect, type SceneBinding } from '@tent-nocode/core';
+import { flowEnvelopeSchema, sceneBindingsSchema, tablesReadBy, type FlowEffect, type SceneBinding } from '@nodeloom/core';
 import { executeSceneBinding } from './scenes/bindings.js';
 
 // THE PUSH (Phase 12, ruling 8): the LISTEN watcher parses desk_live pointers; the delta computer knows which

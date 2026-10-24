@@ -1,5 +1,5 @@
-import { primitiveOfNode, primitiveRef } from '@tent-nocode/core';
-import type { SceneNode } from '@tent-nocode/core';
+import { primitiveOfNode, primitiveRef } from '@nodeloom/core';
+import type { SceneNode } from '@nodeloom/core';
 import { freshId } from './flowWires.js';
 
 // The declared-action writes over the five and the wave C vocabulary: a frame's action {run: name} fires a

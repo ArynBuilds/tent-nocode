@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import type { OrgRole } from '@tent-nocode/core';
+import type { OrgRole } from '@nodeloom/core';
 import type { MessageRow } from '../../../shared/ipc.js';
 import { approvalAction, can } from '../../../shared/roles.js';
 import { desk } from '../../lib/desk.js';

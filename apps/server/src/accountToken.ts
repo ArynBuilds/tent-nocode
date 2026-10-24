@@ -9,8 +9,8 @@ export interface AccountIdentity {
   displayName?: string;
 }
 
-const ISSUER = 'tent-nocode-desktop';
-const AUDIENCE = 'tent-nocode-host';
+const ISSUER = 'nodeloom-desktop';
+const AUDIENCE = 'nodeloom-host';
 
 const b64url = (b: Buffer): string => b.toString('base64').replace(/=+$/, '').replace(/\+/g, '-').replace(/\//g, '_');
 const b64urlDecode = (s: string): Buffer => Buffer.from(s.replace(/-/g, '+').replace(/_/g, '/'), 'base64');

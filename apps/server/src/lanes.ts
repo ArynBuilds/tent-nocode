@@ -1,11 +1,11 @@
 import type postgres from 'postgres';
 // Zero-model wall: imports runner's OPS subpath only, never the model driver.
-import { processPendingOperationExecutions, type OpsExecutorConfig } from '@tent-nocode/runner/ops';
+import { processPendingOperationExecutions, type OpsExecutorConfig } from '@nodeloom/runner/ops';
 import {
   evaluateTriggers, processPendingIntegrationExecutions, sweepDueImports, sweepDueMirrors,
   sweepFlowExecutions, triggerSweepDueOrgs,
   type IntegrationExecutorConfig,
-} from '@tent-nocode/kernel';
+} from '@nodeloom/kernel';
 
 /** Server's whole runtime loop: executor sweep + idle cadence trigger sweep (pure kernel, zero-LLM). */
 

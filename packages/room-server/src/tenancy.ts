@@ -1,5 +1,5 @@
 import type postgres from 'postgres';
-import type { HostLookup } from '@tent-nocode/kernel';
+import type { HostLookup } from '@nodeloom/kernel';
 
 // Pins tenant context: every tenant-scoped statement runs in a transaction with transaction-local GUCs.
 

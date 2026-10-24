@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { SceneBinding } from '@tent-nocode/core';
+import type { SceneBinding } from '@nodeloom/core';
 import type { ComponentCatalogEntry } from '../../../shared/ipc.js';
 import { useLive } from '../../lib/data/useLive.js';
 import { useQuery } from '../../lib/data/useQuery.js';

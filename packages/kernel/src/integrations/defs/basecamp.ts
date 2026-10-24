@@ -22,7 +22,7 @@ export const basecamp: IntegrationDef = {
     tokenHelp: 'Click Sign in to Basecamp and approve access to your account - there is no key to paste.',
   },
   // Basecamp refuses requests without an app-identifying User-Agent (400).
-  headers: { 'user-agent': 'Tent NoCode (https://github.com/ArynBuilds/tentis)' },
+  headers: { 'user-agent': 'Nodeloom (https://github.com/ArynBuilds/tentis)' },
   endpoints: [
     {
       id: 'list-todos',

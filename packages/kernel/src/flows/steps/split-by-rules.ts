@@ -1,4 +1,4 @@
-import { conditionSchema, type FlowCondition, type FlowItem } from '@tent-nocode/core';
+import { conditionSchema, type FlowCondition, type FlowItem } from '@nodeloom/core';
 import { SINGLE_IN, type FlowStepDef, type PureRunOutput } from '../stepTypes.js';
 
 interface Rule {

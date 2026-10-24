@@ -55,7 +55,7 @@ export function AgentFrames({ visibleThreadIds }: { visibleThreadIds: string[] }
       >×</button>
       {shown.map((a) => (
         <div key={a.runId} className={styles.agentFrame} title={a.threadTitle}>
-          <span className={styles.agentFrameRole}>{a.role === 'desk' ? 'Tent NoCode' : a.role}</span>
+          <span className={styles.agentFrameRole}>{a.role === 'desk' ? 'Nodeloom' : a.role}</span>
           <span className={styles.agentFrameLine}>{stepLine(a.step)}</span>
         </div>
       ))}

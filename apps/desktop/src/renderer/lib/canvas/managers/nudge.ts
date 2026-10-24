@@ -1,4 +1,4 @@
-import { primitiveOfNode } from '@tent-nocode/core';
+import { primitiveOfNode } from '@nodeloom/core';
 import type { Editor } from '../tools/StateNode.js';
 import type { ElementRecord } from '../store.js';
 import { withScopedValues } from '../../../components/page-edit/panelGroups.js';

@@ -1,4 +1,4 @@
-import { statsGlance, type ArrayStats, type ContinuationHistoryEntry } from '@tent-nocode/core';
+import { statsGlance, type ArrayStats, type ContinuationHistoryEntry } from '@nodeloom/core';
 import type postgres from 'postgres';
 import { numberLines, projectDialectLens } from '../dialect.js';
 import { sanitizeLabel } from '../sanitize.js';

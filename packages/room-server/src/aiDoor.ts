@@ -2,7 +2,7 @@
 
 export const AI_DOOR_PATH = '/api/ai';
 
-/** Tent NoCode never supplies the inference key; callers bring their own. */
+/** Nodeloom never supplies the inference key; callers bring their own. */
 export const AI_DOOR_REFUSAL = "This app's assistant needs a key — connect yours.";
 
 export interface AiDoorResponse { status: number; body: string }

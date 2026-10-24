@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import type { SceneBinding } from '@tent-nocode/core';
+import type { SceneBinding } from '@nodeloom/core';
 import { desk } from '../../lib/desk.js';
 import { useOrg } from '../../lib/OrgContext.js';
 import { useLive } from '../../lib/data/useLive.js';

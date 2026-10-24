@@ -219,7 +219,7 @@ export function OnboardingGate({ step, auth }: {
       <div className={styles.gate}>
         <div className={styles.bar}><Titlebar /></div>
         <div className={styles.loading}>
-          <Logo size={56} className={styles.loadingMark} title="Tent NoCode is starting" />
+          <Logo size={56} className={styles.loadingMark} title="Nodeloom is starting" />
         </div>
       </div>
     );

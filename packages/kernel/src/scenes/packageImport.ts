@@ -2,7 +2,7 @@ import { basename } from 'node:path';
 import type postgres from 'postgres';
 import {
   documentToOps, stripImportExt, type LsgEntry, type LsgPackage, type SceneDocument,
-} from '@tent-nocode/core';
+} from '@nodeloom/core';
 import { canonicalContentHash, datasetEntryRows, validateLsgPackage } from './packageVerify.js';
 import { emitEvent } from '../events.js';
 import { operationCodeHash } from '../operations/registry.js';

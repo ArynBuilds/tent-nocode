@@ -9,8 +9,8 @@ import meteor from '@iconify-json/meteor-icons/icons.json' with { type: 'json' }
 import mage from '@iconify-json/mage/icons.json' with { type: 'json' };
 import sargam from '@iconify-json/si/icons.json' with { type: 'json' };
 import logos from '@iconify-json/logos/icons.json' with { type: 'json' };
-import { primitiveOfRef } from '@tent-nocode/core';
-import type { SceneDocument } from '@tent-nocode/core';
+import { primitiveOfRef } from '@nodeloom/core';
+import type { SceneDocument } from '@nodeloom/core';
 
 // Vendored icon sets resolved to shape data at the serve seam; nothing fetches at runtime - icons are data, never code.
 

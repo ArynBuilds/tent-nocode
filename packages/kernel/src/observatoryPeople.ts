@@ -1,5 +1,5 @@
 import type postgres from 'postgres';
-import { parseDatasetGrant } from '@tent-nocode/core';
+import { parseDatasetGrant } from '@nodeloom/core';
 import type { AutomationEdge, AutomationNode } from './observatory.js';
 
 // Staff, scope-grant, and notes projections for the automation graph.

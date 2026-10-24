@@ -1,11 +1,11 @@
 {
-  "name": "@tent-nocode/room-server",
+  "name": "@nodeloom/room-server",
   "version": "0.0.1",
   "type": "module",
   "exports": { ".": "./src/index.ts" },
   "dependencies": {
-    "@tent-nocode/core": "*",
-    "@tent-nocode/kernel": "*",
+    "@nodeloom/core": "*",
+    "@nodeloom/kernel": "*",
     "postgres": "^3.4.4",
     "zod": "^3.23.8"
   }

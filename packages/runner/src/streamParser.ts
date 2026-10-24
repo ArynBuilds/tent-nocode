@@ -1,4 +1,4 @@
-import type { ActivityStep } from '@tent-nocode/core';
+import type { ActivityStep } from '@nodeloom/core';
 
 /**
  * FR-173/174: pure mapping from claude CLI stream-json NDJSON lines to ActivitySteps.

@@ -19,7 +19,7 @@ export const xTwitter: IntegrationDef = {
     tokenUrl: 'https://api.x.com/2/oauth2/token',
     scopes: ['tweet.read', 'tweet.write', 'users.read', 'offline.access'],
     clientEnv: 'X',
-    tokenHelp: 'Sign in with your X account when connecting - Tent NoCode holds the keys, nothing to paste.',
+    tokenHelp: 'Sign in with your X account when connecting - Nodeloom holds the keys, nothing to paste.',
   },
   endpoints: [
     {

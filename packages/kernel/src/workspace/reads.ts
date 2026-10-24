@@ -1,7 +1,7 @@
 import type {
   ActivityRow, EventRow, JobKind, MessageRow,
   MessageType, RunRow, RunsOverviewDto, RunStatus, WorkRunView,
-} from '@tent-nocode/core';
+} from '@nodeloom/core';
 import type postgres from 'postgres';
 import { findActiveFolderGrant } from '../consent.js';
 import { z } from 'zod';

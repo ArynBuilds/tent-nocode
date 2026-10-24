@@ -38,7 +38,7 @@ export function Showcase() {
       <Ambient />
       <div className={styles.brand}>
         <Logo size={26} className={styles.brandMark} />
-        <span className={styles.brandName}>Tent NoCode</span>
+        <span className={styles.brandName}>Nodeloom</span>
       </div>
       <div className={styles.stage}>
         <svg className={styles.wires} width="440" height="340" viewBox="0 0 440 340">

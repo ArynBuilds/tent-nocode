@@ -31,9 +31,9 @@ export function ServerSection({ item, onGoExport }: { item: ProjectNavItem; onGo
             </button>
           </Step>
           <Step n={2} title="Copy the file to your server and name it app.tproject." />
-          <Step n={3} title="Get Tent NoCode on the server.">
+          <Step n={3} title="Get Nodeloom on the server.">
             <p className={styles.stepNote}>
-              With Node 20 or newer, clone the Tent NoCode repository, then run these two commands inside it:
+              With Node 20 or newer, clone the Nodeloom repository, then run these two commands inside it:
             </p>
             <CopyValue value="npm install" />
             <CopyValue value="npm run build:tentkit" />

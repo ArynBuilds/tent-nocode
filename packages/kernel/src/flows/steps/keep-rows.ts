@@ -1,4 +1,4 @@
-import { conditionSchema } from '@tent-nocode/core';
+import { conditionSchema } from '@nodeloom/core';
 import { SINGLE_IN, type FlowStepDef, type PureRunOutput } from '../stepTypes.js';
 
 /** Keeps only the rows that pass the condition; failing rows leave quietly. */

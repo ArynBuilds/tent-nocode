@@ -1,7 +1,7 @@
 import type postgres from 'postgres';
-import { sceneActionsSchema, tablesWrittenBy, type ActionAnswer, type FlowEffect } from '@tent-nocode/core';
-import { getSceneActionExecutionResult, getSceneActionFlowResult, requireScene, submitSceneAction } from '@tent-nocode/kernel';
-import type { HostLookup } from '@tent-nocode/kernel';
+import { sceneActionsSchema, tablesWrittenBy, type ActionAnswer, type FlowEffect } from '@nodeloom/core';
+import { getSceneActionExecutionResult, getSceneActionFlowResult, requireScene, submitSceneAction } from '@nodeloom/kernel';
+import type { HostLookup } from '@nodeloom/kernel';
 import { withTenant } from './tenancy.js';
 
 // Visitor action routes: declared scene actions through the kernel action wall; the answer carries its effects.

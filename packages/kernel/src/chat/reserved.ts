@@ -1,5 +1,5 @@
 import type postgres from 'postgres';
-import type { GenomeInput } from '@tent-nocode/core';
+import type { GenomeInput } from '@nodeloom/core';
 import { createAgent } from '../registry/create.js';
 import { publishVersion } from '../registry/publish.js';
 

@@ -1,5 +1,5 @@
-import { keyBetween, primitiveOfNode, propertiesOf, SHARED_GROUPS } from '@tent-nocode/core';
-import type { SceneNode } from '@tent-nocode/core';
+import { keyBetween, primitiveOfNode, propertiesOf, SHARED_GROUPS } from '@nodeloom/core';
+import type { SceneNode } from '@nodeloom/core';
 import { StateNode, type Editor, type PointerInfo } from '../StateNode.js';
 import type { ElementRecord } from '../../store.js';
 import { orderedByRail, withPlace } from './Translating.js';

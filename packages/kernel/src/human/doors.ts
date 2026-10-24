@@ -1,6 +1,6 @@
 import { readFile } from 'node:fs/promises';
 import type postgres from 'postgres';
-import { sceneBindingsSchema, type SceneBinding } from '@tent-nocode/core';
+import { sceneBindingsSchema, type SceneBinding } from '@nodeloom/core';
 import { emitEvent } from '../events.js';
 import { projectArm } from '../containment.js';
 import { ensureDataset, validateRows } from '../tabs/datasets.js';

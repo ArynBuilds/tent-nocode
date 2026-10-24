@@ -2,7 +2,7 @@ import { closeSync, openSync, readSync, statSync } from 'node:fs';
 import {
   arrayDescriptorSchema, parseNpyHeader, validateProjection, DTYPE_BYTES,
   type ArrayDescriptor, type ProjectionRequest, type ProjectionPlan,
-} from '@tent-nocode/core';
+} from '@nodeloom/core';
 
 // Reads a validated projection from a .npy file; only the needed strided runs, never the whole file.
 
